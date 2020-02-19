@@ -38,18 +38,19 @@ int makeHistograms(){//main
   const unsigned nS = 1;//nom,jesup/down,jerup/down...
   //  std::string syst[5] = {"Nominal","JESUP","JESDOWN","JERUP","JERDOWN"};
   std::string syst[9] = {"Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown",};
-  const unsigned nP = 1;//QCDW,Z,EWKW,Z
+  const unsigned nP = 2;//QCDW,Z,EWKW,Z
   // std::string proc[6] = {"QCDW","QCDZinv","QCDZll","EWKW","EWKZinv","EWKZll"};
   // std::string name[6] = {"WJETS","ZJETS","DY","EWKW","EWKZNUNU","EWKZll"};
 
   // std::string proc[6] = {"QCDZinv","QCDZll","EWKW","EWKZinv","EWKZll"};
   // std::string name[6] = {"ZJETS","DY","EWKW","EWKZNUNU","EWKZll"};
   
-  //  std::string proc[1] = {"DATA"};
-  std::string proc[1] = {"QCD"};
-  std::string year = "2018";
-  bool isMC = true;
-  std::string name[1] = {"QCD_" + year};
+  std::string proc[2] = {"DATA","QCD"};
+  //  std::string proc[1] = {"QCD"};
+  std::string year = "2017";
+
+  //std::string name[1] = {"QCD_" + year};
+  std::string name[2] = {"DATA_" + year, "QCD_" + year};
 
   //  std::string name[1] = {"DATA_2017"};
   //std::string name[1] = {"QCD"};
@@ -71,9 +72,8 @@ int makeHistograms(){//main
 	  selector->SetProcess(proc[iP]);
 	  std::cout << "Set Year" << std::endl;
 	  selector->SetYear(year);
-	  selector->SetMC(isMC);
 	  selector->SetSystematic(syst[iS]);
-	  selector->SetOutFileName(lPlotDir+"Histos_"+syst[iS]+"_"+proc[iP]+".root");
+	  selector->SetOutFileName(lPlotDir+"Histos_"+syst[iS]+"_"+proc[iP]+"_" + year + ".root");
 	  std::cout << " -- Tree " << syst[iS] << " " << proc[iP] << " entries = " << tree[iS][iP]->GetEntries() << ", outfile: " << selector->GetOutFileName() << std::endl;
 	  tree[iS][iP]->Process(selector);
 	}
