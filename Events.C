@@ -61,12 +61,12 @@ void Events::Begin(TTree * /*tree*/)
   mFout = TFile::Open(mOutFile.c_str(),"RECREATE");
     
   const unsigned nVars = 18;
-  std::string lVar[nVars] = {"MetNoLep","dijet_M","dijet_dEta","dijet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","JetMetmindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","dijet_M"};
+  std::string lVar[nVars] = {"MetNoLep","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M"};
   for (unsigned iV(0); iV<nVars; ++iV){//loop on variables
     mVarVec.push_back(lVar[iV]);
   }
   
-  std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","nJets (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","M_{jj} (GeV)"};
+  std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","nCleanJet30 (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","M_{jj} (GeV)"};
 
   //  const int nBins[nVars] = {350,380,120,50,84,52,100,100,10,180,60,60,7,10,10,10,10};
   const int nBins[nVars] = {500,380,120,50,84,52,100,100,10,180,60,60,7,10,10,10,40,6};
@@ -175,7 +175,7 @@ bool Events::CheckValue(ROOT::Internal::TTreeReaderValueBase& value) {
 void Events::SetTreeContent(std::string year){
 
 
-  //  bool isMC = !(static_cast*isData);
+  // / bool isMC = !(static_cast*isData);
 
   bool isMC = !static_cast<int>(*isData + 0.5);
   SetMC(isMC);
@@ -191,23 +191,23 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["decayLeptonId"] = *decayLeptonId;
     lTreeContent["CRLooseMuon_eventSelW"] = *CRLooseMuon_eventSelW;
     lTreeContent["CRVetoElectron_eventSelW"] = *CRVetoElectron_eventSelW;
-    lTreeContent["LooseMuon_eventVetoW_systID_up"] = *LooseMuon_eventVetoW_systID_up;
-    lTreeContent["LooseMuon_eventVetoW_systID_down"] = *LooseMuon_eventVetoW_systID_down;
+    // lTreeContent["LooseMuon_eventVetoW_systID_up"] = *LooseMuon_eventVetoW_systID_up;
+    // lTreeContent["LooseMuon_eventVetoW_systID_down"] = *LooseMuon_eventVetoW_systID_down;
     lTreeContent["LooseMuon_eventVetoW"] = *LooseMuon_eventVetoW;
     lTreeContent["xs_weight"] = *xs_weight;
     lTreeContent["GenMET_pt"] = *GenMET_pt;
     lTreeContent["Pileup_nTrueInt"] = *Pileup_nTrueInt;
     lTreeContent["VLooseSITTau_eventVetoW"] = *VLooseSITTau_eventVetoW;
-    lTreeContent["VLooseSITTau_eventVetoW_up"] = *VLooseSITTau_eventVetoW_up;
-    lTreeContent["VLooseSITTau_eventVetoW_down"] = *VLooseSITTau_eventVetoW_down;
-    lTreeContent["gen_pt0"] = *gen_pt0;
-    lTreeContent["gen_mjj"] = *gen_mjj;
+    // lTreeContent["VLooseSITTau_eventVetoW_up"] = *VLooseSITTau_eventVetoW_up;
+    // lTreeContent["VLooseSITTau_eventVetoW_down"] = *VLooseSITTau_eventVetoW_down;
+    lTreeContent["gen_pt0"] = *Gen_jet_pt;
+    lTreeContent["gen_mjj"] = *Gen_Mjj;
     lTreeContent["VLooseTau_eventVetoW"] = *VLooseTau_eventVetoW;
     lTreeContent["MediumBJet_eventVetoW"] = *MediumBJet_eventVetoW;
-    lTreeContent["MediumBJet_eventVetoW_up"] = *MediumBJet_eventVetoW_up;
-    lTreeContent["MediumBJet_eventVetoW_down"] = *MediumBJet_eventVetoW_down;
+    // lTreeContent["MediumBJet_eventVetoW_up"] = *MediumBJet_eventVetoW_up;
+    // lTreeContent["MediumBJet_eventVetoW_down"] = *MediumBJet_eventVetoW_down;
     lTreeContent["puWeight"] = *puWeight;
-    lTreeContent["LHE_Vpt"] = -1;
+    lTreeContent["LHE_Vpt"] = *LHE_Vpt;
     lTreeContent["LHE_Nb"] = *LHE_Nb;
     lTreeContent["LHE_Njets"] = *LHE_Njets;
     lTreeContent["LHE_Nglu"] = *LHE_Nglu;
@@ -215,67 +215,70 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["LHE_HT"] = *LHE_HT;
     lTreeContent["LHE_Nuds"] = *LHE_Nuds;
     lTreeContent["VetoElectron_eventVetoW"] = *VetoElectron_eventVetoW;
-    lTreeContent["VetoElectron_eventVetoW_systIDISO_up"] = *VetoElectron_eventVetoW_systIDISO_up;
-    lTreeContent["VetoElectron_eventVetoW_systIDISO_down"] = *VetoElectron_eventVetoW_systIDISO_down;
-    lTreeContent["gen_boson_pt"] = *gen_boson_pt;
+    // lTreeContent["VetoElectron_eventVetoW_systIDISO_up"] = *VetoElectron_eventVetoW_systIDISO_up;
+    // lTreeContent["VetoElectron_eventVetoW_systIDISO_down"] = *VetoElectron_eventVetoW_systIDISO_down;
+    lTreeContent["gen_boson_pt"] = *Gen_boson_pt;
     lTreeContent["nGenDressedLepton"] = *nGenDressedLepton;
     lTreeContent["VetoElectron_eventSelW"] = *VetoElectron_eventSelW;
     lTreeContent["LooseMuon_eventSelW"] = *LooseMuon_eventSelW;
     lTreeContent["GenMET_phi"] = *GenMET_phi;
     lTreeContent["CRTightElectron_eventSelW"] = *CRTightElectron_eventSelW;
-    lTreeContent["Pileup_nPU"] = *Pileup_nPU;
-    lTreeContent["nloSF_"] = *nloSF_;
     lTreeContent["CRTightMuon_eventSelW"] = *CRTightMuon_eventSelW;
+    lTreeContent["Pileup_nPU"] = *Pileup_nPU;
+    lTreeContent["fnlo_SF_EWK_corr"] = *fnlo_SF_EWK_corr;
+    lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"] = *fnlo_SF_QCD_corr_QCD_proc_MTR;
+    lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"] = *fnlo_SF_QCD_corr_QCD_proc_VTR;
+    lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
     if ( year == "2017" )
       lTreeContent["met_filters"] = *met_filters_2017_mc;
     else if  ( year == "2018" )
       lTreeContent["met_filters"] = *met_filters_2018_mc;
   }
-  else{
-    lTreeContent["decayLeptonId"] = 0;
-    lTreeContent["CRLooseMuon_eventSelW"] = 1;
-    lTreeContent["CRVetoElectron_eventSelW"] = 1;
-    lTreeContent["LooseMuon_eventVetoW_systID_up"] = 1;
-    lTreeContent["LooseMuon_eventVetoW_systID_down"] = 1;
-    lTreeContent["LooseMuon_eventVetoW"] = 1;
-    lTreeContent["xs_weight"] = 1;
-    lTreeContent["GenMET_pt"] = 0;
-    lTreeContent["Pileup_nTrueInt"] = -1;
-    lTreeContent["VLooseSITTau_eventVetoW"] = 1;
-    lTreeContent["VLooseSITTau_eventVetoW_up"] = 1;
-    lTreeContent["VLooseSITTau_eventVetoW_down"] = 1;
-    lTreeContent["gen_pt0"] = -1;
-    lTreeContent["VLooseTau_eventVetoW"] = 1;
-    lTreeContent["gen_mjj"] = -1;
-    lTreeContent["MediumBJet_eventVetoW"] = 1;
-    lTreeContent["MediumBJet_eventVetoW_up"] = 1;
-    lTreeContent["MediumBJet_eventVetoW_down"] = 1;
-    lTreeContent["puWeight"] = 1;
-    lTreeContent["LHE_Vpt"] = -1;
-    lTreeContent["LHE_Nb"] = -1;
-    lTreeContent["LHE_Njets"] = -1;
-    lTreeContent["LHE_Nglu"] = -1;
-    lTreeContent["LHE_Nc"] = -1;
-    lTreeContent["LHE_HT"] = -1;
-    lTreeContent["LHE_Nuds"] = -1;
-    lTreeContent["VetoElectron_eventVetoW"] = 1;
-    lTreeContent["VetoElectron_eventVetoW_systIDISO_up"] = 1;
-    lTreeContent["VetoElectron_eventVetoW_systIDISO_down"] = 1;
-    lTreeContent["gen_boson_pt"] = -1;
-    lTreeContent["nGenDressedLepton"] = -1;
-    lTreeContent["VetoElectron_eventSelW"] = 1;
-    lTreeContent["LooseMuon_eventSelW"] = 1;
-    lTreeContent["GenMET_phi"] = -1;
-    lTreeContent["CRTightElectron_eventSelW"] = 1;
-    lTreeContent["Pileup_nPU"] = -1;
-    lTreeContent["nloSF_"] = 1;
-    lTreeContent["CRTightMuon_eventSelW"] = 1;
-    if ( year == "2017" )
-      lTreeContent["met_filters"] = *met_filters_2017_data;
-    else if  ( year == "2018" )
-      lTreeContent["met_filters"] = *met_filters_2018_data;
+  // else{
+  //   lTreeContent["decayLeptonId"] = 0;
+  //   lTreeContent["CRLooseMuon_eventSelW"] = 1;
+  //   lTreeContent["CRVetoElectron_eventSelW"] = 1;
+  //   lTreeContent["LooseMuon_eventVetoW_systID_up"] = 1;
+  //   lTreeContent["LooseMuon_eventVetoW_systID_down"] = 1;
+  //   lTreeContent["LooseMuon_eventVetoW"] = 1;
+  //   lTreeContent["xs_weight"] = 1;
+  //   lTreeContent["GenMET_pt"] = 0;
+  //   lTreeContent["Pileup_nTrueInt"] = -1;
+  //   lTreeContent["VLooseSITTau_eventVetoW"] = 1;
+  //   lTreeContent["VLooseSITTau_eventVetoW_up"] = 1;
+  //   lTreeContent["VLooseSITTau_eventVetoW_down"] = 1;
+  //   lTreeContent["gen_pt0"] = -1;
+  //   lTreeContent["VLooseTau_eventVetoW"] = 1;
+  //   lTreeContent["gen_mjj"] = -1;
+  //   lTreeContent["MediumBJet_eventVetoW"] = 1;
+  //   lTreeContent["MediumBJet_eventVetoW_up"] = 1;
+  //   lTreeContent["MediumBJet_eventVetoW_down"] = 1;
+  //   lTreeContent["puWeight"] = 1;
+  //   lTreeContent["LHE_Vpt"] = -1;
+  //   lTreeContent["LHE_Nb"] = -1;
+  //   lTreeContent["LHE_Njets"] = -1;
+  //   lTreeContent["LHE_Nglu"] = -1;
+  //   lTreeContent["LHE_Nc"] = -1;
+  //   lTreeContent["LHE_HT"] = -1;
+  //   lTreeContent["LHE_Nuds"] = -1;
+  //   lTreeContent["VetoElectron_eventVetoW"] = 1;
+  //   lTreeContent["VetoElectron_eventVetoW_systIDISO_up"] = 1;
+  //   lTreeContent["VetoElectron_eventVetoW_systIDISO_down"] = 1;
+  //   lTreeContent["gen_boson_pt"] = -1;
+  //   lTreeContent["nGenDressedLepton"] = -1;
+  //   lTreeContent["VetoElectron_eventSelW"] = 1;
+  //   lTreeContent["LooseMuon_eventSelW"] = 1;
+  //   lTreeContent["GenMET_phi"] = -1;
+  //   lTreeContent["CRTightElectron_eventSelW"] = 1;
+  //   lTreeContent["Pileup_nPU"] = -1;
+  //   lTreeContent["nloSF_"] = 1;
+  //   lTreeContent["CRTightMuon_eventSelW"] = 1;
+  //   if ( year == "2017" )
+  //     lTreeContent["met_filters"] = *met_filters_2017_data;
+  //   else if  ( year == "2018" )
+  //     lTreeContent["met_filters"] = *met_filters_2018_data;
 
-  }
+
 
 
   lTreeContent["Zmumu_flag"] = *Zmumu_flag;
@@ -284,31 +287,31 @@ void Events::SetTreeContent(std::string year){
   lTreeContent["HLT_Photon200"] = *HLT_Photon200;
   lTreeContent["Wmunu_flag"] = *Wmunu_flag;
   lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] = *HLT_PFMETNoMu120_PFMHTNoMu120_IDTight;
-  lTreeContent["nMediumBJet"] = *nMediumBJet;
-  lTreeContent["Leading_el_eta"] = *Leading_el_eta;
+  // lTreeContent["nMediumBJet"] = *nMediumBJet;
+  // lTreeContent["Leading_el_eta"] = *Leading_el_eta;
   lTreeContent["Zee_flag"] = *Zee_flag;
   lTreeContent["HLT_Ele32_WPTight_Gsf"] = *HLT_Ele32_WPTight_Gsf;
-  lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60;
+lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60;
   lTreeContent["Subleading_jet_eta"] = *Subleading_jet_eta;
   lTreeContent["Wenu_flag"] = *Wenu_flag;
   lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"] = *HLT_TripleJet110_35_35_Mjj650_PFMET110;
-  lTreeContent["Met"] = *Met;
-  lTreeContent["dijet_M"] = *dijet_M;
+  lTreeContent["MET_pt"] = *MET_pt;
+  lTreeContent["diCleanJet_M"] = *diCleanJet_M;
   lTreeContent["nVLooseTau"] = *nVLooseTau;
-  lTreeContent["MetPhiNoLep"] = *MetPhiNoLep;
+  lTreeContent["MetNoLep_CleanJet_mindPhi"] = *MetNoLep_CleanJet_mindPhi;
   lTreeContent["nVetoElectron"] = *nVetoElectron;
   lTreeContent["Leading_jet_pt"] = *Leading_jet_pt;
   lTreeContent["DiVetoElectron_mass"] = *DiVetoElectron_mass;
   lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"] = *HLT_DiJet110_35_Mjj650_PFMET110;
-  lTreeContent["MetPhi"] = *MetPhi;
+  lTreeContent["MET_phi"] = *MET_phi;
   lTreeContent["Leading_jet_phi"] = *Leading_jet_phi;
   lTreeContent["Leading_muon_phi"] = *Leading_muon_phi;
   lTreeContent["Subleading_jet_phi"] = *Subleading_jet_phi;
   lTreeContent["Subleading_el_pt"] = *Subleading_el_pt;
   lTreeContent["Leading_jet_eta"] = *Leading_jet_eta;
   lTreeContent["HLT_IsoMu27"] = *HLT_IsoMu27;
-  lTreeContent["MetNoLep"] = *MetNoLep;
-  lTreeContent["dijet_dPhi"] = *dijet_dPhi;
+  lTreeContent["MetNoLep_pt"] = *MetNoLep_pt;
+  lTreeContent["diCleanJet_dPhi"] = *diCleanJet_dPhi;
   lTreeContent["Subleading_muon_phi"] = *Subleading_muon_phi;
   lTreeContent["Subleading_muon_eta"] = *Subleading_muon_eta;
   lTreeContent["Subleading_el_eta"] = *Subleading_el_eta;
@@ -316,15 +319,14 @@ void Events::SetTreeContent(std::string year){
   lTreeContent["HLT_Ele32_WPTight_Gsf_L1DoubleEG"] = *HLT_Ele32_WPTight_Gsf_L1DoubleEG;
   lTreeContent["PV_npvsGood"] = *PV_npvsGood;
   lTreeContent["Subleading_muon_pt"] = *Subleading_muon_pt;
-  lTreeContent["JetMetmindPhi"] = *JetMetmindPhi;
-  lTreeContent["nJets"] = *nJets;
+  lTreeContent["MetNoLep_CleanJet_mindPhi"] = *MetNoLep_CleanJet_mindPhi;
+  lTreeContent["nCleanJet30"] = *nCleanJet30;
   lTreeContent["DiLooseMuon_mass"] = *DiLooseMuon_mass;
-  lTreeContent["dijet_dEta"] = *dijet_dEta;
+  lTreeContent["diCleanJet_dEta"] = *diCleanJet_dEta;
   lTreeContent["Leading_el_phi"] = *Leading_el_phi;
   lTreeContent["Leading_muon_pt"] = *Leading_muon_pt;
   lTreeContent["nLoosePhoton"] = *nLoosePhoton;
   lTreeContent["nLooseMuon"] = *nLooseMuon;
-  lTreeContent["nCleanJet30"] = *nCleanJet30;
   lTreeContent["Subleading_jet_pt"] = *Subleading_jet_pt;
   lTreeContent["Leading_muon_eta"] = *Leading_muon_eta;
 }
@@ -338,9 +340,9 @@ Bool_t Events::BaseSelection(){
     pass = lTreeContent["nCleanJet30"]>=2
       && (lTreeContent["Leading_jet_pt"] > 80)
       && (lTreeContent["Subleading_jet_pt"] > 40)
-      && (lTreeContent["dijet_M"]>200)
-      && (lTreeContent["dijet_dEta"]>1)     
-      && (lTreeContent["dijet_dPhi"]<1.5)
+      && (lTreeContent["diCleanJet_M"]>200)
+      && (lTreeContent["diCleanJet_dEta"]>1)     
+      && (lTreeContent["diCleanJet_dPhi"]<1.5)
       && (lTreeContent["nLoosePhoton"]==0)
       && (lTreeContent["met_filters"]==0);
     if ( misMC ){      
@@ -418,7 +420,7 @@ Bool_t Events::PassSelection(){
   if (mReg==RegionType::SR){
     pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
     pass = pass && lTreeContent["MetNoLep"]>250;
-    pass = pass && lTreeContent["JetMetmindPhi"]>0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -433,27 +435,27 @@ Bool_t Events::PassSelection(){
   else if (mReg==RegionType::Wmu ){
     pass = pass && lTreeContent["MetNoLep"]>250;
     pass = pass && lTreeContent["Wmunu_flag"]==1 && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] == 1);
-    pass = pass && lTreeContent["JetMetmindPhi"]>0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
   }
   else if (mReg==RegionType::We){
     pass = pass && lTreeContent["MetNoLep"]>250;
     pass = pass && lTreeContent["Wenu_flag"]==1 && lTreeContent["HLT_Ele35_WPTight_Gsf"]==1 && lTreeContent["Leading_el_pt"]>40;
-    pass = pass && lTreeContent["JetMetmindPhi"]>0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
   }
   else if (mReg==RegionType::Zmumu){
     pass = pass && lTreeContent["MetNoLep"]>250;
     pass = pass && lTreeContent["Zmumu_flag"]==1 && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] == 1);
-    pass = pass && lTreeContent["JetMetmindPhi"]>0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
   }
   else if (mReg==RegionType::Zee){
     pass = pass && lTreeContent["MetNoLep"]>250;
     pass = pass && lTreeContent["Zee_flag"]==1 && lTreeContent["HLT_Ele35_WPTight_Gsf"]==1 && lTreeContent["Leading_el_pt"]>40;
-    pass = pass && lTreeContent["JetMetmindPhi"]>0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
   }
   else if (mReg==RegionType::QCDCR){
     pass = pass && lTreeContent["MetNoLep"]>250;
     pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["JetMetmindPhi"]<0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -470,7 +472,7 @@ Bool_t Events::PassSelection(){
     pass = pass && (lTreeContent["MetNoLep"]>100);
     pass = pass && (lTreeContent["MetNoLep"]<160);
     pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["JetMetmindPhi"]<0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -495,7 +497,7 @@ Bool_t Events::PassSelection(){
     }
 
     pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["JetMetmindPhi"]>0.5;
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
     if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
 
@@ -571,14 +573,12 @@ Bool_t Events::Process(Long64_t entry)
 
 
 
-
   fReader.SetLocalEntry(entry);
-
-
-   SetTreeContent(mYear);
+  SetTreeContent(mYear);
 
    if (entry%100000==0) std::cout << " -- processing entry " << entry/1000. << "k" << std::endl;
-   
+   if ( entry > 100 ) Abort("maxevents");
+     std::cout << __LINE__ << std::endl;
    //std::cout << " -- DEBUG: entry " << entry
    //	     << " METnoLep = " <<  lTreeContent["MetNoLep"]
    //	     << std::endl;
@@ -588,7 +588,7 @@ Bool_t Events::Process(Long64_t entry)
      if (!BaseSelection()){
        continue;
      }
-     
+       std::cout << __LINE__ << std::endl;
      //     std::cout << " -- event passes selection." << std::endl;
      
      for (unsigned iR(RegionType::SR); iR!=RegionType::Last; ++iR){//loop on region
@@ -596,7 +596,7 @@ Bool_t Events::Process(Long64_t entry)
        if (!PassSelection()){
 	 continue;
        }
-
+  std::cout << __LINE__ << std::endl;
        for (unsigned iV(0); iV<mHistVec[iR][iC].size(); ++iV){
 
 	 double weight = BaseWeight()*SelWeight();
@@ -604,7 +604,7 @@ Bool_t Events::Process(Long64_t entry)
 	 //   if (weight > 0.5 || weight < 0) weight = 0;
 	 //   //	   if (weight < 0) weight = 0;
 	 // }
-
+  std::cout << __LINE__ << std::endl;
 	 mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);
 
 

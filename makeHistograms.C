@@ -29,7 +29,8 @@
 int makeHistograms(){//main
 
   //std::string baseDir = "/home/hep/magnan/CMS/CHIP/analysis/output_skims/";
-  std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
+  //  std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
+  std::string baseDir = "/vols/cms/snwebb/Common/";
   std::string lPlotDir = "Plots/";
   const double lLumi = 41800;
 
@@ -47,10 +48,13 @@ int makeHistograms(){//main
   
   std::string proc[2] = {"DATA","QCD"};
   //  std::string proc[1] = {"QCD"};
-  std::string year = "2017";
+  std::string year = "2018";
 
   //std::string name[1] = {"QCD_" + year};
-  std::string name[2] = {"DATA_" + year, "QCD_" + year};
+  //  std::string name[2] = {"DATA_" + year, "QCD_" + year};
+  //  std::string name[2] = {"DATA_JetHT_" + year, "QCD_" + year};
+
+  std::string name[2] = {"JetHT", "QCD"};
 
   //  std::string name[1] = {"DATA_2017"};
   //std::string name[1] = {"QCD"};
@@ -62,7 +66,8 @@ int makeHistograms(){//main
   for (unsigned iS(0); iS<nS; ++iS){//loop on syst
     for (unsigned iP(0); iP<nP; ++iP){//loop on proc
       //      fin[iS][iP] = TFile::Open((baseDir+syst[iS]+"/"+name[iP]+".root").c_str());
-      fin[iS][iP] = TFile::Open((baseDir+"Nominal/"+name[iP]+".root").c_str());
+      //      fin[iS][iP] = TFile::Open((baseDir+"Nominal/"+name[iP]+".root").c_str());
+      fin[iS][iP] = TFile::Open((baseDir+"/"+year+"/"+name[iP]+".root").c_str());
       if (fin[iS][iP]){
 	fin[iS][iP]->cd();
 	tree[iS][iP] = (TTree*)gDirectory->Get("Events");
