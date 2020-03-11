@@ -25,10 +25,14 @@
 #include <string>
 #include <map>
 
-enum RegionType { SR=0, We=1, Wmu=2, Zee=3, Zmumu=4, QCDCR=5, QCDA=6, QCDB=7, Last };
+//enum RegionType { SR=0, We=1, Wmu=2, Zee=3, Zmumu=4, QCDCR=5, QCDA=6, QCDB=7, Last };
+
+enum RegionType { SR=0, QCDCR=1, QCDA=2, QCDB=3, Last };
 
 //enum CatType { MTR=0, MTRvetoTau=1, MTRvetoB=2, MTRvetoLep=3, MTRveto=4, LastCat };
-enum CatType { MTR=0, LastCat, MTRvetoTau=1, MTRvetoB=2, MTRvetoLep=3, MTRveto=4 };
+//enum CatType { MTR=0, LastCat, MTRvetoTau=1, MTRvetoB=2, MTRvetoLep=3, MTRveto=4 };
+
+enum CatType { MTR=0, VTR=1, LastCat, MTRvetoTau=2, MTRvetoB=3, MTRvetoLep=4, MTRveto=5 };
 
 class Events : public TSelector {
   
@@ -74,7 +78,7 @@ class Events : public TSelector {
  private:
    TFile *mFout;
    std::string mOutFile;
-   std::vector<string> mVarVec;
+   std::vector<std::string> mVarVec;
    std::vector<TH1F*> mHistVec[RegionType::Last][CatType::LastCat];
 
    CatType mCat;
@@ -216,19 +220,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> HLT_IsoMu27 ;
    TTreeReaderValue<Double_t> HLT_Ele32_WPTight_Gsf_L1DoubleEG ;
    TTreeReaderValue<Double_t> HLT_Photon200 ;
-
-
-
-   /* TTreeReaderValue<Double_t> LooseMuon_eventVetoW_systID_up  ; */
-   /* TTreeReaderValue<Double_t> VetoElectron_eventVetoW_systIDISO_up  ; */
-   /* TTreeReaderValue<Double_t> LooseMuon_eventVetoW_systID_down  ; */
-   /* TTreeReaderValue<Double_t> VetoElectron_eventVetoW_systIDISO_down  ; */
-   /* TTreeReaderValue<Double_t> VLooseSITTau_eventVetoW_up  ; */
-   /* TTreeReaderValue<Double_t> VLooseSITTau_eventVetoW_down  ; */
-   /* TTreeReaderValue<Double_t> MediumBJet_eventVetoW_up  ; */
-   /* TTreeReaderValue<Double_t> MediumBJet_eventVetoW_down  ; */
   
-
 };
 
 #endif

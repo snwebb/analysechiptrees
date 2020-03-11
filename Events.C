@@ -1,3 +1,4 @@
+#ifndef Events_cxx
 #define Events_cxx
 // The class definition in Events.h has been generated automatically
 // by the ROOT utility TTree::MakeSelector(). This class is derived
@@ -61,7 +62,7 @@ void Events::Begin(TTree * /*tree*/)
   mFout = TFile::Open(mOutFile.c_str(),"RECREATE");
     
   const unsigned nVars = 18;
-  std::string lVar[nVars] = {"MetNoLep","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M"};
+  std::string lVar[nVars] = {"MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M"};
   for (unsigned iV(0); iV<nVars; ++iV){//loop on variables
     mVarVec.push_back(lVar[iV]);
   }
@@ -141,13 +142,15 @@ void Events::SetCategory(const CatType & aCategory){
 }
 
 std::string Events::GetRegionStr(const RegionType & aRegion){
-  std::string reg[8] = {"SR","We","Wmu","Zee","Zmumu","QCDCR","QCDA","QCDB"};
+  //  std::string reg[8] = {"SR","We","Wmu","Zee","Zmumu","QCDCR","QCDA","QCDB"};
+  std::string reg[4] = {"SR","QCDCR","QCDA","QCDB"};
   if (aRegion==RegionType::Last) return "";
   return reg[static_cast<unsigned>(aRegion)];
 }
 
 std::string Events::GetCatStr(const CatType & aCat){
-  std::string cat[5] = {"MTR","MTRvetoTau","MTRvetoB","MTRvetoLep","MTRvetoAll"};
+  //  std::string cat[5] = {"MTR","MTRvetoTau","MTRvetoB","MTRvetoLep","MTRvetoAll"};
+  std::string cat[2] = {"MTR","VTR"};
   if (aCat==CatType::LastCat) return "";
   return cat[static_cast<unsigned>(aCat)];
 }
@@ -229,10 +232,10 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"] = *fnlo_SF_QCD_corr_QCD_proc_MTR;
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"] = *fnlo_SF_QCD_corr_QCD_proc_VTR;
     lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
-    if ( year == "2017" )
-      lTreeContent["met_filters"] = *met_filters_2017_mc;
-    else if  ( year == "2018" )
-      lTreeContent["met_filters"] = *met_filters_2018_mc;
+    // if ( year == "2017" )
+    //   lTreeContent["met_filters"] = *met_filters_2017_mc;
+    // else if  ( year == "2018" )
+    //   lTreeContent["met_filters"] = *met_filters_2018_mc;
   }
   // else{
   //   lTreeContent["decayLeptonId"] = 0;
@@ -278,6 +281,16 @@ void Events::SetTreeContent(std::string year){
   //   else if  ( year == "2018" )
   //     lTreeContent["met_filters"] = *met_filters_2018_data;
 
+
+
+    lTreeContent["VBF_MTR_QCD_CR_eff_Sel"] = * VBF_MTR_QCD_CR_eff_Sel;  
+    lTreeContent["VBF_VTR_QCD_CR_eff_Sel"] = * VBF_VTR_QCD_CR_eff_Sel;
+    lTreeContent["VBF_MTR_QCD_SR_eff_Sel"] = * VBF_MTR_QCD_SR_eff_Sel;
+    lTreeContent["VBF_VTR_QCD_SR_eff_Sel"] = * VBF_VTR_QCD_SR_eff_Sel;
+    lTreeContent["VBF_MTR_QCD_A_eff_Sel"] = * VBF_MTR_QCD_A_eff_Sel; 
+    lTreeContent["VBF_VTR_QCD_A_eff_Sel"] = * VBF_VTR_QCD_A_eff_Sel; 
+    lTreeContent["VBF_MTR_QCD_B_eff_Sel"] = * VBF_MTR_QCD_B_eff_Sel; 
+    lTreeContent["VBF_VTR_QCD_B_eff_Sel"] = * VBF_VTR_QCD_B_eff_Sel; 
 
 
 
@@ -336,15 +349,20 @@ Bool_t Events::BaseSelection(){
   
   bool pass=kTRUE;
   std::string catStr = GetCatStr(mCat);
+  //  std::cout << lTreeContent["Leading_jet_pt"] << " - " << lTreeContent["Subleading_jet_pt"] << std::endl;w
+  //  std::cout << lTreeContent["nCleanJet30"] << " - " << lTreeContent["diCleanJet_M"] << std::endl;
+  //  std::cout << lTreeContent["diCleanJet_dEta"] << " - " << lTreeContent["diCleanJet_dPhi"] << std::endl;
+  //  std::cout << lTreeContent["nLoosePhoton"] << " - " << lTreeContent["met_filters"] << std::endl;
+
   if (catStr.find("MTR")!=catStr.npos){
-    pass = lTreeContent["nCleanJet30"]>=2
-      && (lTreeContent["Leading_jet_pt"] > 80)
-      && (lTreeContent["Subleading_jet_pt"] > 40)
-      && (lTreeContent["diCleanJet_M"]>200)
-      && (lTreeContent["diCleanJet_dEta"]>1)     
-      && (lTreeContent["diCleanJet_dPhi"]<1.5)
-      && (lTreeContent["nLoosePhoton"]==0)
-      && (lTreeContent["met_filters"]==0);
+    //    pass = lTreeContent["nCleanJet30"]>=2
+      //      && (lTreeContent["Leading_jet_pt"] > 80)
+      //      && (lTreeContent["Subleading_jet_pt"] > 40)
+      //&& (lTreeContent["diCleanJet_M"]>200)
+      //      && (lTreeContent["diCleanJet_dEta"]>1)     
+      //      && (lTreeContent["diCleanJet_dPhi"]<1.5)
+      //      && (lTreeContent["nLoosePhoton"]==0);
+      //      && (lTreeContent["met_filters"]==0);
     if ( misMC ){      
       pass = pass 
 	&& (lTreeContent["xs_weight"] > 0);
@@ -353,20 +371,26 @@ Bool_t Events::BaseSelection(){
   }
   else if (catStr.find("VTR")!=catStr.npos){
     pass = kTRUE;
+
+    if ( misMC ){      
+      pass = pass 
+	&& (lTreeContent["xs_weight"] > 0);
+    }
+
   }
   
-  if (mCat==CatType::MTRvetoTau){
-    pass = pass && lTreeContent["nVLooseTau"]==0;
-  }
-  else if (mCat==CatType::MTRvetoB){
-    pass = pass && lTreeContent["nMediumBJet"]==0;
-  }
-  else if (mCat==CatType::MTRveto){
-    pass = pass && lTreeContent["nVLooseTau"]==0 && lTreeContent["nMediumBJet"]==0;
-  }
+  // if (mCat==CatType::MTRvetoTau){
+  //   pass = pass && lTreeContent["nVLooseTau"]==0;
+  // }
+  // else if (mCat==CatType::MTRvetoB){
+  //   pass = pass && lTreeContent["nMediumBJet"]==0;
+  // }
+  // else if (mCat==CatType::MTRveto){
+  //   pass = pass && lTreeContent["nVLooseTau"]==0 && lTreeContent["nMediumBJet"]==0;
+  // }
   
   if ( mProc == "QCD" ){
-    //    pass = pass && lTreeContent["LHE_HT"]>1000;
+    pass = pass && lTreeContent["LHE_HT"]>300;
   }
 
 
@@ -383,29 +407,36 @@ Double_t Events::BaseWeight(){
   double electronveto = lTreeContent["VetoElectron_eventVetoW"];
   double muonveto = lTreeContent["LooseMuon_eventVetoW"];
 
+  //  std::cout << tauveto << " - " <<bjetveto<< " - " << electronveto <<" - " << muonveto << std::endl;
+  //  std::cout << lTreeContent["L1PreFiringWeight_Nom"] <<std::endl;
+
+  // if ( tauveto < 0 ) tauveto = 0;
+  // if ( bjetveto < 0 ) bjetveto =0;
+  // if ( electronveto < 0 ) electronveto = 0;
+  // if ( muonveto < 0 ) muonveto = 0;
   // if ( tauveto > 0.9 && bjetveto > 0.9 && electronveto > 0.9 && muonveto > 0.9){
     
   // }
 
-  if ( mSyst == "TauVetoUp"){
-    tauveto = lTreeContent["VLooseSITTau_eventVetoW_up"];
-  }
-  else if ( mSyst == "TauVetoDown"){
-    tauveto = lTreeContent["VLooseSITTau_eventVetoW_down"];
-  }
-  else if ( mSyst == "BjetVetoUp"){
-    bjetveto = lTreeContent["MediumBJet_eventVetoW_up"];
-  }
-  else if ( mSyst == "BjetVetoDown"){
-    bjetveto = lTreeContent["MediumBJet_eventVetoW_down"];
-  }
+  // if ( mSyst == "TauVetoUp"){
+  //   tauveto = lTreeContent["VLooseSITTau_eventVetoW_up"];
+  // }
+  // else if ( mSyst == "TauVetoDown"){
+  //   tauveto = lTreeContent["VLooseSITTau_eventVetoW_down"];
+  // }
+  // else if ( mSyst == "BjetVetoUp"){
+  //   bjetveto = lTreeContent["MediumBJet_eventVetoW_up"];
+  // }
+  // else if ( mSyst == "BjetVetoDown"){
+  //   bjetveto = lTreeContent["MediumBJet_eventVetoW_down"];
+  // }
 
-  if (catStr.find("veto")==catStr.npos){
-    w *= tauveto*bjetveto;
-  }
-  else if (mCat==CatType::MTRvetoTau) w *= (lTreeContent["MediumBJet_eventVetoW"]);
-  else if (mCat==CatType::MTRvetoB) w *= (lTreeContent["VLooseSITTau_eventVetoW"]);
-  else if (mCat==CatType::MTRvetoLep) w *= (lTreeContent["VLooseSITTau_eventVetoW"])*(lTreeContent["MediumBJet_eventVetoW"]);
+  //  if (catStr.find("veto")==catStr.npos){
+  w *= tauveto*bjetveto*electronveto*muonveto;
+  //  }
+  // else if (mCat==CatType::MTRvetoTau) w *= (lTreeContent["MediumBJet_eventVetoW"]);
+  // else if (mCat==CatType::MTRvetoB) w *= (lTreeContent["VLooseSITTau_eventVetoW"]);
+  // else if (mCat==CatType::MTRvetoLep) w *= (lTreeContent["VLooseSITTau_eventVetoW"])*(lTreeContent["MediumBJet_eventVetoW"]);
   //  w =(lTreeContent["puWeight"])*(lTreeContent["xs_weight"])*mLumiPb;
 
   if ( !misMC ) w = 1.0;//Data
@@ -417,9 +448,22 @@ Double_t Events::BaseWeight(){
 Bool_t Events::PassSelection(){
 
   bool pass = kTRUE;
-  if (mReg==RegionType::SR){
+  
+  std::string lreg = "";
+
+  if (mCat==CatType::MTR){
+    lreg = "MTR";
     pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["MetNoLep"]>250;
+  }
+  else if  (mCat==CatType::VTR){
+    lreg = "VTR";
+    pass = pass && (lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"]==1 || lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"]==1);
+  }
+
+  if (mReg==RegionType::SR){
+    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_SR_eff_Sel"]);
+    //  pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
+    pass = pass && lTreeContent["MetNoLep_pt"]>250;
     pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
 
     if ( !misMC ){
@@ -432,29 +476,31 @@ Bool_t Events::PassSelection(){
 
     if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
-  else if (mReg==RegionType::Wmu ){
-    pass = pass && lTreeContent["MetNoLep"]>250;
-    pass = pass && lTreeContent["Wmunu_flag"]==1 && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] == 1);
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
-  }
-  else if (mReg==RegionType::We){
-    pass = pass && lTreeContent["MetNoLep"]>250;
-    pass = pass && lTreeContent["Wenu_flag"]==1 && lTreeContent["HLT_Ele35_WPTight_Gsf"]==1 && lTreeContent["Leading_el_pt"]>40;
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
-  }
-  else if (mReg==RegionType::Zmumu){
-    pass = pass && lTreeContent["MetNoLep"]>250;
-    pass = pass && lTreeContent["Zmumu_flag"]==1 && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] == 1);
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
-  }
-  else if (mReg==RegionType::Zee){
-    pass = pass && lTreeContent["MetNoLep"]>250;
-    pass = pass && lTreeContent["Zee_flag"]==1 && lTreeContent["HLT_Ele35_WPTight_Gsf"]==1 && lTreeContent["Leading_el_pt"]>40;
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
-  }
+  // else if (mReg==RegionType::Wmu ){
+  //   pass = pass && lTreeContent["MetNoLep_pt"]>250;
+  //   pass = pass && lTreeContent["Wmunu_flag"]==1 && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] == 1);
+  //   pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+  // }
+  // else if (mReg==RegionType::We){
+  //   pass = pass && lTreeContent["MetNoLep_pt"]>250;
+  //   pass = pass && lTreeContent["Wenu_flag"]==1 && lTreeContent["HLT_Ele35_WPTight_Gsf"]==1 && lTreeContent["Leading_el_pt"]>40;
+  //   pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+  // }
+  // else if (mReg==RegionType::Zmumu){
+  //   pass = pass && lTreeContent["MetNoLep_pt"]>250;
+  //   pass = pass && lTreeContent["Zmumu_flag"]==1 && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] == 1);
+  //   pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+  // }
+  // else if (mReg==RegionType::Zee){
+  //   pass = pass && lTreeContent["MetNoLep_pt"]>250;
+  //   pass = pass && lTreeContent["Zee_flag"]==1 && lTreeContent["HLT_Ele35_WPTight_Gsf"]==1 && lTreeContent["Leading_el_pt"]>40;
+  //   pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+  // }
   else if (mReg==RegionType::QCDCR){
-    pass = pass && lTreeContent["MetNoLep"]>250;
-    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
+    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_CR_eff_Sel"]);
+    pass = pass && lTreeContent["MetNoLep_pt"]>250;
+
+    //    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
     pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
 
     if ( !misMC ){
@@ -469,9 +515,10 @@ Bool_t Events::PassSelection(){
     if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
   else if (mReg==RegionType::QCDA){
-    pass = pass && (lTreeContent["MetNoLep"]>100);
-    pass = pass && (lTreeContent["MetNoLep"]<160);
-    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
+    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_A_eff_Sel"]);
+    pass = pass && (lTreeContent["MetNoLep_pt"]>100);
+    pass = pass && (lTreeContent["MetNoLep_pt"]<160);
+    //    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
     pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
 
     if ( !misMC ){
@@ -485,8 +532,11 @@ Bool_t Events::PassSelection(){
     if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
   else if (mReg==RegionType::QCDB){
-    pass = pass && lTreeContent["MetNoLep"]>100;
-    pass = pass && lTreeContent["MetNoLep"]<160;
+    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_B_eff_Sel"]);
+    pass = pass && lTreeContent["MetNoLep_pt"]>100;
+    pass = pass && lTreeContent["MetNoLep_pt"]<160;
+    //    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -496,8 +546,6 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
 
-    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
     if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
 
@@ -507,7 +555,8 @@ Bool_t Events::PassSelection(){
 
 Double_t Events::SelWeight(){
   double w = 1.;
-  
+
+  /*  
   if (mReg==RegionType::SR || mReg==RegionType::QCDCR ||  mReg==RegionType::QCDA ||  mReg==RegionType::QCDB){
     if (mCat!=CatType::MTRvetoLep && mCat!=CatType::MTRveto){
      
@@ -535,18 +584,19 @@ Double_t Events::SelWeight(){
     }
     //    if (mCat!=CatType::MTRvetoLep && mCat!=CatType::MTRveto) w *= (lTreeContent["LooseMuon_eventVetoW"]);
   }
-  else if (mReg==RegionType::Wmu){
-    w *= (lTreeContent["CRTightMuon_eventSelW"]);
-  }
-  else if (mReg==RegionType::We){
-    w *= (lTreeContent["CRTightElectron_eventSelW"]);
-  }
-  else if (mReg==RegionType::Zmumu){
-    w *= (lTreeContent["CRLooseMuon_eventSelW"])*(lTreeContent["CRTightMuon_eventSelW"]);
-  }
-  else if (mReg==RegionType::Zee){
-    w *= (lTreeContent["CRVetoElectron_eventSelW"])*(lTreeContent["CRTightElectron_eventSelW"]);
-  }
+  */
+  // else if (mReg==RegionType::Wmu){
+  //   w *= (lTreeContent["CRTightMuon_eventSelW"]);
+  // }
+  // else if (mReg==RegionType::We){
+  //   w *= (lTreeContent["CRTightElectron_eventSelW"]);
+  // }
+  // else if (mReg==RegionType::Zmumu){
+  //   w *= (lTreeContent["CRLooseMuon_eventSelW"])*(lTreeContent["CRTightMuon_eventSelW"]);
+  // }
+  // else if (mReg==RegionType::Zee){
+  //   w *= (lTreeContent["CRVetoElectron_eventSelW"])*(lTreeContent["CRTightElectron_eventSelW"]);
+  // }
 
   if ( !misMC ) w = 1.0;//Data
   return w;
@@ -575,12 +625,10 @@ Bool_t Events::Process(Long64_t entry)
 
   fReader.SetLocalEntry(entry);
   SetTreeContent(mYear);
-
-   if (entry%100000==0) std::cout << " -- processing entry " << entry/1000. << "k" << std::endl;
-   if ( entry > 100 ) Abort("maxevents");
-     std::cout << __LINE__ << std::endl;
+   if (entry%10000==0) std::cout << " -- processing entry " << entry/1000. << "k" << std::endl;
+   //   if ( entry > 100 ) Abort("maxevents");
    //std::cout << " -- DEBUG: entry " << entry
-   //	     << " METnoLep = " <<  lTreeContent["MetNoLep"]
+   //	     << " METnoLep = " <<  lTreeContent["MetNoLep_pt"]
    //	     << std::endl;
    
    for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on cat
@@ -588,27 +636,23 @@ Bool_t Events::Process(Long64_t entry)
      if (!BaseSelection()){
        continue;
      }
-       std::cout << __LINE__ << std::endl;
-     //     std::cout << " -- event passes selection." << std::endl;
-     
+     //     std::cout << " -- event passes selection." << std::endl;     
      for (unsigned iR(RegionType::SR); iR!=RegionType::Last; ++iR){//loop on region
        SetRegion(static_cast<RegionType>(iR));
        if (!PassSelection()){
 	 continue;
        }
-  std::cout << __LINE__ << std::endl;
        for (unsigned iV(0); iV<mHistVec[iR][iC].size(); ++iV){
-
+	 //	 std::cout << BaseWeight() << " - " << SelWeight() << std::endl;
 	 double weight = BaseWeight()*SelWeight();
 	 // if ( iR == 0 && iC == 0 ) {
 	 //   if (weight > 0.5 || weight < 0) weight = 0;
 	 //   //	   if (weight < 0) weight = 0;
 	 // }
-  std::cout << __LINE__ << std::endl;
 	 mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);
 
 
-	 //	 if ( mVarVec[iV] == "MetNoLep" ) 	 std::cout << iR << " - " << iC << " - " << iV << " - " << mHistVec[iR][iC][iV]->Integral() << std::endl;
+	 //	 if ( mVarVec[iV] == "MetNoLep_pt" ) 	 std::cout << iR << " - " << iC << " - " << iV << " - " << mHistVec[iR][iC][iV]->Integral() << std::endl;
 	 //	 mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],BaseWeight());
 	 // mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],1);
        }
@@ -637,3 +681,4 @@ void Events::Terminate()
   mFout->Close();
   
 }
+#endif

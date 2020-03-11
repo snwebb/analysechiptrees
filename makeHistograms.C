@@ -36,60 +36,91 @@ int makeHistograms(){//main
 
   
   //  const unsigned nS = 9;//nom,jesup/down,jerup/down...
-  const unsigned nS = 1;//nom,jesup/down,jerup/down...
+  //  const unsigned nS = 1;//nom,jesup/down,jerup/down...
   //  std::string syst[5] = {"Nominal","JESUP","JESDOWN","JERUP","JERDOWN"};
-  std::string syst[9] = {"Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown",};
-  const unsigned nP = 2;//QCDW,Z,EWKW,Z
+  //  std::vector<std::string> syst = {"Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown",};
+  //  std::vector<std::string> syst = {"Nominal"};
+  //  const unsigned nP = 13;//QCDW,Z,EWKW,Z
   // std::string proc[6] = {"QCDW","QCDZinv","QCDZll","EWKW","EWKZinv","EWKZll"};
   // std::string name[6] = {"WJETS","ZJETS","DY","EWKW","EWKZNUNU","EWKZll"};
 
   // std::string proc[6] = {"QCDZinv","QCDZll","EWKW","EWKZinv","EWKZll"};
   // std::string name[6] = {"ZJETS","DY","EWKW","EWKZNUNU","EWKZll"};
-  
-  std::string proc[2] = {"DATA","QCD"};
-  //  std::string proc[1] = {"QCD"};
-  std::string year = "2018";
-
-  //std::string name[1] = {"QCD_" + year};
-  //  std::string name[2] = {"DATA_" + year, "QCD_" + year};
-  //  std::string name[2] = {"DATA_JetHT_" + year, "QCD_" + year};
-
-  std::string name[2] = {"JetHT", "QCD"};
-
-  //  std::string name[1] = {"DATA_2017"};
-  //std::string name[1] = {"QCD"};
+  //
 
 
-  TFile* fin[nS][nP];
-  TTree* tree[nS][nP];
+  //std::string proc[13] = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP"};
+			   //  std::string proc[2] = {"DATA","QCD",};
 
-  for (unsigned iS(0); iS<nS; ++iS){//loop on syst
-    for (unsigned iP(0); iP<nP; ++iP){//loop on proc
-      //      fin[iS][iP] = TFile::Open((baseDir+syst[iS]+"/"+name[iP]+".root").c_str());
-      //      fin[iS][iP] = TFile::Open((baseDir+"Nominal/"+name[iP]+".root").c_str());
-      fin[iS][iP] = TFile::Open((baseDir+"/"+year+"/"+name[iP]+".root").c_str());
-      if (fin[iS][iP]){
-	fin[iS][iP]->cd();
-	tree[iS][iP] = (TTree*)gDirectory->Get("Events");
-	if (tree[iS][iP]){
-	  Events *selector = (Events*)TSelector::GetSelector("Events.C+");
+
+  //    std::string proc[2] = {"DATA","QCD"};
+  std::vector<std::string> proc = {"QCD"};
+    std::vector<std::string> years = {"2017","2018"};
+    //  std::vector<std::string> years = {"2017"};
+  //  std::string year = "2018";
+
+  std::vector<std::string> name;
+  for (auto process: proc){
+    if ( process == "DATA" ){
+      name.push_back("JetHT");
+    }
+    else{
+      name.push_back(process);
+    }
+  }
+
+  // std::vector<TFile*> fin;
+  // std::vector<TTree*> tree;
+
+  // TFile* fin[nS][nP];
+  // TTree* tree[nS][nP];
+
+  //  for (unsigned iS(0); iS<nS; ++iS){//loop on syst
+
+
+  //  for (unsigned iS(0); iS<syst.size(); ++iS){//loop on syst
+  TFile * fin = 0;
+  TTree * tree = 0;
+
+
+  for (auto year: years){
+    for (unsigned iP(0); iP<proc.size(); ++iP){//loop on proc
+    
+      fin = new TFile( (baseDir+"/"+year+"/"+name[iP]+".root").c_str() , "READ" );
+    
+      //fin.push_back(TFile::Open((baseDir+"/"+year+"/"+name[iP]+".root").c_str()))
+      
+      if ( fin ){
+	//      if (fin[iS][iP]){
+	//fin[iS][iP]->cd();
+	fin->cd();
+	tree = (TTree*) fin->Get( "Events" );
+	//	tree[iS][iP] = (TTree*)gDirectory->Get("Events");
+	//	if (tree[iS][iP]){
+	if (tree){
+	  
+	  Events * selector = (Events*)TSelector::GetSelector("Events.C+");
 	  selector->SetLumiPb(lLumi);
 	  selector->SetProcess(proc[iP]);
 	  std::cout << "Set Year" << std::endl;
 	  selector->SetYear(year);
-	  selector->SetSystematic(syst[iS]);
-	  selector->SetOutFileName(lPlotDir+"Histos_"+syst[iS]+"_"+proc[iP]+"_" + year + ".root");
-	  std::cout << " -- Tree " << syst[iS] << " " << proc[iP] << " entries = " << tree[iS][iP]->GetEntries() << ", outfile: " << selector->GetOutFileName() << std::endl;
-	  tree[iS][iP]->Process(selector);
+	  selector->SetSystematic("Nominal");
+	  selector->SetOutFileName(lPlotDir+"Histos_Nominal_"+proc[iP]+"_" + year + ".root");
+	  std::cout << " -- Tree Nominal " << proc[iP] << " entries = " << tree->GetEntries() << ", outfile: " << selector->GetOutFileName() << std::endl;
+	  //	tree[iS][iP]->Process(selector);
+	  tree->Process(selector);
 	}
 	else {
-	  std::cout << " -- Tree not found for " << syst[iS] << " " << proc[iP] << std::endl;
+	  std::cout << " -- Tree not found for Nominal " << proc[iP] << std::endl;
 	}
-      }
+	
+	fin->Close();
+    }
     }//loop on proc
-  }//loop on syst
-  
-  
+    //  }//loop on syst
+    
+  }
   return 0;
   
 }//main
+
