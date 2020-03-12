@@ -75,7 +75,7 @@ void Events::Begin(TTree * /*tree*/)
 
   //const double binsX[nBins+1] = {200,400,600,900,1200,1500,2000,2750,3500,5000};
   //const double binsX[nBins+1] = {0,50,100,150,200,250,300,400,500,800};
-  const double binMin[nVars-1] = {100,200,1,0,80,40,-5,-5,2,0.5,0,0,0,0,0,0,0};
+  const double binMin[nVars-1] = {100,200,1,0,80,40,-5,-5,2,0,0,0,0,0,0,0,0};
   const double binMax[nVars-1] = {600,4000,7,1.5,500,300,5,5,12,3.1416,600,2000,7,10,10,10,80};
   //  double mjjbins[11] = {0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000};
 
@@ -451,20 +451,22 @@ Bool_t Events::PassSelection(){
   
   std::string lreg = "";
 
+
   if (mCat==CatType::MTR){
     lreg = "MTR";
-    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
+    if ( mProc != "DATA")//JetHT
+      pass = pass && (static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"])==1 || static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"])==1);
   }
   else if  (mCat==CatType::VTR){
     lreg = "VTR";
-    pass = pass && (lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"]==1 || lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"]==1);
+    if ( mProc != "DATA")//JetHT
+      pass = pass && (static_cast<int>(lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"])==1 || static_cast<int>(lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"])==1);
   }
 
   if (mReg==RegionType::SR){
-    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_SR_eff_Sel"]);
-    //  pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["MetNoLep_pt"]>250;
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+    pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_SR_eff_Sel"]));
+    //    pass = pass && lTreeContent["MetNoLep_pt"]>250;
+    //pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -474,7 +476,7 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
 
-    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
+    //    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && static_cast<int>(lTreeContent["nLooseMuon"])==0 && static_cast<int>(lTreeContent["nVetoElectron"]==0);
   }
   // else if (mReg==RegionType::Wmu ){
   //   pass = pass && lTreeContent["MetNoLep_pt"]>250;
@@ -497,11 +499,10 @@ Bool_t Events::PassSelection(){
   //   pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
   // }
   else if (mReg==RegionType::QCDCR){
-    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_CR_eff_Sel"]);
-    pass = pass && lTreeContent["MetNoLep_pt"]>250;
+    pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_CR_eff_Sel"]));
+    //   pass = pass && lTreeContent["MetNoLep_pt"]>250;
 
-    //    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
+    // pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -512,14 +513,13 @@ Bool_t Events::PassSelection(){
     }
 
 
-    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
+    //    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
   else if (mReg==RegionType::QCDA){
-    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_A_eff_Sel"]);
-    pass = pass && (lTreeContent["MetNoLep_pt"]>100);
-    pass = pass && (lTreeContent["MetNoLep_pt"]<160);
-    //    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
+    pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_A_eff_Sel"]));
+    // pass = pass && (lTreeContent["MetNoLep_pt"]>100);
+    // pass = pass && (lTreeContent["MetNoLep_pt"]<160);
+    //    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -529,14 +529,13 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
 
-    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
+    //    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
   else if (mReg==RegionType::QCDB){
-    pass = pass && (lTreeContent["VBF_"+lreg+"_QCD_B_eff_Sel"]);
-    pass = pass && lTreeContent["MetNoLep_pt"]>100;
-    pass = pass && lTreeContent["MetNoLep_pt"]<160;
-    //    pass = pass && (lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"]==1 || lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"]==1);
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+    pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_B_eff_Sel"]));
+    //    pass = pass && lTreeContent["MetNoLep_pt"]>100;
+    //    pass = pass && lTreeContent["MetNoLep_pt"]<160;
+    //    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
 
     if ( !misMC ){
       pass = pass 
@@ -546,7 +545,7 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
 
-    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
+    //    if (mCat==CatType::MTRvetoLep || mCat==CatType::MTRveto) pass = pass && lTreeContent["nLooseMuon"]==0 && lTreeContent["nVetoElectron"]==0;
   }
 
 

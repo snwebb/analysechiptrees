@@ -32,9 +32,10 @@ int makeHistograms(){//main
   //  std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
   std::string baseDir = "/vols/cms/snwebb/Common/";
   std::string lPlotDir = "Plots/";
-  const double lLumi = 41800;
-
   
+  double lLumi_2017 = 41800;
+  double lLumi_2018 = 59700;
+
   //  const unsigned nS = 9;//nom,jesup/down,jerup/down...
   //  const unsigned nS = 1;//nom,jesup/down,jerup/down...
   //  std::string syst[5] = {"Nominal","JESUP","JESDOWN","JERUP","JERDOWN"};
@@ -49,14 +50,11 @@ int makeHistograms(){//main
   //
 
 
-  //std::string proc[13] = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP"};
-			   //  std::string proc[2] = {"DATA","QCD",};
-
-
-  //    std::string proc[2] = {"DATA","QCD"};
-  std::vector<std::string> proc = {"QCD"};
-    std::vector<std::string> years = {"2017","2018"};
-    //  std::vector<std::string> years = {"2017"};
+  std::vector<std::string> proc = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
+  //  std::vector<std::string> proc = { "DATA"};
+  std::vector<std::string> years = {"2017","2018"};
+  //    std::vector<std::string> years = {"2018"};
+  //std::vector<std::string> years = {"2017"};
   //  std::string year = "2018";
 
   std::vector<std::string> name;
@@ -100,7 +98,10 @@ int makeHistograms(){//main
 	if (tree){
 	  
 	  Events * selector = (Events*)TSelector::GetSelector("Events.C+");
-	  selector->SetLumiPb(lLumi);
+	  if ( year == "2017" )
+	    selector->SetLumiPb(lLumi_2017);
+	  else if ( year == "2018" )
+	    selector->SetLumiPb(lLumi_2018);
 	  selector->SetProcess(proc[iP]);
 	  std::cout << "Set Year" << std::endl;
 	  selector->SetYear(year);
