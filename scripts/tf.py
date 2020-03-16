@@ -28,7 +28,8 @@ for year in years:
     #     files.append( ROOT.TFile.Open("../Plots/Histos_"+syst+"_QCD_2017.root"))
     #     SRs.append(files[-1].Get("SR/MTR/h_SR_MTR_dijet_M_binned"))
     #     CRs.append(files[-1].Get("QCDCR/MTR/h_QCDCR_MTR_dijet_M_binned"))
-    
+
+
     #for syst in listOfSysts:
     for sample in samples:
         files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/Plots/Histos_Nominal_"+sample+"_"+year+".root"))
@@ -77,29 +78,51 @@ for year in years:
     file_out = ROOT.TFile("out_" + year+ ".root","RECREATE")
     
     
-    #c = ROOT.TCanvas()
+
     
     #Write all relevant hists:
     
-    # for i,(sr,cr,a,b) in enumerate(zip(SRs,CRs,As,Bs)):
-    #     sr.Write(samples[i]+"_SR")
-    #     cr.Write(samples[i]+"_CR")
-    #     a.Write(samples[i]+"_A")
-    #     b.Write(samples[i]+"_B")
+    for i,(sr,cr,a,b) in enumerate(zip(SRs,CRs,As,Bs)):
+        sr.Write(samples[i]+"_SR")
+        cr.Write(samples[i]+"_CR")
+        a.Write(samples[i]+"_A")
+        b.Write(samples[i]+"_B")
         
-    QCDTransferFactor_SR.Write()
-    QCDTransferFactor_B.Write()
+    # QCDTransferFactor_SR.Write()
+    # QCDTransferFactor_B.Write()
     
-    BackgroundSubtractedData_A.Write()
-    BackgroundSubtractedData_CR.Write()
+    # BackgroundSubtractedData_A.Write()
+    # BackgroundSubtractedData_CR.Write()
 
-    FinalQCDSR.Write()
-    FinalQCDB.Write()
+    # FinalQCDSR.Write()
+    # FinalQCDB.Write()
     
-    QCDMC_SR.Write()
-    QCDMC_CR.Write()
+    # QCDMC_SR.Write()
+    # QCDMC_CR.Write()
+
+
+
+    leg = ROOT.TLegend(0.7,0.7,0.9,0.9)
+    c = ROOT.TCanvas("stackplot")
+    stack = ROOT.THStack("hs","")
+    for i,CR in enumerate(CRs):
+        if ( samples[i] == "DATA" or samples[i] == "MET"):
+            continue
+        CR.SetFillColor(30+i)
+        CR.SetLineColor(30+i)
+        leg.AddEntry(CR,samples[i],"F")
+        stack.Add(CR)
+    CRs[0].Draw()
+    stack.Draw("HISTsame")
+    leg.Draw()
+    c.Draw()
+    c.Write()
     
     file_out.Close()
+
+
+
+
 
 # for i,tf in enumerate(TFs):
 #     tf.SetLineColor(i+1)

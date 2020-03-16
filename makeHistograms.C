@@ -33,8 +33,8 @@ int makeHistograms(){//main
   std::string baseDir = "/vols/cms/snwebb/Common/";
   std::string lPlotDir = "Plots/";
   
-  double lLumi_2017 = 41800;
-  double lLumi_2018 = 59700;
+  double lLumi_2017 = 41529;
+  double lLumi_2018 = 59741;
 
   //  const unsigned nS = 9;//nom,jesup/down,jerup/down...
   //  const unsigned nS = 1;//nom,jesup/down,jerup/down...
@@ -52,9 +52,9 @@ int makeHistograms(){//main
 
   std::vector<std::string> proc = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
   //  std::vector<std::string> proc = { "DATA"};
-  std::vector<std::string> years = {"2017","2018"};
+  //  std::vector<std::string> years = {"2017","2018"};
   //    std::vector<std::string> years = {"2018"};
-  //std::vector<std::string> years = {"2017"};
+  std::vector<std::string> years = {"2017"};
   //  std::string year = "2018";
 
   std::vector<std::string> name;
