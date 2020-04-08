@@ -185,9 +185,16 @@ void Events::SetTreeContent(std::string year){
 
   if ( year == "2017"){
     lTreeContent["L1PreFiringWeight_Nom"] = *L1PreFiringWeight_Nom;
+    lTreeContent["trigger_weight_METMHT"] = *trigger_weight_METMHT2017;
+    lTreeContent["trigger_weight_VBF"] = *trigger_weight_VBF2017;
+    lTreeContent["trigger_weight_SingleEle35"] = *trigger_weight_SingleEle352017;
+
   }
   else if  ( year == "2018"){
     lTreeContent["L1PreFiringWeight_Nom"] = 1;
+    lTreeContent["trigger_weight_METMHT"] = *trigger_weight_METMHT2018;
+    lTreeContent["trigger_weight_VBF"] = *trigger_weight_VBF2018;
+    lTreeContent["trigger_weight_SingleEle32"] = *trigger_weight_SingleEle322018;
   }
 
   if ( isMC ){
@@ -344,12 +351,6 @@ lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120
   lTreeContent["Leading_muon_eta"] = *Leading_muon_eta;
 
 
-  lTreeContent["trigger_weight_METMHT2018"] = *trigger_weight_METMHT2018;
-  lTreeContent["trigger_weight_VBF2018"] = *trigger_weight_VBF2018;
-  lTreeContent["trigger_weight_SingleEle322018"] = *trigger_weight_SingleEle322018;
-  lTreeContent["trigger_weight_METMHT2017"] = *trigger_weight_METMHT2017;
-  lTreeContent["trigger_weight_VBF2017"] = *trigger_weight_VBF2017;
-  lTreeContent["trigger_weight_SingleEle352017"] = *trigger_weight_SingleEle352017;
 
   
 
@@ -511,7 +512,7 @@ Bool_t Events::PassSelection(){
     pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_CR_eff_Sel"]));
 
 
-    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.3;
+    //pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.3;
 
     if ( !misMC ){
       pass = pass 
@@ -566,19 +567,20 @@ Double_t Events::SelWeight(){
 
   if ( mCat == CatType::MTR ){
 
-    w *= lTreeContent["trigger_weight_METMHT2018"];
+    w *= lTreeContent["trigger_weight_METMHT"];
     w *= lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"];
 
   }
   else if ( mCat == CatType::VTR ){
 
-    w *= lTreeContent["trigger_weight_VBF2018"];
+    w *= lTreeContent["trigger_weight_VBF"];
     w *= lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"];
 
   }
 
   w *= lTreeContent["fnlo_SF_QCD_corr_EWK_proc"];
   w *= lTreeContent["fnlo_SF_EWK_corr"];
+
 
   /*  
   if (mReg==RegionType::SR || mReg==RegionType::QCDCR ||  mReg==RegionType::QCDA ||  mReg==RegionType::QCDB){
