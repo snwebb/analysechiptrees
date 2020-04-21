@@ -8,11 +8,13 @@ import sys
 
 #samples = ["DATA","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","MET"]
 years = ["2017","2018"]
-samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
+#years = ["2017"]
+#samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
+samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS"]
 
-#variables = ["diCleanJet_M_binned"]
+variables = ["diCleanJet_M_binned"]
 
-variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M_binned"]
+#variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M_binned"]
 
 
 for variable in variables:
@@ -87,11 +89,11 @@ for variable in variables:
 
         #Write all relevant hists:
 
-        for i,(sr,cr,a,b) in enumerate(zip(SRs,CRs,As,Bs)):
-            sr.Write(samples[i]+"_SR")
-            cr.Write(samples[i]+"_CR")
-            a.Write(samples[i]+"_A")
-            b.Write(samples[i]+"_B")
+        # for i,(sr,cr,a,b) in enumerate(zip(SRs,CRs,As,Bs)):
+        #     sr.Write(samples[i]+"_SR")
+        #     cr.Write(samples[i]+"_CR")
+        #     a.Write(samples[i]+"_A")
+        #     b.Write(samples[i]+"_B")
 
         QCDTransferFactor_SR.Write()
         QCDTransferFactor_B.Write()
@@ -107,24 +109,24 @@ for variable in variables:
 
 
 
-        leg = ROOT.TLegend(0.7,0.7,0.9,0.9)
-        c = ROOT.TCanvas("stackplot_" + variable)
-        stack = ROOT.THStack("hs","")
-        for i,CR in enumerate(CRs):
-            if ( samples[i] == "DATA" or samples[i] == "MET"):
-                continue
-            CR.SetFillColor(30+i)
-            CR.SetLineColor(30+i)
-            leg.AddEntry(CR,samples[i],"F")
-            stack.Add(CR)
-        CRs[0].Draw()
-        CRs[0].SetMinimum(0)
-        stack.Draw("HISTsame")
-        leg.Draw()
-        c.Draw()
-        c.SaveAs("Henning/" + variable + "_" + year + ".png")
-        c.Close()
-        file_out.Close()
+        # leg = ROOT.TLegend(0.7,0.7,0.9,0.9)
+        # c = ROOT.TCanvas("stackplot_" + variable)
+        # stack = ROOT.THStack("hs","")
+        # for i,CR in enumerate(CRs):
+        #     if ( samples[i] == "DATA" or samples[i] == "MET"):
+        #         continue
+        #     CR.SetFillColor(30+i)
+        #     CR.SetLineColor(30+i)
+        #     leg.AddEntry(CR,samples[i],"F")
+        #     stack.Add(CR)
+        # CRs[0].Draw()
+        # CRs[0].SetMinimum(0)
+        # stack.Draw("HISTsame")
+        # leg.Draw()
+        # c.Draw()
+        # c.SaveAs("Henning/" + variable + "_" + year + ".png")
+        # c.Close()
+        # file_out.Close()
 
 
 

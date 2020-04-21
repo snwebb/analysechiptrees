@@ -182,7 +182,6 @@ void Events::SetTreeContent(std::string year){
 
   bool isMC = !static_cast<int>(*isData + 0.5);
   SetMC(isMC);
-
   if ( year == "2017"){
     lTreeContent["L1PreFiringWeight_Nom"] = *L1PreFiringWeight_Nom;
     lTreeContent["trigger_weight_METMHT"] = *trigger_weight_METMHT2017;
@@ -239,10 +238,11 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"] = *fnlo_SF_QCD_corr_QCD_proc_MTR;
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"] = *fnlo_SF_QCD_corr_QCD_proc_VTR;
     lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
-    // if ( year == "2017" )
-    //   lTreeContent["met_filters"] = *met_filters_2017_mc;
-    // else if  ( year == "2018" )
-    //   lTreeContent["met_filters"] = *met_filters_2018_mc;
+
+    if ( year == "2017" )
+      lTreeContent["met_filters"] = *met_filters_2017_mc;
+    else if  ( year == "2018" )
+      lTreeContent["met_filters"] = *met_filters_2018_mc;
   }
   // else{
   //   lTreeContent["decayLeptonId"] = 0;
@@ -283,21 +283,11 @@ void Events::SetTreeContent(std::string year){
   //   lTreeContent["Pileup_nPU"] = -1;
   //   lTreeContent["nloSF_"] = 1;
   //   lTreeContent["CRTightMuon_eventSelW"] = 1;
-  //   if ( year == "2017" )
-  //     lTreeContent["met_filters"] = *met_filters_2017_data;
-  //   else if  ( year == "2018" )
-  //     lTreeContent["met_filters"] = *met_filters_2018_data;
 
-
-
-    lTreeContent["VBF_MTR_QCD_CR_eff_Sel"] = * VBF_MTR_QCD_CR_eff_Sel;  
-    lTreeContent["VBF_VTR_QCD_CR_eff_Sel"] = * VBF_VTR_QCD_CR_eff_Sel;
-    lTreeContent["VBF_MTR_QCD_SR_eff_Sel"] = * VBF_MTR_QCD_SR_eff_Sel;
-    lTreeContent["VBF_VTR_QCD_SR_eff_Sel"] = * VBF_VTR_QCD_SR_eff_Sel;
-    lTreeContent["VBF_MTR_QCD_A_eff_Sel"] = * VBF_MTR_QCD_A_eff_Sel; 
-    lTreeContent["VBF_VTR_QCD_A_eff_Sel"] = * VBF_VTR_QCD_A_eff_Sel; 
-    lTreeContent["VBF_MTR_QCD_B_eff_Sel"] = * VBF_MTR_QCD_B_eff_Sel; 
-    lTreeContent["VBF_VTR_QCD_B_eff_Sel"] = * VBF_VTR_QCD_B_eff_Sel; 
+    if ( year == "2017" )
+      lTreeContent["met_filters"] = *met_filters_2017_data;
+    else if  ( year == "2018" )
+      lTreeContent["met_filters"] = *met_filters_2018_data;
 
 
 
@@ -311,14 +301,14 @@ void Events::SetTreeContent(std::string year){
   // lTreeContent["Leading_el_eta"] = *Leading_el_eta;
   lTreeContent["Zee_flag"] = *Zee_flag;
   lTreeContent["HLT_Ele32_WPTight_Gsf"] = *HLT_Ele32_WPTight_Gsf;
-lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60;
+  lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60;
   lTreeContent["Subleading_jet_eta"] = *Subleading_jet_eta;
   lTreeContent["Wenu_flag"] = *Wenu_flag;
   lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"] = *HLT_TripleJet110_35_35_Mjj650_PFMET110;
   lTreeContent["MET_pt"] = *MET_pt;
-  lTreeContent["diCleanJet_M"] = *diCleanJet_M;
+  lTreeContent["diCleanJet_M"] = *dijet_M;//Temp for AM
   lTreeContent["nVLooseTau"] = *nVLooseTau;
-  lTreeContent["MetNoLep_CleanJet_mindPhi"] = *MetNoLep_CleanJet_mindPhi;
+  lTreeContent["MetNoLep_CleanJet_mindPhi"] = *JetMetmindPhi; //Temp for AM
   lTreeContent["nVetoElectron"] = *nVetoElectron;
   lTreeContent["Leading_jet_pt"] = *Leading_jet_pt;
   lTreeContent["DiVetoElectron_mass"] = *DiVetoElectron_mass;
@@ -330,8 +320,8 @@ lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120
   lTreeContent["Subleading_el_pt"] = *Subleading_el_pt;
   lTreeContent["Leading_jet_eta"] = *Leading_jet_eta;
   lTreeContent["HLT_IsoMu27"] = *HLT_IsoMu27;
-  lTreeContent["MetNoLep_pt"] = *MetNoLep_pt;
-  lTreeContent["diCleanJet_dPhi"] = *diCleanJet_dPhi;
+  lTreeContent["MetNoLep_pt"] = *MetNoLep;//Temp for AM
+  lTreeContent["diCleanJet_dPhi"] = *dijet_dPhi;//Temp for AM
   lTreeContent["Subleading_muon_phi"] = *Subleading_muon_phi;
   lTreeContent["Subleading_muon_eta"] = *Subleading_muon_eta;
   lTreeContent["Subleading_el_eta"] = *Subleading_el_eta;
@@ -339,10 +329,9 @@ lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120
   lTreeContent["HLT_Ele32_WPTight_Gsf_L1DoubleEG"] = *HLT_Ele32_WPTight_Gsf_L1DoubleEG;
   lTreeContent["PV_npvsGood"] = *PV_npvsGood;
   lTreeContent["Subleading_muon_pt"] = *Subleading_muon_pt;
-  lTreeContent["MetNoLep_CleanJet_mindPhi"] = *MetNoLep_CleanJet_mindPhi;
   lTreeContent["nCleanJet30"] = *nCleanJet30;
   lTreeContent["DiLooseMuon_mass"] = *DiLooseMuon_mass;
-  lTreeContent["diCleanJet_dEta"] = *diCleanJet_dEta;
+  lTreeContent["diCleanJet_dEta"] = *dijet_dEta;//Temp for AM
   lTreeContent["Leading_el_phi"] = *Leading_el_phi;
   lTreeContent["Leading_muon_pt"] = *Leading_muon_pt;
   lTreeContent["nLoosePhoton"] = *nLoosePhoton;
@@ -352,8 +341,50 @@ lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120
 
 
 
-  
+  lTreeContent["Met"] = *Met;
+  lTreeContent["TkMET_pt"] = *TkMET_pt;
+  lTreeContent["SoftActivityJetHT10"] = *SoftActivityJetHT10;
+  lTreeContent["softActivityJet1_eta"] = *softActivityJet1_eta;
+  lTreeContent["softActivityJet1_phi"] = *softActivityJet1_phi;
+  lTreeContent["softActivityJet2_eta"] = *softActivityJet2_eta;
+  lTreeContent["softActivityJet2_phi"] = *softActivityJet2_phi;
+  lTreeContent["softActivityJet3_eta"] = *softActivityJet3_eta;
+  lTreeContent["softActivityJet3_phi"] = *softActivityJet3_phi;
+  lTreeContent["softActivityJet4_eta"] = *softActivityJet4_eta;
+  lTreeContent["softActivityJet4_phi"] = *softActivityJet4_phi;
+  lTreeContent["softActivityJet5_eta"] = *softActivityJet5_eta;
+  lTreeContent["softActivityJet5_phi"] = *softActivityJet5_phi;
+  lTreeContent["softActivityJet6_eta"] = *softActivityJet6_eta;
+  lTreeContent["softActivityJet6_phi"] = *softActivityJet6_phi;
+  lTreeContent["isoTrack1_eta"] = *isoTrack1_eta;
+  lTreeContent["isoTrack1_phi"] = *isoTrack1_phi;
+  lTreeContent["isoTrack2_eta"] = *isoTrack2_eta;
+  lTreeContent["isoTrack2_phi"] = *isoTrack2_phi;
+  lTreeContent["isoTrack3_eta"] = *isoTrack3_eta;
+  lTreeContent["isoTrack3_phi"] = *isoTrack3_phi;
 
+
+
+  // lTreeContent["VBF_MTR_QCD_CR_eff_Sel"] = * VBF_MTR_QCD_CR_eff_Sel;  
+  // lTreeContent["VBF_VTR_QCD_CR_eff_Sel"] = * VBF_VTR_QCD_CR_eff_Sel;
+  // lTreeContent["VBF_MTR_QCD_SR_eff_Sel"] = * VBF_MTR_QCD_SR_eff_Sel;
+  // lTreeContent["VBF_VTR_QCD_SR_eff_Sel"] = * VBF_VTR_QCD_SR_eff_Sel;
+  // lTreeContent["VBF_MTR_QCD_A_eff_Sel"] = * VBF_MTR_QCD_A_eff_Sel; 
+  // lTreeContent["VBF_VTR_QCD_A_eff_Sel"] = * VBF_VTR_QCD_A_eff_Sel; 
+  // lTreeContent["VBF_MTR_QCD_B_eff_Sel"] = * VBF_MTR_QCD_B_eff_Sel; 
+  // lTreeContent["VBF_VTR_QCD_B_eff_Sel"] = * VBF_VTR_QCD_B_eff_Sel; 
+
+  lTreeContent["VBF_MTR_QCD_CR_eff_Sel"] = 1;  
+  lTreeContent["VBF_VTR_QCD_CR_eff_Sel"] = 1;
+  lTreeContent["VBF_MTR_QCD_SR_eff_Sel"] = 1;
+  lTreeContent["VBF_VTR_QCD_SR_eff_Sel"] = 1;
+  lTreeContent["VBF_MTR_QCD_A_eff_Sel"] = 1; 
+  lTreeContent["VBF_VTR_QCD_A_eff_Sel"] = 1; 
+  lTreeContent["VBF_MTR_QCD_B_eff_Sel"] = 1; 
+  lTreeContent["VBF_VTR_QCD_B_eff_Sel"] = 1; 
+
+
+  
 }
 
 
@@ -361,20 +392,21 @@ Bool_t Events::BaseSelection(){
   
   bool pass=kTRUE;
   std::string catStr = GetCatStr(mCat);
-  //  std::cout << lTreeContent["Leading_jet_pt"] << " - " << lTreeContent["Subleading_jet_pt"] << std::endl;w
-  //  std::cout << lTreeContent["nCleanJet30"] << " - " << lTreeContent["diCleanJet_M"] << std::endl;
-  //  std::cout << lTreeContent["diCleanJet_dEta"] << " - " << lTreeContent["diCleanJet_dPhi"] << std::endl;
-  //  std::cout << lTreeContent["nLoosePhoton"] << " - " << lTreeContent["met_filters"] << std::endl;
+
 
   if (catStr.find("MTR")!=catStr.npos){
-    //    pass = lTreeContent["nCleanJet30"]>=2
-      //      && (lTreeContent["Leading_jet_pt"] > 80)
-      //      && (lTreeContent["Subleading_jet_pt"] > 40)
-      //&& (lTreeContent["diCleanJet_M"]>200)
-      //      && (lTreeContent["diCleanJet_dEta"]>1)     
-      //      && (lTreeContent["diCleanJet_dPhi"]<1.5)
-      //      && (lTreeContent["nLoosePhoton"]==0);
-      //      && (lTreeContent["met_filters"]==0);
+    //Needed if we don't have the flags
+       pass = lTreeContent["nCleanJet30"]>=2
+           && (lTreeContent["Leading_jet_pt"] > 80)
+           && (lTreeContent["Subleading_jet_pt"] > 40)
+      && (lTreeContent["diCleanJet_M"]>200)
+           && (lTreeContent["diCleanJet_dEta"]>1)     
+           && (lTreeContent["diCleanJet_dPhi"]<1.5)
+           && (lTreeContent["nLoosePhoton"]==0)
+           && (lTreeContent["met_filters"]==0);
+	   ////////////////////////
+
+
     if ( misMC ){      
       pass = pass 
 	&& (lTreeContent["xs_weight"] > 0);
@@ -462,6 +494,18 @@ Bool_t Events::PassSelection(){
   
   std::string lreg = "";
 
+  bool lCleanCut0 = !(std::abs(lTreeContent["Met"] - lTreeContent["TkMET_pt"])/lTreeContent["Met"] >= 0.8 && ((std::abs(lTreeContent["Leading_jet_eta"])>=2.8 && std::abs(lTreeContent["Leading_jet_eta"]) <= 3.2) || (std::abs(lTreeContent["Subleading_jet_eta"])>=2.8 && std::abs(lTreeContent["Subleading_jet_eta"]) <= 3.2)));
+  bool lCleanCut1 = !(lTreeContent["SoftActivityJetHT10"]<100 && ((std::abs(lTreeContent["Leading_jet_eta"])>=2.8 && std::abs(lTreeContent["Leading_jet_eta"]) <= 3.2) || (std::abs(lTreeContent["Subleading_jet_eta"])>=2.8 && std::abs(lTreeContent["Subleading_jet_eta"]) <= 3.2)));
+  bool lCleanCut2 = !(((lTreeContent["softActivityJet1_eta"] > -3 && lTreeContent["softActivityJet1_eta"] < -1.2 && lTreeContent["softActivityJet1_phi"] < -0.5 && lTreeContent["softActivityJet1_phi"] > - 1.9) || (lTreeContent["softActivityJet2_eta"] > -3 && lTreeContent["softActivityJet2_eta"] < -1.2 && lTreeContent["softActivityJet2_phi"] < -0.5 && lTreeContent["softActivityJet2_phi"] > - 1.9) || (lTreeContent["softActivityJet3_eta"] > -3 && lTreeContent["softActivityJet3_eta"] < -1.2 && lTreeContent["softActivityJet3_phi"] < -0.5 && lTreeContent["softActivityJet3_phi"] > - 1.9) || (lTreeContent["softActivityJet4_eta"] > -3 && lTreeContent["softActivityJet4_eta"] < -1.2 && lTreeContent["softActivityJet4_phi"] < -0.5 && lTreeContent["softActivityJet4_phi"] > - 1.9) || (lTreeContent["softActivityJet5_eta"] > -3 && lTreeContent["softActivityJet5_eta"] < -1.2 && lTreeContent["softActivityJet5_phi"] < -0.5 && lTreeContent["softActivityJet5_phi"] > - 1.9) || (lTreeContent["softActivityJet6_eta"] > -3 && lTreeContent["softActivityJet6_eta"] < -1.2 && lTreeContent["softActivityJet6_phi"] < -0.5 && lTreeContent["softActivityJet6_phi"] > - 1.9)) && lTreeContent["MetPhiNoLep"]>-1.6 && lTreeContent["MetPhiNoLep"]<-0.8);
+  bool lCleanCut3 = !(((lTreeContent["isoTrack1_eta"] > -3 && lTreeContent["isoTrack1_eta"] < -1.2 && lTreeContent["isoTrack1_phi"] < -0.5 && lTreeContent["isoTrack1_phi"] > - 1.9) || (lTreeContent["isoTrack2_eta"] > -3 && lTreeContent["isoTrack2_eta"] < -1.2 && lTreeContent["isoTrack2_phi"] < -0.5 && lTreeContent["isoTrack2_phi"] > - 1.9) || (lTreeContent["isoTrack3_eta"] > -3 && lTreeContent["isoTrack3_eta"] < -1.2 && lTreeContent["isoTrack3_phi"] < -0.5 && lTreeContent["isoTrack3_phi"] > - 1.9)) && lTreeContent["MetPhiNoLep"]>-1.6 && lTreeContent["MetPhiNoLep"]<-0.8);
+
+  pass = pass && lCleanCut0;
+  pass = pass && lCleanCut1;
+
+  if (mYear == "2018"){
+    pass = pass && lCleanCut2;
+    pass = pass && lCleanCut3;
+  }
 
   if (mCat==CatType::MTR){
     lreg = "MTR";
@@ -476,8 +520,13 @@ Bool_t Events::PassSelection(){
 
   if (mReg==RegionType::SR){
     pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_SR_eff_Sel"]));
-    //    pass = pass && lTreeContent["MetNoLep_pt"]>250;
-    //pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+
+
+    //Temp if no flag
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+    pass = pass && lTreeContent["MetNoLep_pt"]>250;
+    /////
+
 
     if ( !misMC ){
       pass = pass 
@@ -511,8 +560,13 @@ Bool_t Events::PassSelection(){
   else if (mReg==RegionType::QCDCR){
     pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_CR_eff_Sel"]));
 
-
     //pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.3;
+
+
+    //Temp if no flag
+    pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
+    pass = pass && lTreeContent["MetNoLep_pt"]>250;
+    /////
 
     if ( !misMC ){
       pass = pass 
@@ -646,7 +700,6 @@ Bool_t Events::Process(Long64_t entry)
    // Use fStatus to set the return value of TTree::Process().
    //
    // The return value is currently not used.
-
 
 
   fReader.SetLocalEntry(entry);

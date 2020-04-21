@@ -156,6 +156,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> Subleading_jet_eta ;
    TTreeReaderValue<Double_t> Subleading_jet_phi ;
    TTreeReaderValue<Double_t> diCleanJet_M ;
+   TTreeReaderValue<Double_t> dijet_M ;
    TTreeReaderValue<Double_t> diCleanJet_dPhi ;
    TTreeReaderValue<Double_t> diCleanJet_dEta ;
    TTreeReaderValue<Double_t> Pileup_nTrueInt ;
@@ -220,7 +221,34 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> HLT_IsoMu27 ;
    TTreeReaderValue<Double_t> HLT_Ele32_WPTight_Gsf_L1DoubleEG ;
    TTreeReaderValue<Double_t> HLT_Photon200 ;
-  
+
+   TTreeReaderValue<Double_t>  Met ;
+   TTreeReaderValue<Double_t>  TkMET_pt ;
+   TTreeReaderValue<Double_t>  SoftActivityJetHT10;
+   TTreeReaderValue<Double_t>  softActivityJet1_eta;
+   TTreeReaderValue<Double_t>  softActivityJet1_phi;
+   TTreeReaderValue<Double_t>  softActivityJet2_eta;
+   TTreeReaderValue<Double_t>  softActivityJet2_phi;
+   TTreeReaderValue<Double_t>  softActivityJet3_eta;
+   TTreeReaderValue<Double_t>  softActivityJet3_phi;
+   TTreeReaderValue<Double_t>  softActivityJet4_eta;
+   TTreeReaderValue<Double_t>  softActivityJet4_phi;
+   TTreeReaderValue<Double_t>  softActivityJet5_eta;
+   TTreeReaderValue<Double_t>  softActivityJet5_phi;
+   TTreeReaderValue<Double_t>  softActivityJet6_eta;
+   TTreeReaderValue<Double_t>  softActivityJet6_phi;
+   TTreeReaderValue<Double_t>  isoTrack1_eta;
+   TTreeReaderValue<Double_t>  isoTrack1_phi;
+   TTreeReaderValue<Double_t>  isoTrack2_eta;
+   TTreeReaderValue<Double_t>  isoTrack2_phi;
+   TTreeReaderValue<Double_t>  isoTrack3_eta;
+   TTreeReaderValue<Double_t>  isoTrack3_phi;        
+
+   //AM's variables
+   TTreeReaderValue<Double_t>  JetMetmindPhi;        
+   TTreeReaderValue<Double_t>  MetNoLep;        
+   TTreeReaderValue<Double_t>  dijet_dPhi;
+   TTreeReaderValue<Double_t>  dijet_dEta;
 };
 
 #endif
@@ -294,6 +322,7 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("Subleading_jet_eta") !=0 ) Subleading_jet_eta = {fReader,"Subleading_jet_eta"};
   if (tree->GetBranch("Subleading_jet_phi") !=0 ) Subleading_jet_phi = {fReader,"Subleading_jet_phi"};
   if (tree->GetBranch("diCleanJet_M") !=0 ) diCleanJet_M = { fReader,"diCleanJet_M"};
+  if (tree->GetBranch("dijet_M") !=0 ) dijet_M = { fReader,"dijet_M"};
   if (tree->GetBranch("diCleanJet_dPhi") !=0 ) diCleanJet_dPhi = {fReader,"diCleanJet_dPhi"};
   if (tree->GetBranch("diCleanJet_dEta") !=0 ) diCleanJet_dEta = {fReader,"diCleanJet_dEta"};
   if (tree->GetBranch("Pileup_nTrueInt") !=0 ) Pileup_nTrueInt = {fReader,"Pileup_nTrueInt"};
@@ -359,16 +388,31 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("HLT_Ele32_WPTight_Gsf_L1DoubleEG") !=0 ) HLT_Ele32_WPTight_Gsf_L1DoubleEG = {    fReader,"HLT_Ele32_WPTight_Gsf_L1DoubleEG"};
   if (tree->GetBranch("HLT_Photon200") !=0 ) HLT_Photon200 = {    fReader,"HLT_Photon200"};
 
+ if (tree->GetBranch("Met") !=0 )		 Met = { fReader, "Met"};		 
+ if (tree->GetBranch("TkMET_pt") !=0 )	 TkMET_pt = { fReader, "TkMET_pt"};	 
+ if (tree->GetBranch("SoftActivityJetHT10") !=0 ) SoftActivityJetHT10= { fReader, "SoftActivityJetHT10"}; 
+ if (tree->GetBranch("softActivityJet1_eta") !=0 ) softActivityJet1_eta= { fReader,"softActivityJet1_eta"}; 
+ if (tree->GetBranch("softActivityJet1_phi") !=0 ) softActivityJet1_phi= { fReader,"softActivityJet1_phi"}; 
+ if (tree->GetBranch("softActivityJet2_eta") !=0 ) softActivityJet2_eta= { fReader,"softActivityJet2_eta"}; 
+ if (tree->GetBranch("softActivityJet2_phi") !=0 ) softActivityJet2_phi= { fReader,"softActivityJet2_phi"}; 
+ if (tree->GetBranch("softActivityJet3_eta") !=0 ) softActivityJet3_eta= { fReader,"softActivityJet3_eta"}; 
+ if (tree->GetBranch("softActivityJet3_phi") !=0 ) softActivityJet3_phi= { fReader,"softActivityJet3_phi"}; 
+ if (tree->GetBranch("softActivityJet4_eta") !=0 ) softActivityJet4_eta= { fReader,"softActivityJet4_eta"}; 
+ if (tree->GetBranch("softActivityJet4_phi") !=0 ) softActivityJet4_phi= { fReader,"softActivityJet4_phi"}; 
+ if (tree->GetBranch("softActivityJet5_eta") !=0 ) softActivityJet5_eta= { fReader,"softActivityJet5_eta"}; 
+ if (tree->GetBranch("softActivityJet5_phi") !=0 ) softActivityJet5_phi= { fReader,"softActivityJet5_phi"}; 
+ if (tree->GetBranch("softActivityJet6_eta") !=0 ) softActivityJet6_eta= { fReader,"softActivityJet6_eta"}; 
+ if (tree->GetBranch("softActivityJet6_phi") !=0 ) softActivityJet6_phi= { fReader,"softActivityJet6_phi"}; 
+ if (tree->GetBranch("isoTrack1_eta") !=0 )	 isoTrack1_eta= { fReader, "isoTrack1_eta"};	 
+ if (tree->GetBranch("isoTrack1_phi") !=0 )	 isoTrack1_phi= { fReader, "isoTrack1_phi"};	 
+ if (tree->GetBranch("isoTrack2_eta") !=0 )	 isoTrack2_eta= { fReader, "isoTrack2_eta"};	 
+ if (tree->GetBranch("isoTrack2_phi") !=0 )	 isoTrack2_phi= { fReader, "isoTrack2_phi"};	 
+ if (tree->GetBranch("isoTrack3_eta") !=0 )	 isoTrack3_eta= { fReader, "isoTrack3_eta"};	 
+ if (tree->GetBranch("isoTrack3_phi") !=0 ) isoTrack3_phi= { fReader, "isoTrack3_phi"};   
 
+  /* Zmumu_flag = {fReader, "Zmumu_flag"}; */
 
-
-
-
-
-
-    /* Zmumu_flag = {fReader, "Zmumu_flag"}; */
-
-    /* if (tree->GetBranch("decayLeptonId") !=0 ) decayLeptonId = {fReader, "decayLeptonId"}; */
+   /* if (tree->GetBranch("decayLeptonId") !=0 ) decayLeptonId = {fReader, "decayLeptonId"}; */
     /* if (tree->GetBranch("L1PreFiringWeight_Nom") !=0 ) L1PreFiringWeight_Nom = {fReader, "L1PreFiringWeight_Nom"}; */
     /* if (tree->GetBranch("CRLooseMuon_eventSelW") !=0 ) CRLooseMuon_eventSelW = {fReader, "CRLooseMuon_eventSelW"}; */
     /* if (tree->GetBranch("CRVetoElectron_eventSelW") !=0 ) CRVetoElectron_eventSelW = {fReader, "CRVetoElectron_eventSelW"}; */
@@ -420,9 +464,9 @@ void Events::Init(TTree *tree)
     /* if (tree->GetBranch("HLT_IsoMu27") !=0 ) HLT_IsoMu27 = {fReader, "HLT_IsoMu27"}; */
     /* if (tree->GetBranch("CRTightMuon_eventSelW") !=0 ) CRTightMuon_eventSelW = {fReader, "CRTightMuon_eventSelW"}; */
     /* if (tree->GetBranch("puWeight") !=0 ) puWeight = {fReader, "puWeight"}; */
-    /* if (tree->GetBranch("MetNoLep") !=0 ) MetNoLep = {fReader, "MetNoLep"}; */
+     if (tree->GetBranch("MetNoLep") !=0 ) MetNoLep = {fReader, "MetNoLep"}; 
     /* if (tree->GetBranch("LHE_Vpt") !=0 ) LHE_Vpt = {fReader, "LHE_Vpt"}; */
-    /* if (tree->GetBranch("dijet_dPhi") !=0 ) dijet_dPhi = {fReader, "dijet_dPhi"}; */
+     if (tree->GetBranch("dijet_dPhi") !=0 ) dijet_dPhi = {fReader, "dijet_dPhi"}; 
     /* if (tree->GetBranch("Subleading_muon_phi") !=0 ) Subleading_muon_phi = {fReader, "Subleading_muon_phi"}; */
     /* if (tree->GetBranch("Subleading_muon_eta") !=0 ) Subleading_muon_eta = {fReader, "Subleading_muon_eta"}; */
     /* if (tree->GetBranch("Subleading_el_eta") !=0 ) Subleading_el_eta = {fReader, "Subleading_el_eta"}; */
@@ -431,12 +475,12 @@ void Events::Init(TTree *tree)
     /* if (tree->GetBranch("HLT_Ele32_WPTight_Gsf_L1DoubleEG") !=0 ) HLT_Ele32_WPTight_Gsf_L1DoubleEG = {fReader, "HLT_Ele32_WPTight_Gsf_L1DoubleEG"}; */
     /* if (tree->GetBranch("PV_npvsGood") !=0 ) PV_npvsGood = {fReader, "PV_npvsGood"}; */
     /* if (tree->GetBranch("Subleading_muon_pt") !=0 ) Subleading_muon_pt = {fReader, "Subleading_muon_pt"}; */
-    /* if (tree->GetBranch("JetMetmindPhi") !=0 ) JetMetmindPhi = {fReader, "JetMetmindPhi"}; */
+     if (tree->GetBranch("JetMetmindPhi") !=0 ) JetMetmindPhi = {fReader, "JetMetmindPhi"}; 
     /* if (tree->GetBranch("isData") !=0 ) isData = {fReader, "isData"};  */
     /* if (tree->GetBranch("nJets") !=0 ) nJets = {fReader, "nJets"}; */
     /* if (tree->GetBranch("DiLooseMuon_mass") !=0 ) DiLooseMuon_mass = {fReader, "DiLooseMuon_mass"}; */
     /* if (tree->GetBranch("LHE_Nb") !=0 ) LHE_Nb = {fReader, "LHE_Nb"}; */
-    /* if (tree->GetBranch("dijet_dEta") !=0 ) dijet_dEta = {fReader, "dijet_dEta"}; */
+    if (tree->GetBranch("dijet_dEta") !=0 ) dijet_dEta = {fReader, "dijet_dEta"}; 
     /* if (tree->GetBranch("Leading_el_phi") !=0 ) Leading_el_phi = {fReader, "Leading_el_phi"}; */
     /* if (tree->GetBranch("gen_boson_pt") !=0 ) gen_boson_pt = {fReader, "gen_boson_pt"}; */
     /* if (tree->GetBranch("nGenDressedLepton") !=0 ) nGenDressedLepton = {fReader, "nGenDressedLepton"}; */
