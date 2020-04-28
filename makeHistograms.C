@@ -28,9 +28,15 @@
 
 int makeHistograms(){//main
 
-  std::string baseDir = "/vols/cms/magnan/Hinvisible/Run2/200402/";
-  //  std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
-  //  std::string baseDir = "/vols/cms/snwebb/Common/";
+  bool isAM = false;
+
+
+  std::string baseDir = "";
+  if (isAM)
+    baseDir = "/vols/cms/magnan/Hinvisible/Run2/200402/";
+  else
+    baseDir = "/vols/cms/snwebb/Common/";
+  //    std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
   std::string lPlotDir = "Plots/";
   
   double lLumi_2017 = 41529;
@@ -51,31 +57,40 @@ int makeHistograms(){//main
 
 
   //  std::vector<std::string> proc = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
+  //  std::vector<std::string> proc = { "DATA","QCD"};
+  std::vector<std::string> proc = { "DATA"};
 
   
-  std::vector<std::string> proc = { "QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
+  //std::vector<std::string> proc = { "QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
 
- std::vector<std::string> name = { "Nominal/qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/ewkznunu",  "Nominal/vv",  "Nominal/ewkzll",  "Nominal/ewkw",  "Nominal/zjets"  ,  "Nominal/dy",  "Nominal/wjets","Nominal/topincl","Data/MET"};
+    // std::vector<std::string> name = { "Nominal/qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/ewkznunu",  "Nominal/vv",  "Nominal/ewkzll",  "Nominal/ewkw",  "Nominal/zjets"  ,  "Nominal/dy",  "Nominal/wjets","Nominal/topincl","Data/MET"};
 
 
 
 
   //  std::vector<std::string> proc = { "DY"};
   //  std::vector<std::string> proc = { "DATA"};
-  std::vector<std::string> years = {"2017","2018"};
-  //    std::vector<std::string> years = {"2018"};
-  //  std::vector<std::string> years = {"2017"};
+    std::vector<std::string> years = {"2017","2018"};
+    //   std::vector<std::string> years = {"2018"};
+    //    std::vector<std::string> years = {"2017"};
   //  std::string year = "2018";
 
-  // std::vector<std::string> name;
-  // for (auto process: proc){
-  //   if ( process == "DATA" ){
-  //     name.push_back("JetHT");
-  //   }
-  //   else{
-  //     name.push_back(process);
-  //   }
-  // }
+  std::vector<std::string> name;
+
+  if ( !isAM ){
+    for (auto process: proc){
+      if ( process == "DATA" ){
+	name.push_back("JetHT");
+      }
+      else{
+	name.push_back(process);
+      }
+    }
+  }
+  else{
+    //    std::vector<std::string> name = { "Nominal/qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/ewkznunu",  "Nominal/vv",  "Nominal/ewkzll",  "Nominal/ewkw",  "Nominal/zjets"  ,  "Nominal/dy",  "Nominal/wjets","Nominal/topincl","Data/MET"};
+    name = { "Data/MET" };
+  }
 
   // std::vector<TFile*> fin;
   // std::vector<TTree*> tree;
@@ -90,20 +105,20 @@ int makeHistograms(){//main
   TFile * fin = 0;
   TTree * tree = 0;
 
-
   for (auto year: years){
     for (unsigned iP(0); iP<proc.size(); ++iP){//loop on proc
-    
-      //      fin = new TFile( (baseDir+"/"+year+"/"+name[iP]+".root").c_str() , "READ" );
-      fin = new TFile( (baseDir+"/output_skims_"+year+"/"+name[iP]+".root").c_str() , "READ" );
-    
-      //fin.push_back(TFile::Open((baseDir+"/"+year+"/"+name[iP]+".root").c_str()))
       
+      if ( isAM )
+	fin = new TFile( (baseDir+"/output_skims_"+year+"/"+name[iP]+".root").c_str() , "READ" );//Temp for AM  
+      else 
+	fin = new TFile( (baseDir+"/"+year+"/"+name[iP]+".root").c_str() , "READ" );
+      //fin.push_back(TFile::Open((baseDir+"/"+year+"/"+name[iP]+".root").c_str()))
       if ( fin ){
 	//      if (fin[iS][iP]){
 	//fin[iS][iP]->cd();
 	fin->cd();
 	tree = (TTree*) fin->Get( "Events" );
+
 	//	tree[iS][iP] = (TTree*)gDirectory->Get("Events");
 	//	if (tree[iS][iP]){
 	if (tree){
@@ -114,6 +129,7 @@ int makeHistograms(){//main
 	  else if ( year == "2018" )
 	    selector->SetLumiPb(lLumi_2018);
 	  selector->SetProcess(proc[iP]);
+	  selector->SetAM(isAM);
 	  std::cout << "Set Year" << std::endl;
 	  selector->SetYear(year);
 	  selector->SetSystematic("Nominal");

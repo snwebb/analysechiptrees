@@ -27,12 +27,12 @@
 
 //enum RegionType { SR=0, We=1, Wmu=2, Zee=3, Zmumu=4, QCDCR=5, QCDA=6, QCDB=7, Last };
 
-enum RegionType { SR=0, QCDCR=1, QCDA=2, QCDB=3, Last };
+enum RegionType { SR=0, QCDCR=1,  QCDA=2, QCDB=3,Last,  };
 
 //enum CatType { MTR=0, MTRvetoTau=1, MTRvetoB=2, MTRvetoLep=3, MTRveto=4, LastCat };
 //enum CatType { MTR=0, LastCat, MTRvetoTau=1, MTRvetoB=2, MTRvetoLep=3, MTRveto=4 };
 
-enum CatType { MTR=0, VTR=1, LastCat, MTRvetoTau=2, MTRvetoB=3, MTRvetoLep=4, MTRveto=5 };
+enum CatType { MTR=0,  VTR=1,  LastCat, MTRvetoTau=2, MTRvetoB=3, MTRvetoLep=4, MTRveto=5 };
 
 class Events : public TSelector {
   
@@ -67,6 +67,7 @@ class Events : public TSelector {
    void SetRegion(const RegionType & aRegion);
    void SetProcess(const std::string aProcess);
    void SetYear(const std::string aYear);
+   void SetAM(const bool aisAM);
    void SetMC(const bool aisMC);
    void SetSystematic(const std::string aSystematic);
    void SetLumiPb(const double & aLumi);
@@ -85,6 +86,7 @@ class Events : public TSelector {
    RegionType mReg;
    TString mProc;
    std::string mYear;
+   bool misAM;
    bool misMC;
    TString mSyst;
    double mLumiPb;
@@ -139,6 +141,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> met_filters_2018_mc ;
    TTreeReaderValue<Double_t> MetNoLep_CleanJet_mindPhi ;
    TTreeReaderValue<Double_t> MetNoLep_pt ;
+   TTreeReaderValue<Double_t> MetNoLep_phi ;
    TTreeReaderValue<Double_t> MET_pt ;
    TTreeReaderValue<Double_t> MET_phi ;
    TTreeReaderValue<Double_t> MET_sumEt ;
@@ -221,6 +224,17 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> HLT_IsoMu27 ;
    TTreeReaderValue<Double_t> HLT_Ele32_WPTight_Gsf_L1DoubleEG ;
    TTreeReaderValue<Double_t> HLT_Photon200 ;
+   TTreeReaderValue<Double_t> HLT_PFJet40;
+   TTreeReaderValue<Double_t> HLT_PFJet60;
+   TTreeReaderValue<Double_t> HLT_PFJet80;
+   TTreeReaderValue<Double_t> HLT_PFJet140;
+   TTreeReaderValue<Double_t> HLT_PFJet200;
+   TTreeReaderValue<Double_t> HLT_PFJet260;
+   TTreeReaderValue<Double_t> HLT_PFJet320;
+   TTreeReaderValue<Double_t> HLT_PFJet400;
+   TTreeReaderValue<Double_t> HLT_PFJet450;
+   TTreeReaderValue<Double_t> HLT_PFJet500;
+   TTreeReaderValue<Double_t> HLT_PFJet550;
 
    TTreeReaderValue<Double_t>  Met ;
    TTreeReaderValue<Double_t>  TkMET_pt ;
@@ -305,6 +319,7 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("met_filters_2018_mc") !=0 ) met_filters_2018_mc = {    fReader,"met_filters_2018_mc"};
   if (tree->GetBranch("MetNoLep_CleanJet_mindPhi") !=0 ) MetNoLep_CleanJet_mindPhi = { fReader,"MetNoLep_CleanJet_mindPhi"};
   if (tree->GetBranch("MetNoLep_pt") !=0 ) MetNoLep_pt = {  fReader,"MetNoLep_pt"};
+  if (tree->GetBranch("MetNoLep_phi") !=0 ) MetNoLep_pt = {  fReader,"MetNoLep_phi"};
   if (tree->GetBranch("MET_pt") !=0 ) MET_pt = {    fReader,"MET_pt"};
   if (tree->GetBranch("MET_phi") !=0 ) MET_phi = {   fReader,"MET_phi"};
   if (tree->GetBranch("MET_sumEt") !=0 ) MET_sumEt = { fReader,"MET_sumEt"};
@@ -387,6 +402,19 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("HLT_IsoMu27") !=0 ) HLT_IsoMu27 = {  fReader,"HLT_IsoMu27"};
   if (tree->GetBranch("HLT_Ele32_WPTight_Gsf_L1DoubleEG") !=0 ) HLT_Ele32_WPTight_Gsf_L1DoubleEG = {    fReader,"HLT_Ele32_WPTight_Gsf_L1DoubleEG"};
   if (tree->GetBranch("HLT_Photon200") !=0 ) HLT_Photon200 = {    fReader,"HLT_Photon200"};
+
+  if (tree->GetBranch("HLT_PFJet40") !=0 ) HLT_PFJet40 = {    fReader,"HLT_PFJet40"};
+  if (tree->GetBranch("HLT_PFJet60") !=0 ) HLT_PFJet60 = {    fReader,"HLT_PFJet60"};
+  if (tree->GetBranch("HLT_PFJet80") !=0 ) HLT_PFJet80 = {    fReader,"HLT_PFJet80"};
+  if (tree->GetBranch("HLT_PFJet140") !=0 ) HLT_PFJet140 = {    fReader,"HLT_PFJet140"};
+  if (tree->GetBranch("HLT_PFJet200") !=0 ) HLT_PFJet200 = {    fReader,"HLT_PFJet200"};
+  if (tree->GetBranch("HLT_PFJet260") !=0 ) HLT_PFJet260 = {    fReader,"HLT_PFJet260"};
+  if (tree->GetBranch("HLT_PFJet320") !=0 ) HLT_PFJet320 = {    fReader,"HLT_PFJet320"};
+  if (tree->GetBranch("HLT_PFJet400") !=0 ) HLT_PFJet400 = {    fReader,"HLT_PFJet400"};
+  if (tree->GetBranch("HLT_PFJet450") !=0 ) HLT_PFJet450 = {    fReader,"HLT_PFJet450"};
+  if (tree->GetBranch("HLT_PFJet500") !=0 ) HLT_PFJet500 = {    fReader,"HLT_PFJet500"};
+  if (tree->GetBranch("HLT_PFJet550") !=0 ) HLT_PFJet550 = {    fReader,"HLT_PFJet550"};
+
 
  if (tree->GetBranch("Met") !=0 )		 Met = { fReader, "Met"};		 
  if (tree->GetBranch("TkMET_pt") !=0 )	 TkMET_pt = { fReader, "TkMET_pt"};	 
