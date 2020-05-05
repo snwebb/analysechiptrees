@@ -29,7 +29,7 @@
 int makeHistograms(){//main
 
   bool isAM = false;
-
+  TH1::SetDefaultSumw2();
 
   std::string baseDir = "";
   if (isAM)
@@ -56,9 +56,9 @@ int makeHistograms(){//main
   //
 
 
-  //  std::vector<std::string> proc = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
+    std::vector<std::string> proc = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
   //  std::vector<std::string> proc = { "DATA","QCD"};
-  std::vector<std::string> proc = { "DATA"};
+  //    std::vector<std::string> proc = { "DATA"};
 
   
   //std::vector<std::string> proc = { "QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
