@@ -56,9 +56,18 @@ int makeHistograms(){//main
   //
 
 
-    std::vector<std::string> proc = { "DATA","QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
-  //  std::vector<std::string> proc = { "DATA","QCD"};
+  //  std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
+  
+
+
+  std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
+
+
+
+  //std::vector<std::string> proc = { "DATA","QCD"};
   //    std::vector<std::string> proc = { "DATA"};
+  //  std::vector<std::string> proc = { "QCD"};
+  //      std::vector<std::string> proc = { "WJETS"};
 
   
   //std::vector<std::string> proc = { "QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
@@ -70,9 +79,9 @@ int makeHistograms(){//main
 
   //  std::vector<std::string> proc = { "DY"};
   //  std::vector<std::string> proc = { "DATA"};
-    std::vector<std::string> years = {"2017","2018"};
-    //   std::vector<std::string> years = {"2018"};
-    //    std::vector<std::string> years = {"2017"};
+      std::vector<std::string> years = {"2017","2018"};
+  //  std::vector<std::string> years = {"2018"};
+  //          std::vector<std::string> years = {"2017"};
   //  std::string year = "2018";
 
   std::vector<std::string> name;
@@ -81,6 +90,9 @@ int makeHistograms(){//main
     for (auto process: proc){
       if ( process == "DATA" ){
 	name.push_back("JetHT");
+      }
+      else if ( process == "QCDRELAX" ){
+	name.push_back("QCD");
       }
       else{
 	name.push_back(process);

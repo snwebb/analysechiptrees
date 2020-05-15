@@ -13,13 +13,18 @@ import ROOT
 years = ["2017","2018"]
 #years = ["2017"]
 #samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
-samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
+samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
 regions = ["MTR","VTR"]
 #variables = ["diCleanJet_M_binned"]
 
 ##variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M_binned"]
-variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","diCleanJet_M_binned","diCleanJet_M_binned_reduced"]
+variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced"]
 
+nick = {}
+nick[("MTR","2017")] = ROOT.TFile("out_MTR_2017.root_qcdDD.root","READ")
+nick[("VTR","2017")] = ROOT.TFile("out_VTR_2017.root_qcdDD.root","READ")
+nick[("MTR","2018")] = ROOT.TFile("out_MTR_2018.root_qcdDD.root","READ")
+nick[("VTR","2018")] = ROOT.TFile("out_VTR_2018.root_qcdDD.root","READ")
 
 for region in regions:
     for variable in variables:
@@ -57,7 +62,7 @@ for region in regions:
             #DRAWING
 
 
-            if variable=="diCleanJet_M_binned":
+            if (  (variable=="diCleanJet_M_binned" and region == "MTR" ) or (variable=="lMjj_binned" and region == "VTR" )  ):
 
                 file_out = ROOT.TFile("out_" + region + "_" + year+ ".root","RECREATE")
 
@@ -67,25 +72,25 @@ for region in regions:
 
 
                 for i,CR in enumerate(CRs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "MET"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET"):
                         continue
                     BackgroundSubtractedData_CR.Add(CR,-1)
                 for i,A in enumerate(As):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "MET"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
                         continue
                     BackgroundSubtractedData_A.Add(A,-1)
                 for i,B in enumerate(Bs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "MET"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
                         continue
                     BackgroundSubtractedData_B.Add(B,-1)
 
                 #Get QCD Tranfer factor
 
-                QCDTransferFactor_SR = SRs[1].Clone("QCDTransferFactor_SR")
-                QCDTransferFactor_B = Bs[1].Clone("QCDTransferFactor_B")
+                QCDTransferFactor_SR = SRs[2].Clone("QCDTransferFactor_SR")
+                QCDTransferFactor_B = Bs[2].Clone("QCDTransferFactor_B")
 
-                QCDTransferFactor_SR.Divide( CRs[1] )
-                QCDTransferFactor_B.Divide( As[1] )
+                QCDTransferFactor_SR.Divide( CRs[2] )
+                QCDTransferFactor_B.Divide( As[2] )
 
                 #Get Final QCD prediction
 
@@ -129,6 +134,7 @@ for region in regions:
                 c_1 = ROOT.TCanvas("QCDTransferFactor_SR")
                 QCDTransferFactor_SR.Draw()
                 QCDTransferFactor_SR.GetYaxis().SetTitle("Transfer factor, r")
+                QCDTransferFactor_SR.SetMinimum(-0.0001)
                 ROOT.gStyle.SetOptStat(0);
                 c_1.Draw()
                 c_1.SaveAs("QCDTransferFactor_SR_" + region + "_" + year + ".png" )
@@ -145,20 +151,27 @@ for region in regions:
                 c_2.Close()
 
                 #FINAL QCD
+                nicks = nick[(region,year)].Get("rebin_QCD_hist_counts")
                 c_3 = ROOT.TCanvas("FinalQCD")
                 FinalQCDSR.Draw()
                 FinalQCDSR.GetYaxis().SetTitle("Number of Events")
                 FinalQCDSR.GetYaxis().SetRangeUser(0.1,50000)
                 QCDMC_SR.SetLineColor(ROOT.kRed)
                 QCDMC_SR.Draw("same")
+                nicks.SetLineColor(ROOT.kBlack)
+                nicks.SetMarkerSize(0)
+                nicks.Draw("Esame")
                 print ( "Data-Driven MJ prediction in " + region + " in " + year + " is "  + str(FinalQCDSR.Integral()) )
                 print ( "MC MJ prediction in " + region + " in " + year + " is "  + str(QCDMC_SR.Integral()) )
 
                 ROOT.gPad.SetLogy(1)
-                leg_3 = ROOT.TLegend(0.6,0.6,0.89,0.89)
+                leg_3 = ROOT.TLegend(0.4,0.6,0.89,0.89)
                 leg_3.SetBorderSize(0);
-                leg_3.AddEntry(FinalQCDSR,"Data-driven QCD prediction","L")
-                leg_3.AddEntry(QCDMC_SR,"Estimate from using QCD MC","L")
+                #leg_3.AddEntry(FinalQCDSR,"Estimate using QCD MC transfer factor","L")
+                leg_3.AddEntry(FinalQCDSR,"Data driven method A","L")
+                leg_3.AddEntry(QCDMC_SR,"QCD MC","L")
+                #leg_3.AddEntry(nicks,"Fully data-driven estimate","L")
+                leg_3.AddEntry(nicks,"Data driven method B","L")
                 leg_3.Draw()
 
                 ROOT.gStyle.SetOptStat(0);
@@ -234,67 +247,93 @@ for region in regions:
                 file_out.Close()
 
             # QCDCR   
-            # leg = ROOT.TLegend(0.7,0.7,0.9,0.9)
-            # c = ROOT.TCanvas("stackplot_" + variable)
-            # stack = ROOT.THStack("hs","")
-            # for i,CR in enumerate(CRs):
-            #     if ( samples[i] == "DATA" or samples[i] == "MET"):
-            #         continue
-            #     CR.SetFillColor(30+i)
-            #     CR.SetLineColor(30+i)
-            #     leg.AddEntry(CR,samples[i],"F")
-            #     stack.Add(CR)
-            # CRs[0].Draw()
-            # CRs[0].SetMinimum(0)
-            # stack.Draw("HISTsame")
-            # CRs[0].Draw("same")
-            # leg.Draw()
-            # c.Draw()
-            # c.SaveAs("CR/" + variable + "_" + region + "_" + year + ".png")
-            # c.Close()
-            # #file_out.Close()
+            leg = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            ROOT.gStyle.SetLegendBorderSize(0)
+            c = ROOT.TCanvas("stackplot_" + variable)
+            stack = ROOT.THStack("hs","")
+            for i,CR in enumerate(CRs):
+                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                    continue
+                CR.SetFillColor(30+(i*2))
+                CR.SetLineColor(30+(i*2))
+                leg.AddEntry(CR,samples[i],"F")
+                stack.Add(CR)
+            CRs[0].Draw()
+            CRs[0].SetMinimum(0)
+            stack.Draw("HISTsame")
+            CRs[0].Draw("same")
+            leg.Draw()
+            c.Draw()
+            c.SaveAs("CR/" + variable + "_" + region + "_" + year + ".png")
+            c.Close()
+            #file_out.Close()
+
+            # SR   
+            leg_SR = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            ROOT.gStyle.SetLegendBorderSize(0)
+            c_SR = ROOT.TCanvas("stackplot_" + variable)
+            stack = ROOT.THStack("hs_SR","")
+            for i,SR in enumerate(SRs):
+                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                    continue
+                SR.SetFillColor(30+(i*2))
+                SR.SetLineColor(30+(i*2))
+                leg_SR.AddEntry(SR,samples[i],"F")
+                stack.Add(SR)
+            #CRs[0].Draw()
+            #CRs[0].SetMinimum(0)
+            stack.Draw("HIST")
+            stack.SetMinimum(0)
+            #CRs[0].Draw("same")
+            leg_SR.Draw()
+            c_SR.Draw()
+            c_SR.SaveAs("SR/" + variable + "_" + region + "_" + year + ".png")
+            c_SR.Close()
+            #file_out.Close()
 
 
-            # #A 
-            # leg_A = ROOT.TLegend(0.7,0.7,0.9,0.9)
-            # c_A = ROOT.TCanvas("stackplot_" + variable)
-            # stack_A = ROOT.THStack("hs_A","")
-            # for i,A in enumerate(As):
-            #     if ( samples[i] == "DATA" or samples[i] == "MET"):
-            #         continue
-            #     A.SetFillColor(30+i)
-            #     A.SetLineColor(30+i)
-            #     leg_A.AddEntry(A,samples[i],"F")
-            #     stack_A.Add(A)
-            # As[-1].Draw()
-            # As[-1].SetMinimum(0)
-            # stack_A.Draw("HISTsame")
-            # As[-1].Draw("same")
-            # leg_A.Draw()
-            # c_A.Draw()
-            # c_A.SaveAs("A/" + variable + "_" + region + "_" + year + ".png")
-            # c_A.Close()
-            # #file_out.Close()
+            #A 
+            leg_A = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            ROOT.gStyle.SetLegendBorderSize(0)
+            c_A = ROOT.TCanvas("stackplot_" + variable)
+            stack_A = ROOT.THStack("hs_A","")
+            for i,A in enumerate(As):
+                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                    continue
+                A.SetFillColor(30+(i*2))
+                A.SetLineColor(30+(i*2))
+                leg_A.AddEntry(A,samples[i],"F")
+                stack_A.Add(A)
+            As[-1].Draw()
+            As[-1].SetMinimum(0)
+            stack_A.Draw("HISTsame")
+            As[-1].Draw("same")
+            leg_A.Draw()
+            c_A.Draw()
+            c_A.SaveAs("A/" + variable + "_" + region + "_" + year + ".png")
+            c_A.Close()
+            #file_out.Close()
 
-            # #B
-            # leg_B = ROOT.TLegend(0.7,0.7,0.9,0.9)
-            # c_B = ROOT.TCanvas("stackplot_" + variable)
-            # stack_B = ROOT.THStack("hs_B","")
-            # for i,B in enumerate(Bs):
-            #     if ( samples[i] == "DATA" or samples[i] == "MET"):
-            #         continue
-            #     B.SetFillColor(30+i)
-            #     B.SetLineColor(30+i)
-            #     leg_B.AddEntry(B,samples[i],"F")
-            #     stack_B.Add(B)
-            # Bs[-1].Draw()
-            # Bs[-1].SetMinimum(0)
-            # stack_B.Draw("HISTsame")
-            # Bs[-1].Draw("same")
-            # leg_B.Draw()
-            # c_B.Draw()
-            # c_B.SaveAs("B/" + variable + "_" + region + "_" + year + ".png")
-            # c_B.Close()
+            #B
+            leg_B = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            ROOT.gStyle.SetLegendBorderSize(0)
+            c_B = ROOT.TCanvas("stackplot_" + variable)
+            stack_B = ROOT.THStack("hs_B","")
+            for i,B in enumerate(Bs):
+                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                    continue
+                B.SetFillColor(30+(i*2))
+                B.SetLineColor(30+(i*2))
+                leg_B.AddEntry(B,samples[i],"F")
+                stack_B.Add(B)
+            Bs[-1].Draw()
+            Bs[-1].SetMinimum(0)
+            stack_B.Draw("HISTsame")
+            Bs[-1].Draw("same")
+            leg_B.Draw()
+            c_B.Draw()
+            c_B.SaveAs("B/" + variable + "_" + region + "_" + year + ".png")
+            c_B.Close()
 
 
 
