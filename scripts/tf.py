@@ -63,9 +63,8 @@ for region in regions:
 
 
             if (  (variable=="diCleanJet_M_binned" and region == "MTR" ) or (variable=="lMjj_binned" and region == "VTR" )  ):
-
+                
                 file_out = ROOT.TFile("out_" + region + "_" + year+ ".root","RECREATE")
-
                 BackgroundSubtractedData_CR = CRs[0].Clone("BackgroundSubtractedData_CR")
                 BackgroundSubtractedData_A = As[-1].Clone("BackgroundSubtractedData_A")
                 BackgroundSubtractedData_B = Bs[-1].Clone("BackgroundSubtractedData_B")
@@ -84,7 +83,7 @@ for region in regions:
                         continue
                     BackgroundSubtractedData_B.Add(B,-1)
 
-                #Get QCD Tranfer factor
+                #Get QCD Transfer factor
 
                 QCDTransferFactor_SR = SRs[2].Clone("QCDTransferFactor_SR")
                 QCDTransferFactor_B = Bs[2].Clone("QCDTransferFactor_B")
@@ -264,7 +263,8 @@ for region in regions:
             CRs[0].Draw("same")
             leg.Draw()
             c.Draw()
-            c.SaveAs("CR/" + variable + "_" + region + "_" + year + ".png")
+            c.SaveAs("CR/CR_" + variable + "_" + region + "_" + year + ".png")
+            c.SaveAs("CR/CR_" + variable + "_" + region + "_" + year + ".pdf")
             c.Close()
             #file_out.Close()
 
@@ -287,7 +287,8 @@ for region in regions:
             #CRs[0].Draw("same")
             leg_SR.Draw()
             c_SR.Draw()
-            c_SR.SaveAs("SR/" + variable + "_" + region + "_" + year + ".png")
+            c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".png")
+            c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
             c_SR.Close()
             #file_out.Close()
 
@@ -310,7 +311,8 @@ for region in regions:
             As[-1].Draw("same")
             leg_A.Draw()
             c_A.Draw()
-            c_A.SaveAs("A/" + variable + "_" + region + "_" + year + ".png")
+            c_A.SaveAs("A/A_" + variable + "_" + region + "_" + year + ".png")
+            c_A.SaveAs("A/A_" + variable + "_" + region + "_" + year + ".pdf")
             c_A.Close()
             #file_out.Close()
 
@@ -332,7 +334,8 @@ for region in regions:
             Bs[-1].Draw("same")
             leg_B.Draw()
             c_B.Draw()
-            c_B.SaveAs("B/" + variable + "_" + region + "_" + year + ".png")
+            c_B.SaveAs("B/B_" + variable + "_" + region + "_" + year + ".png")
+            c_B.SaveAs("B/B_" + variable + "_" + region + "_" + year + ".pdf")
             c_B.Close()
 
 
@@ -349,3 +352,79 @@ for region in regions:
 
         #c.Draw()
         #c.Print("plot_"+year+".root")
+
+#For Nick's method
+variables = ["MetNoLep_CleanJet_mindPhi"]
+for region in regions:
+    for variable in variables:
+        for year in years:
+
+            files = []
+            SRs = []
+            CRs = []
+            As = []
+            Bs = []
+
+            for sample in samples:
+                files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/Plots/Histos_Nominal_"+sample+"_"+year+".root"))
+                SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
+                CRs.append(files[-1].Get("QCDCR/"+region+"/h_QCDCR_"+region+"_" + variable))
+                As.append(files[-1].Get("QCDA/"+region+"/h_QCDA_"+region+"_" + variable))
+                Bs.append(files[-1].Get("QCDB/"+region+"/h_QCDB_"+region+"_" + variable))
+
+            file_out = ROOT.TFile("out_" + region + "_" + year+ ".root","UPDATE")
+            
+
+            file_out.mkdir("MetNoLep_CleanJet_mindPhi")
+            file_out.cd("MetNoLep_CleanJet_mindPhi")
+
+            for CR,SR in zip(CRs,SRs):
+                CR.Add(SR)
+
+            for A,B in zip(As,Bs):
+                A.Add(B)
+
+            for i,CR in enumerate(CRs):
+                CR.Rebin(5)
+                CR.Write(samples[i]+"_CR")
+            for i,A in enumerate(As):
+                A.Rebin(5)
+                A.Write(samples[i]+"_A")
+
+            BackgroundSum_CR = CRs[0].Clone("BackgroundSum_CR")
+            BackgroundSum_CR.Reset()
+
+            BackgroundSum_A = As[0].Clone("BackgroundSum_A")
+            BackgroundSum_A.Reset()
+
+            for i,cr in enumerate(CRs):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
+                    continue
+                BackgroundSum_CR.Add(cr)
+
+            BackgroundSum_CR.Write()
+
+            for i,a in enumerate(As):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
+                    continue
+                BackgroundSum_A.Add(a)
+
+            BackgroundSum_A.Write()
+
+            # BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_MetNoLep_CleanJet_mindPhi_SR")
+
+            # for i,CR in enumerate(CRs):
+            #     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET"):
+            #         continue
+            #     BackgroundSubtractedData_CR.Add(CR,-1)
+            # for i,SR in enumerate(SRs):
+            #     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET"):
+            #         continue
+            #     BackgroundSubtractedData_SR.Add(SR,-1)
+
+            # BackgroundSubtractedData_CR.Add(BackgroundSubtractedData_SR)
+            # #Write all relevant hists:
+            # BackgroundSubtractedData_CR.Write()
+
+            file_out.Close()
+
