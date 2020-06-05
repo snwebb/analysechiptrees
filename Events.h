@@ -15,6 +15,7 @@
 #include <TTreeReader.h>
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
+#include <TH2D.h>
 
 // Headers needed by this particular selector
 
@@ -23,7 +24,9 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <map>
+#include <string>
+#include <utility>
+#include <functional>
 
 //enum RegionType { SR=0, We=1, Wmu=2, Zee=3, Zmumu=4, QCDCR=5, QCDA=6, QCDB=7, Last };
 
@@ -73,14 +76,16 @@ class Events : public TSelector {
    void SetLumiPb(const double & aLumi);
    void SetTreeContent(std::string year);
    bool CheckValue(ROOT::Internal::TTreeReaderValueBase& value);
-
+   void CalculateAdditionalVariables();
 
    
  private:
    TFile *mFout;
    std::string mOutFile;
    std::vector<std::string> mVarVec;
+   std::vector<std::pair<std::string,std::string> > mVarVec2D;
    std::vector<TH1F*> mHistVec[RegionType::Last][CatType::LastCat];
+   std::vector<TH2D*> mHistVec2D[RegionType::Last][CatType::LastCat];
 
    CatType mCat;
    RegionType mReg;
@@ -96,6 +101,13 @@ class Events : public TSelector {
    Bool_t PassSelection();
    Double_t SelWeight();
 
+   /* struct hist1D{ */
+   /*   std::string varname; */
+   /*   int nBins; */
+   /*   double binMin; */
+   /*   double binMax; */
+   /* }; */
+   
    std::map<std::string,double> lTreeContent;
    
    //public:
@@ -157,9 +169,13 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> Leading_jet_pt ;
    TTreeReaderValue<Double_t> Leading_jet_eta ;
    TTreeReaderValue<Double_t> Leading_jet_phi ;
+   TTreeReaderValue<Double_t> Leading_jet_chHEF ;
+   TTreeReaderValue<Double_t> Leading_jet_neHEF ;
    TTreeReaderValue<Double_t> Subleading_jet_pt ;
    TTreeReaderValue<Double_t> Subleading_jet_eta ;
    TTreeReaderValue<Double_t> Subleading_jet_phi ;
+   TTreeReaderValue<Double_t> Subleading_jet_chHEF ;
+   TTreeReaderValue<Double_t> Subleading_jet_neHEF ;
    TTreeReaderValue<Double_t> diCleanJet_M ;
    TTreeReaderValue<Double_t> lMjj ;
    TTreeReaderValue<Double_t> DiCleanJet_mass ;
@@ -339,9 +355,13 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("Leading_jet_pt") !=0 ) Leading_jet_pt = { fReader,"Leading_jet_pt"};
   if (tree->GetBranch("Leading_jet_eta") !=0 ) Leading_jet_eta = {fReader,"Leading_jet_eta"};
   if (tree->GetBranch("Leading_jet_phi") !=0 ) Leading_jet_phi = {fReader,"Leading_jet_phi"};
+  if (tree->GetBranch("Leading_jet_chHEF") !=0 ) Leading_jet_chHEF = {fReader,"Leading_jet_chHEF"};
+  if (tree->GetBranch("Leading_jet_neHEF") !=0 ) Leading_jet_neHEF = {fReader,"Leading_jet_neHEF"};
   if (tree->GetBranch("Subleading_jet_pt") !=0 ) Subleading_jet_pt = { fReader,"Subleading_jet_pt"};
   if (tree->GetBranch("Subleading_jet_eta") !=0 ) Subleading_jet_eta = {fReader,"Subleading_jet_eta"};
   if (tree->GetBranch("Subleading_jet_phi") !=0 ) Subleading_jet_phi = {fReader,"Subleading_jet_phi"};
+  if (tree->GetBranch("Subleading_jet_chHEF") !=0 ) Subleading_jet_chHEF = {fReader,"Subleading_jet_chHEF"};
+  if (tree->GetBranch("Subleading_jet_neHEF") !=0 ) Subleading_jet_neHEF = {fReader,"Subleading_jet_neHEF"};
   if (tree->GetBranch("diCleanJet_M") !=0 ) diCleanJet_M = { fReader,"diCleanJet_M"};
   if (tree->GetBranch("lMjj") !=0 ) lMjj = { fReader,"lMjj"};
   if (tree->GetBranch("DiCleanJet_mass") !=0 ) DiCleanJet_mass = { fReader,"DiCleanJet_mass"};

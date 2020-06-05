@@ -28,12 +28,14 @@
 
 int makeHistograms(){//main
 
-  bool isAM = false;
+  bool isAM = true;
   TH1::SetDefaultSumw2();
 
   std::string baseDir = "";
-  if (isAM)
-    baseDir = "/vols/cms/magnan/Hinvisible/Run2/200402/";
+  if (isAM){
+    //    baseDir = "/vols/cms/magnan/Hinvisible/Run2/200402/";
+    baseDir = "/vols/cms/magnan/Hinvisible/Run2/200527/";
+  }
   else
     baseDir = "/vols/cms/snwebb/Common/";
   //    std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
@@ -56,18 +58,20 @@ int makeHistograms(){//main
   //
 
 
-  //  std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
+  //std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
   
 
 
-  //  std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
+  //        std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
 
 
 
-  std::vector<std::string> proc = { "MET"};
-  //    std::vector<std::string> proc = { "DATA"};
+
+  //
+  //       std::vector<std::string> proc = { "QCDRELAX"};
+  //      std::vector<std::string> proc = { "DATA"};
   //  std::vector<std::string> proc = { "QCD"};
-  //      std::vector<std::string> proc = { "WJETS"};
+    std::vector<std::string> proc = {"MET"};
 
   
   //std::vector<std::string> proc = { "QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
@@ -79,9 +83,9 @@ int makeHistograms(){//main
 
   //  std::vector<std::string> proc = { "DY"};
   //  std::vector<std::string> proc = { "DATA"};
-      std::vector<std::string> years = {"2017","2018"};
-  //  std::vector<std::string> years = {"2018"};
-  //          std::vector<std::string> years = {"2017"};
+       //      std::vector<std::string> years = {"2017","2018"};
+      //    std::vector<std::string> years = {"2017"};
+         std::vector<std::string> years = {"2017"};
   //  std::string year = "2018";
 
   std::vector<std::string> name;
