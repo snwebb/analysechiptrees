@@ -28,7 +28,7 @@
 
 int makeHistograms(){//main
 
-  bool isAM = true;
+  bool isAM = false;
   TH1::SetDefaultSumw2();
 
   std::string baseDir = "";
@@ -38,14 +38,15 @@ int makeHistograms(){//main
   }
   else
     baseDir = "/vols/cms/snwebb/Common/";
+
+    //    baseDir = "/home/hep/snwebb/invisible/Nick/analysis/temp-znn-q";
   //    std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
   std::string lPlotDir = "Plots/";
   
   double lLumi_2017 = 41529;
+  //  double lLumi_2017 = 1;
   double lLumi_2018 = 59741;
 
-  //  const unsigned nS = 9;//nom,jesup/down,jerup/down...
-  //  const unsigned nS = 1;//nom,jesup/down,jerup/down...
   //  std::string syst[5] = {"Nominal","JESUP","JESDOWN","JERUP","JERDOWN"};
   //  std::vector<std::string> syst = {"Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown",};
   //  std::vector<std::string> syst = {"Nominal"};
@@ -57,24 +58,20 @@ int makeHistograms(){//main
   // std::string name[6] = {"ZJETS","DY","EWKW","EWKZNUNU","EWKZll"};
   //
 
-
   //std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
   
 
 
-  //        std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
+  
+
+  std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
 
 
 
 
   //
-  //       std::vector<std::string> proc = { "QCDRELAX"};
-  //      std::vector<std::string> proc = { "DATA"};
-  //  std::vector<std::string> proc = { "QCD"};
-    std::vector<std::string> proc = {"MET"};
-
-  
-  //std::vector<std::string> proc = { "QCD", "GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
+  //  std::vector<std::string> proc = { "DATA","QCDRELAX"};
+  //std::vector<std::string> proc = { "ZNN"};
 
     // std::vector<std::string> name = { "Nominal/qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/ewkznunu",  "Nominal/vv",  "Nominal/ewkzll",  "Nominal/ewkw",  "Nominal/zjets"  ,  "Nominal/dy",  "Nominal/wjets","Nominal/topincl","Data/MET"};
 
@@ -83,9 +80,9 @@ int makeHistograms(){//main
 
   //  std::vector<std::string> proc = { "DY"};
   //  std::vector<std::string> proc = { "DATA"};
-       //      std::vector<std::string> years = {"2017","2018"};
-      //    std::vector<std::string> years = {"2017"};
-         std::vector<std::string> years = {"2017"};
+    std::vector<std::string> years = {"2017","2018"};
+  //std::vector<std::string> years = {"2017"};
+  //           std::vector<std::string> years = {"2018"};
   //  std::string year = "2018";
 
   std::vector<std::string> name;
@@ -104,8 +101,8 @@ int makeHistograms(){//main
     }
   }
   else{
-    //    std::vector<std::string> name = { "Nominal/qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/ewkznunu",  "Nominal/vv",  "Nominal/ewkzll",  "Nominal/ewkw",  "Nominal/zjets"  ,  "Nominal/dy",  "Nominal/wjets","Nominal/topincl","Data/MET"};
-    name = { "Data/MET" };
+    name = { "Data/MET", "Nominal/all_qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/all_ewkznunu",  "Nominal/all_vv",  "Nominal/all_ewkzll",  "Nominal/all_ewkw",  "Nominal/all_zjets"  ,  "Nominal/all_dy",  "Nominal/all_wjets","Nominal/all_topincl","Data/MET"};
+    //  name = { "Data/MET" };
   }
 
   // std::vector<TFile*> fin;
@@ -120,12 +117,14 @@ int makeHistograms(){//main
   //  for (unsigned iS(0); iS<syst.size(); ++iS){//loop on syst
   TFile * fin = 0;
   TTree * tree = 0;
-
+  //crashes at MET in AM code.
   for (auto year: years){
-    for (unsigned iP(0); iP<proc.size(); ++iP){//loop on proc
-      
-      if ( isAM )
+    for (unsigned iP(0); iP<proc.size(); ++iP){//loop on proc      
+      if ( isAM ){
+	if ( proc[iP] == "QCDRELAX" ) continue;
+	if ( proc[iP] == "DATA" ) continue;
 	fin = new TFile( (baseDir+"/output_skims_"+year+"/"+name[iP]+".root").c_str() , "READ" );//Temp for AM  
+      }
       else 
 	fin = new TFile( (baseDir+"/"+year+"/"+name[iP]+".root").c_str() , "READ" );
       //fin.push_back(TFile::Open((baseDir+"/"+year+"/"+name[iP]+".root").c_str()))

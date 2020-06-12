@@ -5,6 +5,7 @@ sys.argv.append( '-b' )
 # os.mkdir("A")
 # os.mkdir("B")
 import ROOT
+ROOT.TH1.SetDefaultSumw2()
 #listOfSysts = ["Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown"]
 #listOfSysts = ["Nominal","ElectronVetoUp","MuonVetoUp","TauVetoUp","BjetVetoUp"]
 #listOfSysts = ["Nominal"]
@@ -13,18 +14,30 @@ import ROOT
 years = ["2017","2018"]
 #years = ["2017"]
 #samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
-samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
+#samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
+samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
 regions = ["MTR","VTR"]
 #variables = ["diCleanJet_M_binned"]
 
 ##variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M_binned"]
-variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced"]
+variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced"]
 
 nick = {}
 nick[("MTR","2017")] = ROOT.TFile("out_MTR_2017.root_qcdDD.root","READ")
 nick[("VTR","2017")] = ROOT.TFile("out_VTR_2017.root_qcdDD.root","READ")
 nick[("MTR","2018")] = ROOT.TFile("out_MTR_2018.root_qcdDD.root","READ")
 nick[("VTR","2018")] = ROOT.TFile("out_VTR_2018.root_qcdDD.root","READ")
+
+colors = {}
+colors["VV"] = '#7bc345'
+colors["TOP"]  =  '#CF3721'
+colors["DY"] =  '#9767a3'
+colors["EWKZll"]  = '#c46c9c'
+colors["EWKZNUNU"]  = '#457bc3'
+colors["ZJETS"]  =  '#14dbf9'
+colors["EWKW"]   =  '#f28d84'
+colors["WJETS"]     =  '#febc67'
+colors["QCD"]     =  '#ffffff'
 
 for region in regions:
     for variable in variables:
@@ -85,11 +98,11 @@ for region in regions:
 
                 #Get QCD Transfer factor
 
-                QCDTransferFactor_SR = SRs[2].Clone("QCDTransferFactor_SR")
-                QCDTransferFactor_B = Bs[2].Clone("QCDTransferFactor_B")
+                QCDTransferFactor_SR = SRs[-2].Clone("QCDTransferFactor_SR")
+                QCDTransferFactor_B = Bs[-2].Clone("QCDTransferFactor_B")
 
-                QCDTransferFactor_SR.Divide( CRs[2] )
-                QCDTransferFactor_B.Divide( As[2] )
+                QCDTransferFactor_SR.Divide( CRs[-2] )
+                QCDTransferFactor_B.Divide( As[-2] )
 
                 #Get Final QCD prediction
 
@@ -99,11 +112,10 @@ for region in regions:
                 FinalQCDSR.Multiply(QCDTransferFactor_SR)
                 FinalQCDB.Multiply(QCDTransferFactor_B)
 
-                QCDMC_SR = SRs[1].Clone("QCDMC_SR")
-                QCDMC_CR = CRs[1].Clone("QCDMC_CR")
+                QCDMC_SR = SRs[-3].Clone("QCDMC_SR")
+                QCDMC_CR = CRs[-3].Clone("QCDMC_CR")
 
-                QCDMC_B = Bs[1].Clone("QCDMC_B")
-
+                QCDMC_B = Bs[-3].Clone("QCDMC_B")
                 JETHT_B = Bs[-1].Clone("JETHT_B")
 
 
@@ -184,6 +196,8 @@ for region in regions:
                 FinalQCDB.Draw()
                 if ( region == "MTR"):
                     FinalQCDB.GetYaxis().SetRangeUser(0,10000)
+                if ( region == "VTR"):
+                    FinalQCDB.GetYaxis().SetRangeUser(0,40)
                 FinalQCDB.GetYaxis().SetTitle("Number of Events")
                 # QCDMC_B.SetLineColor(ROOT.kRed)
                 # QCDMC_B.Draw("same")
@@ -207,6 +221,8 @@ for region in regions:
                 ratio.Divide(JETHT_B)
                 ratio.Draw()
                 if ( region == "MTR"):
+                    ratio.GetYaxis().SetRangeUser(0,3)
+                if ( region == "VTR"):
                     ratio.GetYaxis().SetRangeUser(0,3)
                 ratio.GetYaxis().SetTitle("Ratio")
                 ROOT.gStyle.SetOptStat(0);
@@ -272,22 +288,50 @@ for region in regions:
             leg_SR = ROOT.TLegend(0.65,0.55,0.87,0.89)
             ROOT.gStyle.SetLegendBorderSize(0)
             c_SR = ROOT.TCanvas("stackplot_" + variable)
-            stack = ROOT.THStack("hs_SR","")
+            p1_SR = ROOT.TPad("SRmain","",0,0.3,1,1)
+            p2_SR = ROOT.TPad("SRratio","",0,0,1,0.3)
+            p1_SR.Draw()
+            p1_SR.cd()
+            ROOT.gStyle.SetOptStat(0);
+            ROOT.gPad.SetBottomMargin(0)
+            stack_SR = ROOT.THStack("hs_SR","")
+            MCSum = SRs[0].Clone("SR_MCSum")
+            MCSum.Reset()
             for i,SR in enumerate(SRs):
-                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                #if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
                     continue
-                SR.SetFillColor(30+(i*2))
-                SR.SetLineColor(30+(i*2))
+                # SR.SetFillColor(30+(i*2))
+                # SR.SetLineColor(30+(i*2))
+                SR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                SR.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                if ( samples[i] == "QCD"):
+                    SR.SetLineColor(1)
                 leg_SR.AddEntry(SR,samples[i],"F")
-                stack.Add(SR)
-            #CRs[0].Draw()
-            #CRs[0].SetMinimum(0)
-            stack.Draw("HIST")
-            stack.SetMinimum(0)
-            #CRs[0].Draw("same")
+                MCSum.Add(SR)
+                stack_SR.Add(SR)
+            SRs[0].Draw()
+            SR_Ratio = SRs[0].Clone("SR_Ratio")
+            SR_Ratio.Divide(MCSum)
+            SRs[0].SetMinimum(0)
+            stack_SR.Draw("HISTsame")
+            stack_SR.SetMinimum(0)
+            SRs[0].Draw("same")
             leg_SR.Draw()
+            c_SR.cd()
+            p2_SR.Draw()
+            p2_SR.cd()
+            p2_SR.SetGrid()
+            ROOT.gPad.SetTopMargin(0)
+            ROOT.gPad.SetBottomMargin(0.3)
+            ROOT.gStyle.SetOptStat(0);
+            SR_Ratio.Draw()
+            
+            SR_Ratio.GetYaxis().SetRangeUser(0,2)
+            c_SR.cd()
             c_SR.Draw()
             c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".png")
+            c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".C")
             c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
             c_SR.Close()
             #file_out.Close()

@@ -144,6 +144,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> Subleading_muon_phi ;
    TTreeReaderValue<Double_t> isData ;
    TTreeReaderValue<Double_t> nVLooseTau ;
+   TTreeReaderValue<Double_t> nVLooseTauFix ;
    TTreeReaderValue<Double_t> nVLooseSITTau ;
    TTreeReaderValue<Double_t> nMediumBJet ;
    TTreeReaderValue<Double_t> nLoosePhoton ;
@@ -178,6 +179,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> Subleading_jet_neHEF ;
    TTreeReaderValue<Double_t> diCleanJet_M ;
    TTreeReaderValue<Double_t> lMjj ;
+   TTreeReaderValue<Double_t> lMjj_dijet_dphi ;
    TTreeReaderValue<Double_t> DiCleanJet_mass ;
    TTreeReaderValue<Double_t> dijet_M ;
    TTreeReaderValue<Double_t> diCleanJet_dPhi ;
@@ -234,6 +236,9 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> VLooseSITTau_eventVetoW ;
    TTreeReaderValue<Double_t> VLooseSITTau_eventVetoW_up ;
    TTreeReaderValue<Double_t> VLooseSITTau_eventVetoW_down ;
+   TTreeReaderValue<Double_t> VLooseTauFix_eventVetoW ;
+   TTreeReaderValue<Double_t> VLooseTauFix_eventVetoW_up ;
+   TTreeReaderValue<Double_t> VLooseTauFix_eventVetoW_down ;
    TTreeReaderValue<Double_t> MediumBJet_eventVetoW ;
    TTreeReaderValue<Double_t> HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60 ;
    TTreeReaderValue<Double_t> HLT_PFMETNoMu120_PFMHTNoMu120_IDTight ;
@@ -277,6 +282,12 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t>  isoTrack2_phi;
    TTreeReaderValue<Double_t>  isoTrack3_eta;
    TTreeReaderValue<Double_t>  isoTrack3_phi;        
+
+   TTreeReaderValue<Double_t>  jet_chf_nhf_cut;        
+   TTreeReaderValue<Double_t>  jet_chf_nhf_vtr_cut;        
+
+   TTreeReaderValue<Double_t>  horn_sel;        
+   TTreeReaderValue<Double_t>  horn_sel_vtr;        
 
    //AM's variables
    TTreeReaderValue<Double_t>  JetMetmindPhi;        
@@ -330,6 +341,7 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("Subleading_muon_phi") !=0 ) Subleading_muon_phi = {    fReader,"Subleading_muon_phi"};
   if (tree->GetBranch("isData") !=0 ) isData = {    fReader,"isData"};
   if (tree->GetBranch("nVLooseTau") !=0 ) nVLooseTau = {fReader,"nVLooseTau"};
+  if (tree->GetBranch("nVLooseTauFix") !=0 ) nVLooseTauFix = {fReader,"nVLooseTauFix"};
   if (tree->GetBranch("nVLooseSITTau") !=0 ) nVLooseSITTau = {fReader,"nVLooseSITTau"};
   if (tree->GetBranch("nMediumBJet") !=0 ) nMediumBJet = {  fReader,"nMediumBJet"};
   if (tree->GetBranch("nLoosePhoton") !=0 ) nLoosePhoton = { fReader,"nLoosePhoton"};
@@ -364,6 +376,7 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("Subleading_jet_neHEF") !=0 ) Subleading_jet_neHEF = {fReader,"Subleading_jet_neHEF"};
   if (tree->GetBranch("diCleanJet_M") !=0 ) diCleanJet_M = { fReader,"diCleanJet_M"};
   if (tree->GetBranch("lMjj") !=0 ) lMjj = { fReader,"lMjj"};
+  if (tree->GetBranch("lMjj_dijet_dphi") !=0 ) lMjj_dijet_dphi = { fReader,"lMjj_dijet_dphi"};
   if (tree->GetBranch("DiCleanJet_mass") !=0 ) DiCleanJet_mass = { fReader,"DiCleanJet_mass"};
   if (tree->GetBranch("dijet_M") !=0 ) dijet_M = { fReader,"dijet_M"};
   if (tree->GetBranch("diCleanJet_dPhi") !=0 ) diCleanJet_dPhi = {fReader,"diCleanJet_dPhi"};
@@ -420,6 +433,10 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("VLooseSITTau_eventVetoW") !=0 ) VLooseSITTau_eventVetoW = {fReader,"VLooseSITTau_eventVetoW"};
   if (tree->GetBranch("VLooseSITTau_eventVetoW_up") !=0 ) VLooseSITTau_eventVetoW_up = {fReader,"VLooseSITTau_eventVetoW_up"};
   if (tree->GetBranch("VLooseSITTau_eventVetoW_down") !=0 ) VLooseSITTau_eventVetoW_down = {   fReader,"VLooseSITTau_eventVetoW_down"};
+  if (tree->GetBranch("VLooseTauFix_eventVetoW") !=0 ) VLooseTauFix_eventVetoW = {   fReader,"VLooseTauFix_eventVetoW"};
+  if (tree->GetBranch("VLooseTauFix_eventVetoW_up") !=0 ) VLooseTauFix_eventVetoW_up = {fReader,"VLooseTauFix_eventVetoW_up"};
+  if (tree->GetBranch("VLooseTauFix_eventVetoW_down") !=0 ) VLooseTauFix_eventVetoW_down = { fReader,"VLooseTauFix_eventVetoW_down"};
+
   if (tree->GetBranch("MediumBJet_eventVetoW") !=0 ) MediumBJet_eventVetoW = {  fReader,"MediumBJet_eventVetoW"};
   if (tree->GetBranch("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60") !=0 ) HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60 = {fReader,"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"};
   if (tree->GetBranch("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight") !=0 ) HLT_PFMETNoMu120_PFMHTNoMu120_IDTight = {  fReader,"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"};
@@ -465,6 +482,13 @@ void Events::Init(TTree *tree)
  if (tree->GetBranch("isoTrack2_phi") !=0 )	 isoTrack2_phi= { fReader, "isoTrack2_phi"};	 
  if (tree->GetBranch("isoTrack3_eta") !=0 )	 isoTrack3_eta= { fReader, "isoTrack3_eta"};	 
  if (tree->GetBranch("isoTrack3_phi") !=0 ) isoTrack3_phi= { fReader, "isoTrack3_phi"};   
+
+
+ if (tree->GetBranch("jet_chf_nhf_cut") !=0 ) jet_chf_nhf_cut= { fReader, "jet_chf_nhf_cut"};   
+ if (tree->GetBranch("jet_chf_nhf_vtr_cut") !=0 ) jet_chf_nhf_vtr_cut= { fReader, "jet_chf_nhf_vtr_cut"};   
+
+ if (tree->GetBranch("horn_sel") !=0 ) horn_sel= { fReader, "horn_sel"};   
+ if (tree->GetBranch("horn_sel_vtr") !=0 ) horn_sel_vtr= { fReader, "horn_sel_vtr"};  
 
  if (tree->GetBranch("MetNoLep") !=0 ) MetNoLep = {fReader, "MetNoLep"}; 
  if (tree->GetBranch("dijet_dPhi") !=0 ) dijet_dPhi = {fReader, "dijet_dPhi"}; 
