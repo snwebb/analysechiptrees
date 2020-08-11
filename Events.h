@@ -177,6 +177,12 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> Subleading_jet_phi ;
    TTreeReaderValue<Double_t> Subleading_jet_chHEF ;
    TTreeReaderValue<Double_t> Subleading_jet_neHEF ;
+   TTreeReaderValue<Double_t> lMjj_jet1_pt ;
+   TTreeReaderValue<Double_t> lMjj_jet1_eta ;
+   TTreeReaderValue<Double_t> lMjj_jet1_phi ;
+   TTreeReaderValue<Double_t> lMjj_jet2_pt ;
+   TTreeReaderValue<Double_t> lMjj_jet2_eta ;
+   TTreeReaderValue<Double_t> lMjj_jet2_phi ;
    TTreeReaderValue<Double_t> diCleanJet_M ;
    TTreeReaderValue<Double_t> lMjj ;
    TTreeReaderValue<Double_t> lMjj_dijet_dphi ;
@@ -289,6 +295,9 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t>  horn_sel;        
    TTreeReaderValue<Double_t>  horn_sel_vtr;        
 
+   TTreeReaderValue<Double_t>  VecBDPhiCutMTR;        
+   TTreeReaderValue<Double_t>  VecBDPhiCutVTR;        
+
    //AM's variables
    TTreeReaderValue<Double_t>  JetMetmindPhi;        
    TTreeReaderValue<Double_t>  MetNoLep;        
@@ -374,6 +383,12 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("Subleading_jet_phi") !=0 ) Subleading_jet_phi = {fReader,"Subleading_jet_phi"};
   if (tree->GetBranch("Subleading_jet_chHEF") !=0 ) Subleading_jet_chHEF = {fReader,"Subleading_jet_chHEF"};
   if (tree->GetBranch("Subleading_jet_neHEF") !=0 ) Subleading_jet_neHEF = {fReader,"Subleading_jet_neHEF"};
+  if (tree->GetBranch("lMjj_jet1_pt") !=0 ) lMjj_jet1_pt = { fReader,"lMjj_jet1_pt"};
+  if (tree->GetBranch("lMjj_jet1_eta") !=0 ) lMjj_jet1_eta = {fReader,"lMjj_jet1_eta"};
+  if (tree->GetBranch("lMjj_jet1_phi") !=0 ) lMjj_jet1_phi = {fReader,"lMjj_jet1_phi"};
+  if (tree->GetBranch("lMjj_jet2_pt") !=0 ) lMjj_jet2_pt = { fReader,"lMjj_jet2_pt"};
+  if (tree->GetBranch("lMjj_jet2_eta") !=0 ) lMjj_jet2_eta = {fReader,"lMjj_jet2_eta"};
+  if (tree->GetBranch("lMjj_jet2_phi") !=0 ) lMjj_jet2_phi = {fReader,"lMjj_jet2_phi"};
   if (tree->GetBranch("diCleanJet_M") !=0 ) diCleanJet_M = { fReader,"diCleanJet_M"};
   if (tree->GetBranch("lMjj") !=0 ) lMjj = { fReader,"lMjj"};
   if (tree->GetBranch("lMjj_dijet_dphi") !=0 ) lMjj_dijet_dphi = { fReader,"lMjj_dijet_dphi"};
@@ -489,6 +504,9 @@ void Events::Init(TTree *tree)
 
  if (tree->GetBranch("horn_sel") !=0 ) horn_sel= { fReader, "horn_sel"};   
  if (tree->GetBranch("horn_sel_vtr") !=0 ) horn_sel_vtr= { fReader, "horn_sel_vtr"};  
+
+ if (tree->GetBranch("VecBDPhiCutMTR") !=0 ) VecBDPhiCutMTR = { fReader, "VecBDPhiCutMTR"};   
+ if (tree->GetBranch("VecBDPhiCutVTR") !=0 ) VecBDPhiCutVTR= { fReader, "VecBDPhiCutVTR"};  
 
  if (tree->GetBranch("MetNoLep") !=0 ) MetNoLep = {fReader, "MetNoLep"}; 
  if (tree->GetBranch("dijet_dPhi") !=0 ) dijet_dPhi = {fReader, "dijet_dPhi"}; 

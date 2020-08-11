@@ -11,8 +11,8 @@ ROOT.TH1.SetDefaultSumw2()
 #listOfSysts = ["Nominal"]
 
 #samples = ["DATA","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","MET"]
-years = ["2017","2018"]
-#years = ["2017"]
+#years = ["2017","2018"]
+years = ["2017"]
 #samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
 #samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
 samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
@@ -197,7 +197,7 @@ for region in regions:
                 if ( region == "MTR"):
                     FinalQCDB.GetYaxis().SetRangeUser(0,10000)
                 if ( region == "VTR"):
-                    FinalQCDB.GetYaxis().SetRangeUser(0,40)
+                    FinalQCDB.GetYaxis().SetRangeUser(0,1000)
                 FinalQCDB.GetYaxis().SetTitle("Number of Events")
                 # QCDMC_B.SetLineColor(ROOT.kRed)
                 # QCDMC_B.Draw("same")

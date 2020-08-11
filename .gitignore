@@ -3,5 +3,7 @@
 *.so
 *.pcm
 *.root
-Plots/
+*.png
+*.pdf
+Plots*/
 temp/
