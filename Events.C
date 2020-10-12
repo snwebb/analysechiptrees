@@ -73,7 +73,10 @@ void Events::Begin(TTree * /*tree*/)
 							     std::make_pair("MetNoLep_CleanJet_mindPhi","Pileup_nPU"),
 							     std::make_pair("diCleanJet_dPhi","dijet_met_balance"),
 							     std::make_pair("MetNoLep_CleanJet_mindPhi","diCleanJet_M"),
-							     std::make_pair("MetNoLep_CleanJet_mindPhi","lMjj")};
+							     std::make_pair("MetNoLep_CleanJet_mindPhi","lMjj"),
+							     std::make_pair("diCleanJet_dEta","diCleanJet_M"),
+							     std::make_pair("lMjj_dijet_dEta","lMjj")};
+
 
   std::vector<std::pair<int,int> > nBins2D = {std::make_pair(32,500),
 					      std::make_pair(32,50),
@@ -83,7 +86,9 @@ void Events::Begin(TTree * /*tree*/)
 					      std::make_pair(32,50),
 					      std::make_pair(32,42),
 					      std::make_pair(32,20),
-					      std::make_pair(32,42)};
+					      std::make_pair(32,42),
+					      std::make_pair(50,20),
+					      std::make_pair(50,20)};
 							     
   std::vector<std::pair<double,double> > binMin2D = {std::make_pair(0,100),
 						     std::make_pair(0,0),
@@ -93,7 +98,9 @@ void Events::Begin(TTree * /*tree*/)
 						     std::make_pair(0,0),
 						     std::make_pair(0,-1),
 						     std::make_pair(0,0),
-						     std::make_pair(0,-1)};
+						     std::make_pair(0,-1),
+						     std::make_pair(0,0),
+						     std::make_pair(0,0)};
 
   std::vector<std::pair<double,double> > binMax2D = {std::make_pair(3.2,600),
 						     std::make_pair(3.2,2.5),
@@ -103,7 +110,9 @@ void Events::Begin(TTree * /*tree*/)
 						     std::make_pair(3.2,500),
 						     std::make_pair(3.2,3.2),
 						     std::make_pair(3.2,80),
-						     std::make_pair(2.5,3.2)};
+						     std::make_pair(2.5,3.2),
+						     std::make_pair(8,2000),
+						     std::make_pair(8,2000)};
 
   for (unsigned iV(0); iV<lVar2D.size(); ++iV){//loop on variables
     mVarVec2D.push_back(lVar2D[iV]);
@@ -275,14 +284,18 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"] = *fnlo_SF_QCD_corr_QCD_proc_MTR;
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"] = *fnlo_SF_QCD_corr_QCD_proc_VTR;
     lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
-
-    if ( year == "2017" )
+    if ( year == "2017" ){
       lTreeContent["met_filters"] = *met_filters_2017_mc;
-    else if  ( year == "2018" )
+      lTreeContent["hem_weight"] = 1;
+    }
+    else if  ( year == "2018" ){
       lTreeContent["met_filters"] = *met_filters_2018_mc;
+      lTreeContent["hem_weight"] = *hem_weight;
+    }
   }
 
   if ( !isMC ){
+    lTreeContent["hem_weight"] = 1;
     if ( year == "2017" )
       lTreeContent["met_filters"] = *met_filters_2017_data;
     else if  ( year == "2018" )
@@ -548,6 +561,8 @@ Double_t Events::BaseWeight(){
   //  w *= tauveto*bjetveto*electronveto*muonveto;
   w *= tauveto*electronveto*muonveto;
 
+  w*=lTreeContent["hem_weight"];//1 for data and MC in 2018
+  
   if ( !misMC ) w = 1.0;//Data
 
   return w;
@@ -586,11 +601,11 @@ Bool_t Events::PassSelection(){
   //Circular Cut and HF HF removal
   if (mCat==CatType::MTR){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutMTR"]));
-    pass = pass && ( abs(lTreeContent["Leading_jet_eta"] > 3.0) || abs(lTreeContent["Subleading_jet_eta"]) > 3.0 );
+    pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < 3.0 || abs(lTreeContent["Subleading_jet_eta"]) < 3.0 );
   }
   else if (mCat==CatType::VTR){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutVTR"]));
-    pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) > 3.0 || abs(lTreeContent["lMjj_jet2_eta"]) > 3.0 );
+    pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < 3.0 || abs(lTreeContent["lMjj_jet2_eta"]) < 3.0 );
   }
 
   //Triggers
@@ -1001,29 +1016,29 @@ Bool_t Events::Process(Long64_t entry)
        CalculateAdditionalVariables();
        for (unsigned iV(0); iV<mHistVec[iR][iC].size(); ++iV){
 	 //Blinding
-	 if ( mReg==RegionType::SR && !misMC ){
-	   if ( mVarVec[iV] != "MetNoLep_CleanJet_mindPhi" && mVarVec[iV] != "Leading_jet_eta"  && mVarVec[iV] != "dijet_met_balance"){
-	     mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],0);
-	   }
-	   else{
-	     mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);
-	   }
-	 }
-	 else{
+	 // if ( mReg==RegionType::SR && !misMC ){
+	 //   if ( mVarVec[iV] != "MetNoLep_CleanJet_mindPhi" && mVarVec[iV] != "Leading_jet_eta"  && mVarVec[iV] != "dijet_met_balance"){
+	 //     mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],0);
+	 //   }
+	 //   else{
+	 //     mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);
+	 //   }
+	 // }
+	 // else{
 	   mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);
-	 }
+	   //	 }
        }
 
        for (unsigned iV(0); iV<mHistVec2D[iR][iC].size(); ++iV){
 	 //Blinding
-	 if ( mReg==RegionType::SR && !misMC ){
-	   if ( mVarVec2D[iV].first != "MetNoLep_CleanJet_mindPhi" && mVarVec2D[iV].first != "Leading_jet_eta" && mVarVec2D[iV].second != "MetNoLep_CleanJet_mindPhi" && mVarVec2D[iV].second != "Leading_jet_eta" &&  mVarVec2D[iV].first != "dijet_met_balance" && mVarVec2D[iV].second != "dijet_met_balance" ){
-	     mHistVec2D[iR][iC][iV]->Fill(lTreeContent[mVarVec2D[iV].first],lTreeContent[mVarVec2D[iV].second],0);
-	   }
-	   else{
-	     mHistVec2D[iR][iC][iV]->Fill(lTreeContent[mVarVec2D[iV].first],lTreeContent[mVarVec2D[iV].second],weight);
-	   }
-	 }
+	 // if ( mReg==RegionType::SR && !misMC ){
+	 //   if ( mVarVec2D[iV].first != "MetNoLep_CleanJet_mindPhi" && mVarVec2D[iV].first != "Leading_jet_eta" && mVarVec2D[iV].second != "MetNoLep_CleanJet_mindPhi" && mVarVec2D[iV].second != "Leading_jet_eta" &&  mVarVec2D[iV].first != "dijet_met_balance" && mVarVec2D[iV].second != "dijet_met_balance" ){
+	 //     mHistVec2D[iR][iC][iV]->Fill(lTreeContent[mVarVec2D[iV].first],lTreeContent[mVarVec2D[iV].second],0);
+	 //   }
+	 //   else{
+	 //     mHistVec2D[iR][iC][iV]->Fill(lTreeContent[mVarVec2D[iV].first],lTreeContent[mVarVec2D[iV].second],weight);
+	 //   }
+	 // }
 	 mHistVec2D[iR][iC][iV]->Fill(lTreeContent[mVarVec2D[iV].first],lTreeContent[mVarVec2D[iV].second],weight);
        }
 
