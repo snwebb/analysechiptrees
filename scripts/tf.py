@@ -1,18 +1,34 @@
 #!/usr/bin/env python
 import sys,os
+import subprocess
 sys.argv.append( '-b' )
 # os.mkdir("CR")
 # os.mkdir("A")
 # os.mkdir("B")
 import ROOT
 ROOT.TH1.SetDefaultSumw2()
+
+plotname = sys.argv[1]
+log = int(sys.argv[2])
+
+if os.path.exists("Plots/"+plotname) == False:
+    os.mkdir("Plots/"+plotname)
+if os.path.exists("Plots/"+plotname+"/A") == False:
+    os.mkdir("Plots/"+plotname+"/A")
+if os.path.exists("Plots/"+plotname+"/B") == False:
+    os.mkdir("Plots/"+plotname+"/B")
+if os.path.exists("Plots/"+plotname+"/SR") == False:
+    os.mkdir("Plots/"+plotname+"/SR")
+if os.path.exists("Plots/"+plotname+"/CR") == False:
+    os.mkdir("Plots/"+plotname+"/CR")
+
 #listOfSysts = ["Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown"]
 #listOfSysts = ["Nominal","ElectronVetoUp","MuonVetoUp","TauVetoUp","BjetVetoUp"]
 #listOfSysts = ["Nominal"]
 
 #samples = ["DATA","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","MET"]
-#years = ["2017","2018"]
-years = ["2017"]
+years = ["2017","2018"]
+#years = ["2018"]
 #samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
 #samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
 samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
@@ -148,8 +164,8 @@ for region in regions:
                 QCDTransferFactor_SR.SetMinimum(-0.0001)
                 ROOT.gStyle.SetOptStat(0);
                 c_1.Draw()
-                c_1.SaveAs("QCDTransferFactor_SR_" + region + "_" + year + ".png" )
-                c_1.SaveAs("QCDTransferFactor_SR_" + region + "_" + year + ".pdf" )
+                c_1.SaveAs("Plots/"+plotname + "/QCDTransferFactor_SR_" + region + "_" + year + ".png" )
+                c_1.SaveAs("Plots/"+plotname + "/QCDTransferFactor_SR_" + region + "_" + year + ".pdf" )
                 c_1.Close()
 
                 c_2 = ROOT.TCanvas("QCDTransferFactor_B")
@@ -157,8 +173,8 @@ for region in regions:
                 QCDTransferFactor_B.GetYaxis().SetTitle("Transfer factor, r")
                 ROOT.gStyle.SetOptStat(0);
                 c_2.Draw()
-                c_2.SaveAs("QCDTransferFactor_B_" + region + "_" + year + ".png" )
-                c_2.SaveAs("QCDTransferFactor_B_" + region + "_" + year + ".pdf" )
+                c_2.SaveAs("Plots/"+plotname + "/QCDTransferFactor_B_" + region + "_" + year + ".png" )
+                c_2.SaveAs("Plots/"+plotname + "/QCDTransferFactor_B_" + region + "_" + year + ".pdf" )
                 c_2.Close()
 
                 #FINAL QCD
@@ -187,15 +203,15 @@ for region in regions:
 
                 ROOT.gStyle.SetOptStat(0);
                 c_3.Draw()
-                c_3.SaveAs("FinalQCDSR_" + region + "_" + year + ".png" )
-                c_3.SaveAs("FinalQCDSR_" + region + "_" + year + ".pdf" )
+                c_3.SaveAs("Plots/"+plotname + "/FinalQCDSR_" + region + "_" + year + ".png" )
+                c_3.SaveAs("Plots/"+plotname + "/FinalQCDSR_" + region + "_" + year + ".pdf" )
                 c_3.Close()
 
                 #FINAL QCD CROSS CHECK
                 c_4 = ROOT.TCanvas("FinalQCD")
                 FinalQCDB.Draw()
                 if ( region == "MTR"):
-                    FinalQCDB.GetYaxis().SetRangeUser(0,10000)
+                    FinalQCDB.GetYaxis().SetRangeUser(0,3000)
                 if ( region == "VTR"):
                     FinalQCDB.GetYaxis().SetRangeUser(0,1000)
                 FinalQCDB.GetYaxis().SetTitle("Number of Events")
@@ -211,8 +227,8 @@ for region in regions:
                 leg_4.Draw()
                 ROOT.gStyle.SetOptStat(0);
                 c_4.Draw()
-                c_4.SaveAs("FinalQCDB_" + region + "_" + year + ".png" )
-                c_4.SaveAs("FinalQCDB_" + region + "_" + year + ".pdf" )
+                c_4.SaveAs("Plots/"+plotname + "/FinalQCDB_" + region + "_" + year + ".png" )
+                c_4.SaveAs("Plots/"+plotname + "/FinalQCDB_" + region + "_" + year + ".pdf" )
                 c_4.Close()
 
                 #FINAL QCD CROSS CHECK Ratio
@@ -227,8 +243,8 @@ for region in regions:
                 ratio.GetYaxis().SetTitle("Ratio")
                 ROOT.gStyle.SetOptStat(0);
                 c_5.Draw()
-                c_5.SaveAs("FinalQCDBRatio_" + region + "_" + year + ".png" )
-                c_5.SaveAs("FinalQCDBRatio_" + region + "_" + year + ".pdf" )
+                c_5.SaveAs("Plots/"+plotname + "/FinalQCDBRatio_" + region + "_" + year + ".png" )
+                c_5.SaveAs("Plots/"+plotname + "/FinalQCDBRatio_" + region + "_" + year + ".pdf" )
                 c_5.Close()
 
 
@@ -242,8 +258,8 @@ for region in regions:
                 ratio.GetYaxis().SetTitle("Ratio")
                 ROOT.gStyle.SetOptStat(0);
                 c_6.Draw()
-                c_6.SaveAs("DataDrivenQCDTransferFactor_" + region + "_" + year + ".png" )
-                c_6.SaveAs("DataDrivenQCDTransferFactor_" + region + "_" + year + ".pdf" )
+                c_6.SaveAs("Plots/"+plotname + "/DataDrivenQCDTransferFactor_" + region + "_" + year + ".png" )
+                c_6.SaveAs("Plots/"+plotname + "/DataDrivenQCDTransferFactor_" + region + "_" + year + ".pdf" )
                 c_6.Close()
 
                 # c_4 = ROOT.TCanvas("QCDTransferFactor_B")
@@ -262,7 +278,8 @@ for region in regions:
                 file_out.Close()
 
             # QCDCR   
-            leg = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            leg = ROOT.TLegend(0.45,0.75,0.87,0.89)
+            leg.SetNColumns(2)
             ROOT.gStyle.SetLegendBorderSize(0)
             c = ROOT.TCanvas("stackplot_" + variable)
             stack = ROOT.THStack("hs","")
@@ -278,9 +295,13 @@ for region in regions:
             stack.Draw("HISTsame")
             CRs[0].Draw("same")
             leg.Draw()
+            if ( CRs[0].Integral()>0 ):
+                CRs[0].SetMinimum(1)
+                ROOT.gPad.SetLogy(log)
+                CRs[0].SetMaximum(CRs[0].GetMaximum()*10)
             c.Draw()
-            c.SaveAs("CR/CR_" + variable + "_" + region + "_" + year + ".png")
-            c.SaveAs("CR/CR_" + variable + "_" + region + "_" + year + ".pdf")
+            c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".png")
+            c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".pdf")
             c.Close()
             #file_out.Close()
 
@@ -330,9 +351,9 @@ for region in regions:
             SR_Ratio.GetYaxis().SetRangeUser(0,2)
             c_SR.cd()
             c_SR.Draw()
-            c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".png")
-            c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".C")
-            c_SR.SaveAs("SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
+            c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".png")
+            c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".C")
+            c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
             c_SR.Close()
             #file_out.Close()
 
@@ -355,8 +376,8 @@ for region in regions:
             As[-1].Draw("same")
             leg_A.Draw()
             c_A.Draw()
-            c_A.SaveAs("A/A_" + variable + "_" + region + "_" + year + ".png")
-            c_A.SaveAs("A/A_" + variable + "_" + region + "_" + year + ".pdf")
+            c_A.SaveAs("Plots/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".png")
+            c_A.SaveAs("Plots/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".pdf")
             c_A.Close()
             #file_out.Close()
 
@@ -372,14 +393,19 @@ for region in regions:
                 B.SetLineColor(30+(i*2))
                 leg_B.AddEntry(B,samples[i],"F")
                 stack_B.Add(B)
-            Bs[-1].Draw()
-            Bs[-1].SetMinimum(0)
-            stack_B.Draw("HISTsame")
-            Bs[-1].Draw("same")
+            if Bs[-1].Integral()>0:
+                Bs[-1].Draw()
+                Bs[-1].SetMinimum(0)
+                stack_B.Draw("HISTsame")
+                Bs[-1].Draw("same")
+            else:
+                stack_B.Draw("HIST")
+                stack_B.SetMinimum(0)
+
             leg_B.Draw()
             c_B.Draw()
-            c_B.SaveAs("B/B_" + variable + "_" + region + "_" + year + ".png")
-            c_B.SaveAs("B/B_" + variable + "_" + region + "_" + year + ".pdf")
+            c_B.SaveAs("Plots/"+plotname + "/B/B_" + variable + "_" + region + "_" + year + ".png")
+            c_B.SaveAs("Plots/"+plotname + "/B/B_" + variable + "_" + region + "_" + year + ".pdf")
             c_B.Close()
 
 
@@ -472,3 +498,6 @@ for region in regions:
 
             file_out.Close()
 
+
+bashCommand = "cd Plots; tar -zcf " + plotname + ".tar.gz " + plotname + "; cd ../;"
+process = subprocess.Popen(bashCommand, shell=True)
