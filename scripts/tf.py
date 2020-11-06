@@ -28,7 +28,7 @@ if os.path.exists("Plots/"+plotname+"/CR") == False:
 
 #samples = ["DATA","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","MET"]
 years = ["2017","2018"]
-#years = ["2018"]
+#years = ["2017"]
 #samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
 #samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
 samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
@@ -36,7 +36,7 @@ regions = ["MTR","VTR"]
 #variables = ["diCleanJet_M_binned"]
 
 ##variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M_binned"]
-variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced"]
+variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta"]
 
 nick = {}
 nick[("MTR","2017")] = ROOT.TFile("out_MTR_2017.root_qcdDD.root","READ")
@@ -54,6 +54,11 @@ colors["ZJETS"]  =  '#14dbf9'
 colors["EWKW"]   =  '#f28d84'
 colors["WJETS"]     =  '#febc67'
 colors["QCD"]     =  '#ffffff'
+
+##directory_name = "Plots/20201016-Histos-DeltaEtaLessThan5"
+#directory_name = "Plots/20201016-Histos-DeltaEtaGreaterThan5"
+#directory_name = "Plots/20201016-Histos-Full"
+directory_name = "Plots/"
 
 for region in regions:
     for variable in variables:
@@ -78,7 +83,7 @@ for region in regions:
 
             #for syst in listOfSysts:
             for sample in samples:
-                files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/Plots/Histos_Nominal_"+sample+"_"+year+".root"))
+                files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/"+directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
                 Bs.append(files[-1].Get("QCDB/"+region+"/h_QCDB_"+region+"_" + variable))
                 As.append(files[-1].Get("QCDA/"+region+"/h_QCDA_"+region+"_" + variable))
                 SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
@@ -93,7 +98,7 @@ for region in regions:
 
             if (  (variable=="diCleanJet_M_binned" and region == "MTR" ) or (variable=="lMjj_binned" and region == "VTR" )  ):
                 
-                file_out = ROOT.TFile("out_" + region + "_" + year+ ".root","RECREATE")
+                file_out = ROOT.TFile("Plots/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
                 BackgroundSubtractedData_CR = CRs[0].Clone("BackgroundSubtractedData_CR")
                 BackgroundSubtractedData_A = As[-1].Clone("BackgroundSubtractedData_A")
                 BackgroundSubtractedData_B = Bs[-1].Clone("BackgroundSubtractedData_B")
@@ -286,8 +291,13 @@ for region in regions:
             for i,CR in enumerate(CRs):
                 if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
                     continue
-                CR.SetFillColor(30+(i*2))
-                CR.SetLineColor(30+(i*2))
+                CR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                CR.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                if ( samples[i] == "QCD"):
+                    CR.SetLineColor(1)
+
+                # CR.SetFillColor(30+(i*2))
+                # CR.SetLineColor(30+(i*2))
                 leg.AddEntry(CR,samples[i],"F")
                 stack.Add(CR)
             CRs[0].Draw()
@@ -306,7 +316,8 @@ for region in regions:
             #file_out.Close()
 
             # SR   
-            leg_SR = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            leg_SR = ROOT.TLegend(0.45,0.75,0.87,0.89)
+            leg_SR.SetNColumns(2)
             ROOT.gStyle.SetLegendBorderSize(0)
             c_SR = ROOT.TCanvas("stackplot_" + variable)
             p1_SR = ROOT.TPad("SRmain","",0,0.3,1,1)
@@ -339,6 +350,10 @@ for region in regions:
             stack_SR.SetMinimum(0)
             SRs[0].Draw("same")
             leg_SR.Draw()
+            if ( SRs[0].Integral()>0 ):
+                SRs[0].SetMinimum(1)
+                ROOT.gPad.SetLogy(log)
+                SRs[0].SetMaximum(SRs[0].GetMaximum()*10)
             c_SR.cd()
             p2_SR.Draw()
             p2_SR.cd()
@@ -359,15 +374,21 @@ for region in regions:
 
 
             #A 
-            leg_A = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            leg_A = ROOT.TLegend(0.45,0.75,0.87,0.89)
+            leg_A.SetNColumns(2)
             ROOT.gStyle.SetLegendBorderSize(0)
             c_A = ROOT.TCanvas("stackplot_" + variable)
             stack_A = ROOT.THStack("hs_A","")
             for i,A in enumerate(As):
                 if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
                     continue
-                A.SetFillColor(30+(i*2))
-                A.SetLineColor(30+(i*2))
+                A.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                A.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                if ( samples[i] == "QCD"):
+                    A.SetLineColor(1)
+
+                # A.SetFillColor(30+(i*2))
+                # A.SetLineColor(30+(i*2))
                 leg_A.AddEntry(A,samples[i],"F")
                 stack_A.Add(A)
             As[-1].Draw()
@@ -382,15 +403,22 @@ for region in regions:
             #file_out.Close()
 
             #B
-            leg_B = ROOT.TLegend(0.65,0.55,0.87,0.89)
+            leg_B = ROOT.TLegend(0.45,0.75,0.87,0.89)
+            leg_B.SetNColumns(2)
+            #leg_B = ROOT.TLegend(0.65,0.55,0.87,0.89)
             ROOT.gStyle.SetLegendBorderSize(0)
             c_B = ROOT.TCanvas("stackplot_" + variable)
             stack_B = ROOT.THStack("hs_B","")
             for i,B in enumerate(Bs):
                 if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
                     continue
-                B.SetFillColor(30+(i*2))
-                B.SetLineColor(30+(i*2))
+                B.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                B.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                if ( samples[i] == "QCD"):
+                    B.SetLineColor(1)
+
+                # B.SetFillColor(30+(i*2))
+                # B.SetLineColor(30+(i*2))
                 leg_B.AddEntry(B,samples[i],"F")
                 stack_B.Add(B)
             if Bs[-1].Integral()>0:
@@ -425,6 +453,7 @@ for region in regions:
 
 #For Nick's method
 variables = ["MetNoLep_CleanJet_mindPhi"]
+
 for region in regions:
     for variable in variables:
         for year in years:
@@ -436,13 +465,13 @@ for region in regions:
             Bs = []
 
             for sample in samples:
-                files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/Plots/Histos_Nominal_"+sample+"_"+year+".root"))
+                files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/"+directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
                 SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
                 CRs.append(files[-1].Get("QCDCR/"+region+"/h_QCDCR_"+region+"_" + variable))
                 As.append(files[-1].Get("QCDA/"+region+"/h_QCDA_"+region+"_" + variable))
                 Bs.append(files[-1].Get("QCDB/"+region+"/h_QCDB_"+region+"_" + variable))
 
-            file_out = ROOT.TFile("out_" + region + "_" + year+ ".root","UPDATE")
+            file_out = ROOT.TFile("Plots/"+ plotname + "/out_" + region + "_" + year+ ".root","UPDATE")
             
 
             file_out.mkdir("MetNoLep_CleanJet_mindPhi")

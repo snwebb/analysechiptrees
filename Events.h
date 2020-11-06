@@ -186,6 +186,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> diCleanJet_M ;
    TTreeReaderValue<Double_t> lMjj ;
    TTreeReaderValue<Double_t> lMjj_dijet_dphi ;
+   TTreeReaderValue<Double_t> lMjj_dijet_deta ;
    TTreeReaderValue<Double_t> DiCleanJet_mass ;
    TTreeReaderValue<Double_t> dijet_M ;
    TTreeReaderValue<Double_t> diCleanJet_dPhi ;
@@ -393,6 +394,7 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("diCleanJet_M") !=0 ) diCleanJet_M = { fReader,"diCleanJet_M"};
   if (tree->GetBranch("lMjj") !=0 ) lMjj = { fReader,"lMjj"};
   if (tree->GetBranch("lMjj_dijet_dphi") !=0 ) lMjj_dijet_dphi = { fReader,"lMjj_dijet_dphi"};
+  if (tree->GetBranch("lMjj_dijet_deta") !=0 ) lMjj_dijet_deta = { fReader,"lMjj_dijet_deta"};
   if (tree->GetBranch("DiCleanJet_mass") !=0 ) DiCleanJet_mass = { fReader,"DiCleanJet_mass"};
   if (tree->GetBranch("dijet_M") !=0 ) dijet_M = { fReader,"dijet_M"};
   if (tree->GetBranch("diCleanJet_dPhi") !=0 ) diCleanJet_dPhi = {fReader,"diCleanJet_dPhi"};

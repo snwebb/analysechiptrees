@@ -5,6 +5,8 @@
 #include <TH2.h>
 #include <TLorentzVector.h>
 #include <TStyle.h>
+#include <stdlib.h>   
+
 
 Events::Events(TTree *){
     mFout = 0;
@@ -39,10 +41,10 @@ void Events::Begin(TTree * /*tree*/)
   TString option = GetOption();
   mFout = TFile::Open(mOutFile.c_str(),"RECREATE");
     
-    const unsigned nVars = 23;
+    const unsigned nVars = 28;
   //  const unsigned nVars = 2;
   // std::string lVar[nVars] = {"MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","MetNoLep_phi","diCleanJet_M"};
-    std::string lVar[nVars] = {"MetNoLep_pt","diCleanJet_M","lMjj","diCleanJet_dEta","diCleanJet_dPhi","lMjj_dijet_dphi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","dijet_met_balance","lMjj","diCleanJet_M","diCleanJet_M"};
+    std::string lVar[nVars] = {"MetNoLep_pt","diCleanJet_M","lMjj","diCleanJet_dEta","lMjj_dijet_deta","diCleanJet_dPhi","lMjj_dijet_dphi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","dijet_met_balance","lMjj","diCleanJet_M","diCleanJet_M"};
 
     // std::string lVar[nVars] = {"MetNoLep_CleanJet_mindPhi","diCleanJet_M"};
   for (unsigned iV(0); iV<nVars; ++iV){//loop on variables
@@ -51,14 +53,14 @@ void Events::Begin(TTree * /*tree*/)
 
   
   //   std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","nCleanJet30 (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","#Phi E_{T}^{miss,no #mu}","M_{jj} (GeV)"};
-  std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#Phi_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","nCleanJet30 (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","p_{T}^{jj}-E_{T}^{miss}/E_{T}^{miss}","M_{jj} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)"};
+  std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#eta_{jj}","#Delta#Phi_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","#eta^{central jet}","#eta^{forward jet}","#eta^{central jet}","#eta^{forward jet}","nCleanJet30 (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","p_{T}^{jj}-E_{T}^{miss}/E_{T}^{miss}","M_{jj} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)"};
   //  std::string lVarName[nVars] = {"min#Delta#Phi(jets,E_{T}^{miss,no #mu})","M_{jj} (GeV)"};
 
-  const int nBins[nVars] = {350,380,380,120,50,50,84,52,50,50,10,160,60,60,7,10,10,10,10,42,10,10,6};
+  const int nBins[nVars] = {350,380,380,120,120,50,50,84,52,50,50,50,50,50,50,10,160,60,60,7,10,10,10,10,42,10,10,6};
   //  const int nBins[nVars] = {500,380,120,50,84,52,100,100,10,180,60,60,7,10,10,10,40,6,180};
 
-  const double binMin[nVars-3] = {100,200,200,1,0,0,80,40,-5,-5,2,0,0,0,0,0,0,0,0,-1};
-  const double binMax[nVars-3] = {600,4000,4000,7,1.5,1.5,500,300,5,5,12,3.2,600,2000,7,10,10,10,80,3.2};
+  const double binMin[nVars-3] = {100,200 ,200 ,1,1,0  ,0  ,80 ,40 ,-5,-5,-5,-5,-5,-5 ,2  ,0   ,0  ,0   ,0 ,0 ,0 ,0  ,0 ,-1};
+  const double binMax[nVars-3] = {600,4000,4000,7,7,1.5,1.5,500,300,5 ,5 ,5 ,5 ,5 ,5  ,12 ,3.2 ,600,2000,7 ,10,10,10 ,80,3.2};
 
   double mjjbins[11] = {0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000};
   double mjjbins_reduced[7] = {200,500,800,1250,2000,2800,5000};
@@ -72,10 +74,12 @@ void Events::Begin(TTree * /*tree*/)
 							     std::make_pair("MetNoLep_CleanJet_mindPhi","dijet_met_balance"),
 							     std::make_pair("MetNoLep_CleanJet_mindPhi","Pileup_nPU"),
 							     std::make_pair("diCleanJet_dPhi","dijet_met_balance"),
-							     std::make_pair("MetNoLep_CleanJet_mindPhi","diCleanJet_M"),
-							     std::make_pair("MetNoLep_CleanJet_mindPhi","lMjj"),
 							     std::make_pair("diCleanJet_dEta","diCleanJet_M"),
-							     std::make_pair("lMjj_dijet_dEta","lMjj")};
+							     std::make_pair("lMjj_dijet_deta","lMjj"),
+							     std::make_pair("diCleanJet_dEta","LHE_HT"),
+							     std::make_pair("lMjj_dijet_deta","LHE_HT"),
+							     std::make_pair("MetNoLep_CleanJet_mindPhi","diCleanJet_M"),
+							     std::make_pair("MetNoLep_CleanJet_mindPhi","lMjj")};
 
 
   std::vector<std::pair<int,int> > nBins2D = {std::make_pair(32,500),
@@ -88,7 +92,9 @@ void Events::Begin(TTree * /*tree*/)
 					      std::make_pair(32,20),
 					      std::make_pair(32,42),
 					      std::make_pair(50,20),
-					      std::make_pair(50,20)};
+					      std::make_pair(50,20),
+					      std::make_pair(50,50),
+					      std::make_pair(50,50)};
 							     
   std::vector<std::pair<double,double> > binMin2D = {std::make_pair(0,100),
 						     std::make_pair(0,0),
@@ -99,6 +105,8 @@ void Events::Begin(TTree * /*tree*/)
 						     std::make_pair(0,-1),
 						     std::make_pair(0,0),
 						     std::make_pair(0,-1),
+						     std::make_pair(0,0),
+						     std::make_pair(0,0),
 						     std::make_pair(0,0),
 						     std::make_pair(0,0)};
 
@@ -111,6 +119,8 @@ void Events::Begin(TTree * /*tree*/)
 						     std::make_pair(3.2,3.2),
 						     std::make_pair(3.2,80),
 						     std::make_pair(2.5,3.2),
+						     std::make_pair(8,2000),
+						     std::make_pair(8,2000),
 						     std::make_pair(8,2000),
 						     std::make_pair(8,2000)};
 
@@ -362,7 +372,6 @@ void Events::SetTreeContent(std::string year){
   }
   else{
     lTreeContent["diCleanJet_M"] = *diCleanJet_M;
-    //    lTreeContent["diCleanJet_M"] = *DiCleanJet_mass;//TEMP
     lTreeContent["lMjj"] = *lMjj;
 
     lTreeContent["MetNoLep_CleanJet_mindPhi"] = *MetNoLep_CleanJet_mindPhi;
@@ -370,6 +379,8 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["jet_chf_nhf_cut"] = *jet_chf_nhf_cut;
     lTreeContent["jet_chf_nhf_vtr_cut"] = *jet_chf_nhf_vtr_cut;
     lTreeContent["lMjj_dijet_dphi"] = *lMjj_dijet_dphi;
+    lTreeContent["lMjj_dijet_deta"] = *lMjj_dijet_deta;
+    //lTreeContent["lMjj_dijet_deta"] = *diCleanJet_dEta;//TEMP
     lTreeContent["horn_sel"] = *horn_sel;
     lTreeContent["horn_sel_vtr"] = *horn_sel_vtr;
     lTreeContent["VecBDPhiCutMTR"] = *VecBDPhiCutMTR;
@@ -537,10 +548,9 @@ Bool_t Events::BaseSelection(){
   }
   
   if ( mProc == "QCD" || mProc == "QCDRELAX" ){
-    pass = pass && lTreeContent["LHE_HT"]>300;
-    if (mYear == "2018"){
-      pass = pass && lTreeContent["LHE_HT"]>300;
-    }
+
+    pass = pass && lTreeContent["LHE_HT"]>700;
+
   }
 
 
@@ -561,7 +571,7 @@ Double_t Events::BaseWeight(){
   //  w *= tauveto*bjetveto*electronveto*muonveto;
   w *= tauveto*electronveto*muonveto;
 
-  w*=lTreeContent["hem_weight"];//1 for data and MC in 2018
+  w*=lTreeContent["hem_weight"];//1 for data and MC in 2017
   
   if ( !misMC ) w = 1.0;//Data
 
@@ -573,7 +583,7 @@ Bool_t Events::PassSelection(){
 
     bool pass = kTRUE;
   
-    std::string lreg = "";
+    std::string lcat = "";
     
     bool lCleanCut0 = true;
     bool lCleanCut1 = true;
@@ -602,86 +612,92 @@ Bool_t Events::PassSelection(){
   if (mCat==CatType::MTR){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutMTR"]));
     pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < 3.0 || abs(lTreeContent["Subleading_jet_eta"]) < 3.0 );
+    //    pass = pass && (std::abs(lTreeContent["diCleanJet_dEta"])>5);    
   }
   else if (mCat==CatType::VTR){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutVTR"]));
     pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < 3.0 || abs(lTreeContent["lMjj_jet2_eta"]) < 3.0 );
+    //pass = pass && (std::abs(lTreeContent["lMjj_dijet_deta"])>5);    
   }
 
   //Triggers
   if (mCat==CatType::MTR){
-    lreg = "MTR";
+    lcat = "MTR";
 
     if (mReg==RegionType::SR || (mReg==RegionType::QCDCR) ){
       pass = pass && (static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"])==1 || static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"])==1);
     }
     else{
-	pass = pass && (
-			// static_cast<int>(lTreeContent["HLT_PFJet40"])==1 
-			// || static_cast<int>(lTreeContent["HLT_PFJet60"])==1
-			// || static_cast<int>(lTreeContent["HLT_PFJet80"])==1
-			// || static_cast<int>(lTreeContent["HLT_PFJet140"])==1
-			static_cast<int>(lTreeContent["HLT_PFJet200"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet260"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet320"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet400"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet450"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet500"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet550"])==1
-			);
-
-	pass = pass && (lTreeContent["Leading_jet_pt"] > 200);
+      pass = pass && (
+		      // static_cast<int>(lTreeContent["HLT_PFJet40"])==1 
+		      // || static_cast<int>(lTreeContent["HLT_PFJet60"])==1
+		      // || static_cast<int>(lTreeContent["HLT_PFJet80"])==1
+		      // || static_cast<int>(lTreeContent["HLT_PFJet140"])==1
+		      static_cast<int>(lTreeContent["HLT_PFJet200"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet260"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet320"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet400"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet450"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet500"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet550"])==1
+		      );
+      
+      pass = pass && (lTreeContent["Leading_jet_pt"] > 200);
     }
   }
   else if  (mCat==CatType::VTR){
-    lreg = "VTR";
+    lcat = "VTR";
     if (mReg==RegionType::SR || (mReg==RegionType::QCDCR) ){
       pass = pass && (static_cast<int>(lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"])==1 || static_cast<int>(lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"])==1);
     }
     else{
-        // if ( mProc == "DATA" || mProc == "QCD" ){  //Already set when defined below
-        pass = pass && (
-			// static_cast<int>(lTreeContent["HLT_PFJet40"])==1 
-			// || static_cast<int>(lTreeContent["HLT_PFJet60"])==1
-			// || static_cast<int>(lTreeContent["HLT_PFJet80"])==1
-			// || static_cast<int>(lTreeContent["HLT_PFJet140"])==1
-			static_cast<int>(lTreeContent["HLT_PFJet200"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet260"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet320"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet400"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet450"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet500"])==1
-			|| static_cast<int>(lTreeContent["HLT_PFJet550"])==1
-			);
-
-	pass = pass && (lTreeContent["Leading_jet_pt"] > 200);
-      }    
+      // if ( mProc == "DATA" || mProc == "QCD" ){  //Already set when defined below
+      pass = pass && (
+		      // static_cast<int>(lTreeContent["HLT_PFJet40"])==1 
+		      // || static_cast<int>(lTreeContent["HLT_PFJet60"])==1
+		      // || static_cast<int>(lTreeContent["HLT_PFJet80"])==1
+		      // || static_cast<int>(lTreeContent["HLT_PFJet140"])==1
+		      static_cast<int>(lTreeContent["HLT_PFJet200"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet260"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet320"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet400"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet450"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet500"])==1
+		      || static_cast<int>(lTreeContent["HLT_PFJet550"])==1
+		      );
+      
+      pass = pass && (lTreeContent["Leading_jet_pt"] > 200);
+    }    
   }//End of trigger section
-
+  
   if (mReg==RegionType::SR){
-
+    
     //////////////////////////////////
     //Investigation into dijet dphi
-
+    
     if ( mProc == "QCDRELAX" ){
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));//TEMP
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+
+
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
 	pass = pass && lTreeContent["MetNoLep_pt"]>250;
+	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi; 
       }
       if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>1.8;
 	pass = pass && lTreeContent["MetNoLep_pt"]<=250;
 	pass = pass && lTreeContent["MetNoLep_pt"]>160;
-      }
+	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
+   }
     }
     else{
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_SR_eff_Sel"]));
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_SR_eff_Sel"]));
     }
-
-
+    
+    
     //////////////////////////////////
-
+    
     if ( misAM ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
       pass = pass && lTreeContent["MetNoLep_pt"]>250;
@@ -698,33 +714,36 @@ Bool_t Events::PassSelection(){
 
   }
   else if (mReg==RegionType::QCDCR){
-
+    
     //////////////////////////////////
     //Investigation into dijet dphi
     if ( mProc == "QCDRELAX" ){
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
-	pass = pass && lTreeContent["MetNoLep_pt"] > 250;   
+	pass = pass && lTreeContent["MetNoLep_pt"] > 250; 
+	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi; 
       }
       if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<1.8;
 	pass = pass && lTreeContent["MetNoLep_pt"] <= 250;   
-	pass = pass && lTreeContent["MetNoLep_pt"] > 160;   
+	pass = pass && lTreeContent["MetNoLep_pt"] > 160;
+	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi; 
       }
     }
     else{
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_CR_eff_Sel"]));
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_CR_eff_Sel"]));
       //pass = pass && lTreeContent["diCleanJet_dPhi"] < 1.5;
     }
-
+    
 
     //////////////////////////////////
-
-
-
+    
+    
+    
     if ( misAM ){
-    //Temp if no flag
+      //Temp if no flag
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
       pass = pass && lTreeContent["MetNoLep_pt"]>250;
     }
@@ -738,49 +757,47 @@ Bool_t Events::PassSelection(){
     }
   }
   else if (mReg==RegionType::QCDA){
-
+    
     
     //////////////////////////////////
     //Investigation into dijet dphi
-
-    if  ( lreg == "MTR" ){
-      if ( mProc == "QCDRELAX" ){
-	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
-	pass = pass && lTreeContent["MetNoLep_pt"]>100;
-	pass = pass && lTreeContent["MetNoLep_pt"]<=160;
-	
-	if ( mCat == CatType::MTR ){
-	  pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
-	}
-	if ( mCat == CatType::VTR ){
-	  pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<1.8;
-	}
-	
-      }
-      else{
-	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_A_eff_Sel"]));
-      }
-    }
-    else if ( lreg == "VTR" ){
-      
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
-      pass = pass && lTreeContent["MetNoLep_pt"]>100;
-      pass = pass && lTreeContent["MetNoLep_pt"]<=160;
-      
+    if ( mProc == "QCDRELAX" ){
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
+	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi;
       }
       if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<1.8;
-      }
-      
-      if ( mProc != "QCDRELAX" ){	
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
-      }
-      // else{
-      // 	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_A_eff_Sel"]));
-      // }
+     }
+      pass = pass && lTreeContent["MetNoLep_pt"]>100;
+      pass = pass && lTreeContent["MetNoLep_pt"]<=160;     
     }
+    else{
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_A_eff_Sel"]));
+    }
+    
+    // else if ( lcat == "VTR" ){
+    
+    //   pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+    //   pass = pass && lTreeContent["MetNoLep_pt"]>100;
+    //   pass = pass && lTreeContent["MetNoLep_pt"]<=160;
+    
+    //   // if ( mCat == CatType::MTR ){
+    //   // 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
+    //   // }
+    //   // if ( mCat == CatType::VTR ){
+    //   pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<1.8;
+    //   //}
+      
+    //   if ( mProc != "QCDRELAX" ){	
+    // 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
+    //   }
+    //   // else{
+    //   // 	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_A_eff_Sel"]));
+    //   // }
+    // }
     
     //////////////////////////////////
     
@@ -792,59 +809,57 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nVetoElectron"]) == 0
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
-
+    
   }
   else if (mReg==RegionType::QCDB){//"Signal-like" region
-
-
+    
+    
     //////////////////////////////////
     //Investigation into dijet dphi
-    if ( lreg == "MTR" ){
-      if ( mProc == "QCDRELAX" ){
-	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
-	
-	pass = pass && lTreeContent["MetNoLep_pt"]>100;
-	pass = pass && lTreeContent["MetNoLep_pt"]<=160;
-	
-	if ( mCat == CatType::MTR ){
-	  pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
-	}
-	if ( mCat == CatType::VTR ){
-	  pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>1.8;
-	}
-	
-      }
+    if ( mProc == "QCDRELAX" ){
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+      pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi;
 
-      else{
-	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_B_eff_Sel"]));
-      }
-    }
-    else if ( lreg == "VTR" ){
-      
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
-      
-      pass = pass && lTreeContent["MetNoLep_pt"]>100;
-      pass = pass && lTreeContent["MetNoLep_pt"]<=160;
-      
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi;
       }
       if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>1.8;
-      }
-      
-      if ( mProc != "QCDRELAX" ){	
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
       }
-      
-      
-      // else{
-      // 	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lreg+"_QCD_B_eff_Sel"]));
-      // }
+      pass = pass && lTreeContent["MetNoLep_pt"]>100;
+      pass = pass && lTreeContent["MetNoLep_pt"]<=160;     
     }
+    else{
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_B_eff_Sel"]));
+    }
+    // else if ( lcat == "VTR" ){
+      
+    //   pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+      
+    //   pass = pass && lTreeContent["MetNoLep_pt"]>100;
+    //   pass = pass && lTreeContent["MetNoLep_pt"]<=160;
+      
+    //   if ( mCat == CatType::MTR ){
+    // 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
+    //   }
+    //   if ( mCat == CatType::VTR ){
+    // 	pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>1.8;
+    //   }
+      
+    //   if ( mProc != "QCDRELAX" ){	
+    // 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
+    //   }
+      
+    
+    // else{
+    // 	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_B_eff_Sel"]));
+    // }
+  
     //////////////////////////////////
-
-
+    
+    
     if ( !misMC ){
       pass = pass 
 	//	&& static_cast<int>(lTreeContent["nVLooseSITTau"]) == 0
@@ -853,9 +868,9 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nVetoElectron"]) == 0
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
-
+    
   }
-
+  
   return pass;
 }
 
@@ -987,6 +1002,21 @@ void Events::CalculateAdditionalVariables(){
 
   lTreeContent["dijet_met_balance"] = dijet_met_balance;
 
+
+  double CentralEtaMTR = 0;
+  double ForwardEtaMTR = 0;
+  double CentralEtaVTR = 0;
+  double ForwardEtaVTR = 0;
+
+  CentralEtaMTR = (std::abs(lTreeContent["Leading_jet_eta"]) < std::abs(lTreeContent["Subleading_jet_eta"])) ? lTreeContent["Leading_jet_eta"] : lTreeContent["Subleading_jet_eta"];
+  ForwardEtaMTR = (std::abs(lTreeContent["Leading_jet_eta"]) > std::abs(lTreeContent["Subleading_jet_eta"])) ? lTreeContent["Leading_jet_eta"] : lTreeContent["Subleading_jet_eta"];
+  CentralEtaVTR = (std::abs(lTreeContent["lMjj_jet1_eta"]) < std::abs(lTreeContent["lMjj_jet2_eta"])) ? lTreeContent["lMjj_jet1_eta"] : lTreeContent["lMjj_jet2_eta"];
+  ForwardEtaVTR = (std::abs(lTreeContent["lMjj_jet1_eta"]) > std::abs(lTreeContent["lMjj_jet2_eta"])) ? lTreeContent["lMjj_jet1_eta"] : lTreeContent["lMjj_jet2_eta"];
+
+  lTreeContent["CentralEtaMTR"] = CentralEtaMTR;
+  lTreeContent["ForwardEtaMTR"] = ForwardEtaMTR;
+  lTreeContent["CentralEtaVTR"] = CentralEtaVTR;
+  lTreeContent["ForwardEtaVTR"] = ForwardEtaVTR;
 
 }
 
