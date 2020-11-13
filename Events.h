@@ -86,6 +86,7 @@ class Events : public TSelector {
    std::vector<std::pair<std::string,std::string> > mVarVec2D;
    std::vector<TH1F*> mHistVec[RegionType::Last][CatType::LastCat];
    std::vector<TH2D*> mHistVec2D[RegionType::Last][CatType::LastCat];
+   ofstream fileMTR;
 
    CatType mCat;
    RegionType mReg;
@@ -114,6 +115,7 @@ class Events : public TSelector {
    ClassDef(Events,0);
    
 
+   TTreeReaderValue<Double_t> event ;
    TTreeReaderValue<Double_t> Zee_flag ;
    TTreeReaderValue<Double_t> Zmumu_flag ;
    TTreeReaderValue<Double_t> Wenu_flag ;
@@ -322,6 +324,7 @@ void Events::Init(TTree *tree)
 
   // Readers to access the data (delete the ones you do not need).
 
+  if (tree->GetBranch("event") !=0 ) event = {  fReader,"event"};
   if (tree->GetBranch("Zee_flag") !=0 ) Zee_flag = {  fReader,"Zee_flag"};
   if (tree->GetBranch("Zmumu_flag") !=0 ) Zmumu_flag = {fReader,"Zmumu_flag"};
   if (tree->GetBranch("Wenu_flag") !=0 ) Wenu_flag = { fReader,"Wenu_flag"};
