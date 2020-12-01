@@ -8,8 +8,14 @@ sys.argv.append( '-b' )
 import ROOT
 ROOT.TH1.SetDefaultSumw2()
 
-plotname = sys.argv[1]
-log = int(sys.argv[2])
+directory_name = sys.argv[1]
+plotname = sys.argv[2]
+log = int(sys.argv[3])
+##directory_name = "Plots/20201016-Histos-DeltaEtaLessThan5"
+#directory_name = "Plots/20201016-Histos-DeltaEtaGreaterThan5"
+#directory_name = "Plots/20201016-Histos-Full"
+#directory_name = "Plots/"
+
 
 if os.path.exists("Plots/"+plotname) == False:
     os.mkdir("Plots/"+plotname)
@@ -31,18 +37,19 @@ years = ["2017","2018"]
 #years = ["2017"]
 #samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
 #samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
+#samples = ["MET","VV","TOP","DY","EWKZll","GluGluHtoInv","VBFHtoInv","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
 samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
 regions = ["MTR","VTR"]
 #variables = ["diCleanJet_M_binned"]
 
-##variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","diCleanJet_M_binned"]
-variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta"]
+#variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dEtaCmF","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta","lMjj_dijet_detaCmF", "lMjj_dijet_dphi"]
+variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta", "lMjj_dijet_dphi"]
 
-nick = {}
-nick[("MTR","2017")] = ROOT.TFile("out_MTR_2017.root_qcdDD.root","READ")
-nick[("VTR","2017")] = ROOT.TFile("out_VTR_2017.root_qcdDD.root","READ")
-nick[("MTR","2018")] = ROOT.TFile("out_MTR_2018.root_qcdDD.root","READ")
-nick[("VTR","2018")] = ROOT.TFile("out_VTR_2018.root_qcdDD.root","READ")
+# nick = {}
+# nick[("MTR","2017")] = ROOT.TFile("out_MTR_2017.root_qcdDD.root","READ")
+# nick[("VTR","2017")] = ROOT.TFile("out_VTR_2017.root_qcdDD.root","READ")
+# nick[("MTR","2018")] = ROOT.TFile("out_MTR_2018.root_qcdDD.root","READ")
+# nick[("VTR","2018")] = ROOT.TFile("out_VTR_2018.root_qcdDD.root","READ")
 
 colors = {}
 colors["VV"] = '#7bc345'
@@ -54,11 +61,9 @@ colors["ZJETS"]  =  '#14dbf9'
 colors["EWKW"]   =  '#f28d84'
 colors["WJETS"]     =  '#febc67'
 colors["QCD"]     =  '#ffffff'
+colors["GluGluHtoInv"]     =  '#34eb9f'
+colors["VBFHtoInv"]     =  '#ebeb34'
 
-##directory_name = "Plots/20201016-Histos-DeltaEtaLessThan5"
-#directory_name = "Plots/20201016-Histos-DeltaEtaGreaterThan5"
-#directory_name = "Plots/20201016-Histos-Full"
-directory_name = "Plots/"
 
 for region in regions:
     for variable in variables:
@@ -99,31 +104,40 @@ for region in regions:
             if (  (variable=="diCleanJet_M_binned" and region == "MTR" ) or (variable=="lMjj_binned" and region == "VTR" )  ):
                 
                 file_out = ROOT.TFile("Plots/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
+                BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_SR")
                 BackgroundSubtractedData_CR = CRs[0].Clone("BackgroundSubtractedData_CR")
                 BackgroundSubtractedData_A = As[-1].Clone("BackgroundSubtractedData_A")
                 BackgroundSubtractedData_B = Bs[-1].Clone("BackgroundSubtractedData_B")
 
 
+                for i,SR in enumerate(SRs):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                        continue
+                    BackgroundSubtractedData_SR.Add(SR,-1)
                 for i,CR in enumerate(CRs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
                     BackgroundSubtractedData_CR.Add(CR,-1)
                 for i,A in enumerate(As):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
                     BackgroundSubtractedData_A.Add(A,-1)
                 for i,B in enumerate(Bs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
                     BackgroundSubtractedData_B.Add(B,-1)
 
                 #Get QCD Transfer factor
+                #QCD relax = -2
+                #QCD normal = -3
 
-                QCDTransferFactor_SR = SRs[-2].Clone("QCDTransferFactor_SR")
-                QCDTransferFactor_B = Bs[-2].Clone("QCDTransferFactor_B")
+                qcdchoice = -2
 
-                QCDTransferFactor_SR.Divide( CRs[-2] )
-                QCDTransferFactor_B.Divide( As[-2] )
+                QCDTransferFactor_SR = SRs[qcdchoice].Clone("QCDTransferFactor_SR")
+                QCDTransferFactor_B = Bs[qcdchoice].Clone("QCDTransferFactor_B")
+
+                QCDTransferFactor_SR.Divide( CRs[qcdchoice] )
+                QCDTransferFactor_B.Divide( As[qcdchoice] )
 
                 #Get Final QCD prediction
 
@@ -155,6 +169,7 @@ for region in regions:
                 BackgroundSubtractedData_A.Write()
                 BackgroundSubtractedData_B.Write()
                 BackgroundSubtractedData_CR.Write()
+                BackgroundSubtractedData_SR.Write()
 
                 FinalQCDSR.Write()
                 FinalQCDB.Write()
@@ -183,16 +198,16 @@ for region in regions:
                 c_2.Close()
 
                 #FINAL QCD
-                nicks = nick[(region,year)].Get("rebin_QCD_hist_counts")
+                #nicks = nick[(region,year)].Get("rebin_QCD_hist_counts")
                 c_3 = ROOT.TCanvas("FinalQCD")
                 FinalQCDSR.Draw()
                 FinalQCDSR.GetYaxis().SetTitle("Number of Events")
                 FinalQCDSR.GetYaxis().SetRangeUser(0.1,50000)
                 QCDMC_SR.SetLineColor(ROOT.kRed)
                 QCDMC_SR.Draw("same")
-                nicks.SetLineColor(ROOT.kBlack)
-                nicks.SetMarkerSize(0)
-                nicks.Draw("Esame")
+                #nicks.SetLineColor(ROOT.kBlack)
+                #nicks.SetMarkerSize(0)
+                #nicks.Draw("Esame")
                 print ( "Data-Driven MJ prediction in " + region + " in " + year + " is "  + str(FinalQCDSR.Integral()) )
                 print ( "MC MJ prediction in " + region + " in " + year + " is "  + str(QCDMC_SR.Integral()) )
 
@@ -203,7 +218,7 @@ for region in regions:
                 leg_3.AddEntry(FinalQCDSR,"Data driven method A","L")
                 leg_3.AddEntry(QCDMC_SR,"QCD MC","L")
                 #leg_3.AddEntry(nicks,"Fully data-driven estimate","L")
-                leg_3.AddEntry(nicks,"Data driven method B","L")
+                #leg_3.AddEntry(nicks,"Data driven method B","L")
                 leg_3.Draw()
 
                 ROOT.gStyle.SetOptStat(0);
@@ -267,14 +282,6 @@ for region in regions:
                 c_6.SaveAs("Plots/"+plotname + "/DataDrivenQCDTransferFactor_" + region + "_" + year + ".pdf" )
                 c_6.Close()
 
-                # c_4 = ROOT.TCanvas("QCDTransferFactor_B")
-                # QCDTransferFactor_B.Draw()
-                # QCDTransferFactor_B.GetYaxis().SetTitle("Transfer factor, r")
-                # c_4.Draw()
-                # c_4.SaveAs("QCDTransferFactor_B_" + year + ".png" )
-                # c_4.SaveAs("QCDTransferFactor_B_" + year + ".pdf" )
-                # c_4.Close()
-
                 #For the main analysis
                 file_out_2 = ROOT.TFile("QCD_" + region + "_" + year+ ".root","RECREATE")
                 FinalQCDSR.Write("QCD")
@@ -289,8 +296,11 @@ for region in regions:
             c = ROOT.TCanvas("stackplot_" + variable)
             stack = ROOT.THStack("hs","")
             for i,CR in enumerate(CRs):
-                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                if ( variable == "MetNoLep_CleanJet_mindPhi" ):
+                    CR.Rebin(5)
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
                     continue
+
                 CR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 CR.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 if ( samples[i] == "QCD"):
@@ -300,6 +310,8 @@ for region in regions:
                 # CR.SetLineColor(30+(i*2))
                 leg.AddEntry(CR,samples[i],"F")
                 stack.Add(CR)
+
+
             CRs[0].Draw()
             CRs[0].SetMinimum(0)
             stack.Draw("HISTsame")
@@ -308,7 +320,10 @@ for region in regions:
             if ( CRs[0].Integral()>0 ):
                 CRs[0].SetMinimum(1)
                 ROOT.gPad.SetLogy(log)
-                CRs[0].SetMaximum(CRs[0].GetMaximum()*10)
+                if ( log ):
+                    CRs[0].SetMaximum(CRs[0].GetMaximum()*10)
+                else:
+                    CRs[0].SetMaximum(CRs[0].GetMaximum()*1.5)
             c.Draw()
             c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".png")
             c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".pdf")
@@ -330,8 +345,9 @@ for region in regions:
             MCSum = SRs[0].Clone("SR_MCSum")
             MCSum.Reset()
             for i,SR in enumerate(SRs):
-                #if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
+                if ( variable == "MetNoLep_CleanJet_mindPhi" ):
+                    SR.Rebin(5)
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
                     continue
                 # SR.SetFillColor(30+(i*2))
                 # SR.SetLineColor(30+(i*2))
@@ -353,7 +369,10 @@ for region in regions:
             if ( SRs[0].Integral()>0 ):
                 SRs[0].SetMinimum(1)
                 ROOT.gPad.SetLogy(log)
-                SRs[0].SetMaximum(SRs[0].GetMaximum()*10)
+                if ( log ):
+                    SRs[0].SetMaximum(SRs[0].GetMaximum()*10)
+                else:
+                    SRs[0].SetMaximum(SRs[0].GetMaximum()*1.5)
             c_SR.cd()
             p2_SR.Draw()
             p2_SR.cd()
@@ -380,8 +399,9 @@ for region in regions:
             c_A = ROOT.TCanvas("stackplot_" + variable)
             stack_A = ROOT.THStack("hs_A","")
             for i,A in enumerate(As):
-                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
                     continue
+
                 A.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 A.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 if ( samples[i] == "QCD"):
@@ -409,9 +429,11 @@ for region in regions:
             ROOT.gStyle.SetLegendBorderSize(0)
             c_B = ROOT.TCanvas("stackplot_" + variable)
             stack_B = ROOT.THStack("hs_B","")
+
             for i,B in enumerate(Bs):
-                if ( samples[i] == "DATA" or samples[i] == "MET" or samples[i] == "QCDRELAX"):
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
                     continue
+
                 B.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 B.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 if ( samples[i] == "QCD"):
@@ -497,14 +519,14 @@ for region in regions:
             BackgroundSum_A.Reset()
 
             for i,cr in enumerate(CRs):
-                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                     continue
                 BackgroundSum_CR.Add(cr)
 
             BackgroundSum_CR.Write()
 
             for i,a in enumerate(As):
-                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET"):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                     continue
                 BackgroundSum_A.Add(a)
 
