@@ -42,10 +42,30 @@ void Events::Begin(TTree * /*tree*/)
   TString option = GetOption();
   mFout = TFile::Open(mOutFile.c_str(),"RECREATE");
    
-  const unsigned nVars = 28;
+  const unsigned nVars = 30;
   //  const unsigned nVars = 2;
   // std::string lVar[nVars] = {"MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","MetNoLep_phi","diCleanJet_M"};
-  std::string lVar[nVars] = {"MetNoLep_pt","diCleanJet_M","lMjj","diCleanJet_dEta","lMjj_dijet_deta","diCleanJet_dPhi","lMjj_dijet_dphi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","dijet_met_balance","lMjj","diCleanJet_M","diCleanJet_M"};
+  std::string lVar[nVars] = {"MetNoLep_pt",
+			     "diCleanJet_M",
+			     "lMjj",
+			     "diCleanJet_dEta",
+			     "lMjj_dijet_deta",
+			     "diCleanJet_dEtaCmF",
+			     "lMjj_dijet_detaCmF",
+			     "diCleanJet_dPhi",
+			     "lMjj_dijet_dphi",
+			     "Leading_jet_pt",
+			     "Subleading_jet_pt",
+			     "Leading_jet_eta",
+			     "Subleading_jet_eta",
+			     "CentralEtaMTR",
+			     "ForwardEtaMTR",
+			     "CentralEtaVTR",
+			     "ForwardEtaVTR",
+			     "nCleanJet30",
+			     "MetNoLep_CleanJet_mindPhi",
+			     "LHE_Vpt",
+			     "LHE_HT","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","Pileup_nPU","dijet_met_balance","lMjj","diCleanJet_M","diCleanJet_M"};
 
   // std::string lVar[nVars] = {"MetNoLep_CleanJet_mindPhi","diCleanJet_M"};
   for (unsigned iV(0); iV<nVars; ++iV){//loop on variables
@@ -54,14 +74,13 @@ void Events::Begin(TTree * /*tree*/)
 
   
   //   std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","nCleanJet30 (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","#Phi E_{T}^{miss,no #mu}","M_{jj} (GeV)"};
-  std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#eta_{jj}","#Delta#Phi_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","#eta^{central jet}","#eta^{forward jet}","#eta^{central jet}","#eta^{forward jet}","nCleanJet30 (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","p_{T}^{jj}-E_{T}^{miss}/E_{T}^{miss}","M_{jj} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)"};
+  std::string lVarName[nVars] = {"E_{T}^{miss,no #mu} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)","#Delta#eta_{jj}","#Delta#eta_{jj}","#Delta#eta_{jj} Central-Forward","#Delta#eta_{jj} Central-Forward","#Delta#Phi_{jj}","#Delta#Phi_{jj}","p_{T}^{jet1} (GeV)","p_{T}^{jet2} (GeV)","#eta^{jet1}","#eta^{jet2}","#eta^{central jet}","#eta^{forward jet}","#eta^{central jet}","#eta^{forward jet}","nCleanJet30 (p_{T}>30 GeV)","min#Delta#Phi(jets,E_{T}^{miss,no #mu})","LHE V p_{T} (GeV)","LHE HT (GeV)","decayLeptonId","LHE_Nuds","LHE_Nb","LHE_Nc","N_PU","p_{T}^{jj}-E_{T}^{miss}/E_{T}^{miss}","M_{jj} (GeV)","M_{jj} (GeV)","M_{jj} (GeV)"};
   //  std::string lVarName[nVars] = {"min#Delta#Phi(jets,E_{T}^{miss,no #mu})","M_{jj} (GeV)"};
 
-  const int nBins[nVars] = {350,380,380,120,120,50,50,84,52,50,50,50,50,50,50,10,160,60,60,7,10,10,10,10,42,10,10,6};
-  //  const int nBins[nVars] = {500,380,120,50,84,52,100,100,10,180,60,60,7,10,10,10,40,6,180};
 
-  const double binMin[nVars-3] = {100,200 ,200 ,1,1,0  ,0  ,80 ,40 ,-5,-5,-5,-5,-5,-5 ,2  ,0   ,0  ,0   ,0 ,0 ,0 ,0  ,0 ,-1};
-  const double binMax[nVars-3] = {600,4000,4000,7,7,1.5,1.5,500,300,5 ,5 ,5 ,5 ,5 ,5  ,12 ,3.2 ,600,2000,7 ,10,10,10 ,80,3.2};
+  const int nBins[nVars]       = {350,380 ,380 ,120,120,140,140,50 ,50 ,84 ,52 ,50,50,50,50,50,50 ,11   ,160 ,60 ,60  ,7 ,10,10,10 ,10,42  ,10,10,6};
+  const double binMin[nVars-3] = {100,200 ,200 ,1  ,1  ,-7 ,-7 ,0  ,0  ,80 ,40 ,-5,-5,-5,-5,-5,-5 ,1.5  ,0   ,0  ,0   ,0 ,0 ,0 ,0  ,0 ,-1};
+  const double binMax[nVars-3] = {600,4000,4000,7  ,7  ,7  ,7  ,1.5,1.5,500,300,5 ,5 ,5 ,5 ,5 ,5  ,12.5 ,3.2 ,600,2000,7 ,10,10,10 ,80,3.2};
 
   double mjjbins[11] = {0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000};
   double mjjbins_reduced[7] = {200,500,800,1250,2000,2800,5000};
@@ -543,6 +562,7 @@ Bool_t Events::BaseSelection(){
   if ( mProc == "QCD" || mProc == "QCDRELAX" ){
 
     //    pass = pass && lTreeContent["LHE_HT"]>700; //TEMP
+    pass = pass && lTreeContent["LHE_HT"]>100; 
 
   }
 
@@ -971,6 +991,9 @@ void Events::CalculateAdditionalVariables(){
   lTreeContent["ForwardEtaMTR"] = ForwardEtaMTR;
   lTreeContent["CentralEtaVTR"] = CentralEtaVTR;
   lTreeContent["ForwardEtaVTR"] = ForwardEtaVTR;
+
+  lTreeContent["diCleanJet_dEtaCmF"] = CentralEtaMTR-ForwardEtaMTR;
+  lTreeContent["lMjj_dijet_detaCmF"] = CentralEtaVTR-ForwardEtaVTR;
 
 }
 
