@@ -3,7 +3,7 @@ import sys,os
 import subprocess
 sys.argv.append( '-b' )
 import ROOT
-plotname = sys.argv[1]
+plotname = sys.argv[2]
 if os.path.exists("Plots/"+plotname) == False:
     os.mkdir("Plots/"+plotname)
 
@@ -15,7 +15,8 @@ regions = ["MTR","VTR"]
 variables = ["MetNoLep_CleanJet_mindPhi_MetNoLep_pt","MetNoLep_CleanJet_mindPhi_diCleanJet_dPhi","MetNoLep_CleanJet_mindPhi_diCleanJet_dEta","MetNoLep_CleanJet_mindPhi_Leading_jet_pt","MetNoLep_CleanJet_mindPhi_Subleading_jet_pt","MetNoLep_CleanJet_mindPhi_dijet_met_balance","MetNoLep_CleanJet_mindPhi_Pileup_nPU","MetNoLep_CleanJet_mindPhi_diCleanJet_M","MetNoLep_CleanJet_mindPhi_lMjj","diCleanJet_dPhi_dijet_met_balance","diCleanJet_dEta_diCleanJet_M","lMjj_dijet_deta_lMjj","diCleanJet_dEta_LHE_HT","lMjj_dijet_deta_LHE_HT"]
 
 files = {}
-PlotDir = "Plots"
+#PlotDir = "Plots"
+PlotDir = sys.argv[1]
 for year in years:
     for sample in samples:
         files[(sample,year)] = ROOT.TFile("~/invisible/AnalyseTrees/analysechiptrees/"+PlotDir+"/Histos_Nominal_"+sample+"_"+year+".root","READ")
