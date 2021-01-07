@@ -38,6 +38,7 @@ int makeHistograms(){//main
   }
   else
     baseDir = "/vols/cms/snwebb/Common/";
+    //    baseDir = "/vols/cms/snwebb/Common/August";
 
     //    baseDir = "/home/hep/snwebb/invisible/Nick/analysis/temp-znn-q";
   //    std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
@@ -66,6 +67,8 @@ int makeHistograms(){//main
 
   std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
 
+  //  std::vector<std::string> proc = { "QCD", "QCDRELAX"};
+
 
 
 
@@ -80,9 +83,9 @@ int makeHistograms(){//main
 
   //  std::vector<std::string> proc = { "DY"};
   //  std::vector<std::string> proc = { "DATA"};
-  std::vector<std::string> years = {"2017","2018"};
-  //std::vector<std::string> years = {"2017"};
-  //           std::vector<std::string> years = {"2018"};
+    std::vector<std::string> years = {"2017","2018"};
+  //  std::vector<std::string> years = {"2017"};
+    //    std::vector<std::string> years = {"2018"};
   //  std::string year = "2018";
 
   std::vector<std::string> name;

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys,os
 import subprocess
+from array import array
 sys.argv.append( '-b' )
 # os.mkdir("CR")
 # os.mkdir("A")
@@ -43,7 +44,10 @@ regions = ["MTR","VTR"]
 #variables = ["diCleanJet_M_binned"]
 
 #variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dEtaCmF","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta","lMjj_dijet_detaCmF", "lMjj_dijet_dphi"]
-variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta", "lMjj_dijet_dphi"]
+
+#variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_M_LeadingPosEta","diCleanJet_M_LeadingNegEta","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta", "lMjj_dijet_dphi"]
+
+variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","MetNoLep_CleanJet_mindPhi","lMjj_binned","diCleanJet_M_binned","lMjj_dijet_deta", "lMjj_dijet_dphi"]
 
 # nick = {}
 # nick[("MTR","2017")] = ROOT.TFile("out_MTR_2017.root_qcdDD.root","READ")
@@ -94,7 +98,20 @@ for region in regions:
                 SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
                 CRs.append(files[-1].Get("QCDCR/"+region+"/h_QCDCR_"+region+"_" + variable))
 
-
+            #rebin if necessary
+            # for i,(A,B,SR,CR) in enumerate(zip(As,Bs,SRs,CRs)):
+            #     if variable == "diCleanJet_M_binned":
+            #         mjjbins=array('d',[0,200,400,600,900,1200,1500,2000,2750,5000])
+            #         As[i] = A.Rebin(len(mjjbins)-1,"A_rebinned",mjjbins)
+            #         Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
+            #         CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
+            #         SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
+            #     elif variable == "lMjj_binned":
+            #         mjjbins=array('d',[0,900,1200,1500,2000,5000])
+            #         As[i] = A.Rebin(len(mjjbins)-1,"A_rebinned",mjjbins)
+            #         Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
+            #         CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
+            #         SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
                 #print (SRs[-1].Integral(),CRs[-1].Integral())
 
             #Get Data - background subtracted
@@ -131,7 +148,7 @@ for region in regions:
                 #QCD relax = -2
                 #QCD normal = -3
 
-                qcdchoice = -2
+                qcdchoice = -3
 
                 QCDTransferFactor_SR = SRs[qcdchoice].Clone("QCDTransferFactor_SR")
                 QCDTransferFactor_B = Bs[qcdchoice].Clone("QCDTransferFactor_B")
@@ -298,6 +315,11 @@ for region in regions:
             for i,CR in enumerate(CRs):
                 if ( variable == "MetNoLep_CleanJet_mindPhi" ):
                     CR.Rebin(5)
+                if ( variable == "diCleanJet_M_LeadingPosEta" or variable == "diCleanJet_M_LeadingNegEta" ):
+                    xbins = array('d', [0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000])
+                    CR = CR.Rebin(len(xbins)-1,"CR_rebinned",xbins)
+                    CRs[i] = CR
+
                 if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
                     continue
 
@@ -342,12 +364,21 @@ for region in regions:
             ROOT.gStyle.SetOptStat(0);
             ROOT.gPad.SetBottomMargin(0)
             stack_SR = ROOT.THStack("hs_SR","")
-            MCSum = SRs[0].Clone("SR_MCSum")
+            MCSum = CRs[0].Clone("SR_MCSum")
             MCSum.Reset()
             for i,SR in enumerate(SRs):
                 if ( variable == "MetNoLep_CleanJet_mindPhi" ):
                     SR.Rebin(5)
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
+
+                if ( variable == "diCleanJet_M_LeadingPosEta" or variable == "diCleanJet_M_LeadingNegEta" ):
+                    xbins = array('d', [0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000])
+                    SR = SR.Rebin(len(xbins)-1,"SR_rebinned",xbins)
+                    SRs[i] = SR
+
+                #if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
+                #Removing QCD from ratio sum as requested by AM
+                #if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
                     continue
                 # SR.SetFillColor(30+(i*2))
                 # SR.SetLineColor(30+(i*2))
