@@ -16,6 +16,7 @@
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
 #include <TH2D.h>
+#include <TH3D.h>
 
 // Headers needed by this particular selector
 
@@ -27,6 +28,7 @@
 #include <string>
 #include <utility>
 #include <functional>
+#include <tuple>
 
 //enum RegionType { SR=0, We=1, Wmu=2, Zee=3, Zmumu=4, QCDCR=5, QCDA=6, QCDB=7, Last };
 
@@ -76,7 +78,8 @@ class Events : public TSelector {
    void SetLumiPb(const double & aLumi);
    void SetTreeContent(std::string year);
    bool CheckValue(ROOT::Internal::TTreeReaderValueBase& value);
-   void CalculateAdditionalVariables();
+   void CalculateAdditionalVariables1();
+   void CalculateAdditionalVariables2();
 
    
  private:
@@ -84,8 +87,10 @@ class Events : public TSelector {
    std::string mOutFile;
    std::vector<std::string> mVarVec;
    std::vector<std::pair<std::string,std::string> > mVarVec2D;
+   std::vector<std::tuple<std::string,std::string,std::string> > mVarVec3D;
    std::vector<TH1F*> mHistVec[RegionType::Last][CatType::LastCat];
    std::vector<TH2D*> mHistVec2D[RegionType::Last][CatType::LastCat];
+   std::vector<TH3D*> mHistVec3D[RegionType::Last][CatType::LastCat];
    ofstream fileMTR;
 
    CatType mCat;
@@ -327,10 +332,10 @@ void Events::Init(TTree *tree)
   // Readers to access the data (delete the ones you do not need).
 
   if (tree->GetBranch("event") !=0 ) event = {  fReader,"event"};
-  if (tree->GetBranch("Zee_flag") !=0 ) Zee_flag = {  fReader,"Zee_flag"};
-  if (tree->GetBranch("Zmumu_flag") !=0 ) Zmumu_flag = {fReader,"Zmumu_flag"};
-  if (tree->GetBranch("Wenu_flag") !=0 ) Wenu_flag = { fReader,"Wenu_flag"};
-  if (tree->GetBranch("Wmunu_flag") !=0 ) Wmunu_flag = {fReader,"Wmunu_flag"};
+  /* if (tree->GetBranch("Zee_flag") !=0 ) Zee_flag = {  fReader,"Zee_flag"}; */
+  /* if (tree->GetBranch("Zmumu_flag") !=0 ) Zmumu_flag = {fReader,"Zmumu_flag"}; */
+  /* if (tree->GetBranch("Wenu_flag") !=0 ) Wenu_flag = { fReader,"Wenu_flag"}; */
+  /* if (tree->GetBranch("Wmunu_flag") !=0 ) Wmunu_flag = {fReader,"Wmunu_flag"}; */
   if (tree->GetBranch("VBF_MTR_QCD_CR_eff_Sel") !=0 ) VBF_MTR_QCD_CR_eff_Sel = { fReader,"VBF_MTR_QCD_CR_eff_Sel"};
   if (tree->GetBranch("VBF_VTR_QCD_CR_eff_Sel") !=0 ) VBF_VTR_QCD_CR_eff_Sel = { fReader,"VBF_VTR_QCD_CR_eff_Sel"};
   if (tree->GetBranch("VBF_MTR_QCD_SR_eff_Sel") !=0 ) VBF_MTR_QCD_SR_eff_Sel = { fReader,"VBF_MTR_QCD_SR_eff_Sel"};
@@ -341,44 +346,44 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("VBF_VTR_QCD_B_eff_Sel") !=0 ) VBF_VTR_QCD_B_eff_Sel = {  fReader,"VBF_VTR_QCD_B_eff_Sel"};
   if (tree->GetBranch("VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel") !=0 ) VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel = {  fReader,"VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel"};
   if (tree->GetBranch("VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel") !=0 ) VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel = {  fReader,"VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel"};
-  if (tree->GetBranch("DiVetoElectron_mass") !=0 ) DiVetoElectron_mass = {    fReader,"DiVetoElectron_mass"};
-  if (tree->GetBranch("DiLooseMuon_mass") !=0 ) DiLooseMuon_mass = {  fReader,"DiLooseMuon_mass"};
-  if (tree->GetBranch("Leading_el_pt") !=0 ) Leading_el_pt = {fReader,"Leading_el_pt"};
-  if (tree->GetBranch("Leading_el_eta") !=0 ) Leading_el_eta = { fReader,"Leading_el_eta"};
-  if (tree->GetBranch("Leading_el_phi") !=0 ) Leading_el_phi = { fReader,"Leading_el_phi"};
-  if (tree->GetBranch("Subleading_el_pt") !=0 ) Subleading_el_pt = {  fReader,"Subleading_el_pt"};
-  if (tree->GetBranch("Subleading_el_eta") !=0 ) Subleading_el_eta = { fReader,"Subleading_el_eta"};
-  if (tree->GetBranch("Subleading_el_phi") !=0 ) Subleading_el_phi = { fReader,"Subleading_el_phi"};
-  if (tree->GetBranch("Leading_muon_pt") !=0 ) Leading_muon_pt = {fReader,"Leading_muon_pt"};
-  if (tree->GetBranch("Leading_muon_eta") !=0 ) Leading_muon_eta = {  fReader,"Leading_muon_eta"};
-  if (tree->GetBranch("Leading_muon_phi") !=0 ) Leading_muon_phi = {  fReader,"Leading_muon_phi"};
-  if (tree->GetBranch("Subleading_muon_pt") !=0 ) Subleading_muon_pt = {fReader,"Subleading_muon_pt"};
-  if (tree->GetBranch("Subleading_muon_eta") !=0 ) Subleading_muon_eta = {    fReader,"Subleading_muon_eta"};
-  if (tree->GetBranch("Subleading_muon_phi") !=0 ) Subleading_muon_phi = {    fReader,"Subleading_muon_phi"};
+  //  if (tree->GetBranch("DiVetoElectron_mass") !=0 ) DiVetoElectron_mass = {    fReader,"DiVetoElectron_mass"};
+  //  if (tree->GetBranch("DiLooseMuon_mass") !=0 ) DiLooseMuon_mass = {  fReader,"DiLooseMuon_mass"};
+  /* if (tree->GetBranch("Leading_el_pt") !=0 ) Leading_el_pt = {fReader,"Leading_el_pt"}; */
+  /* if (tree->GetBranch("Leading_el_eta") !=0 ) Leading_el_eta = { fReader,"Leading_el_eta"}; */
+  /* if (tree->GetBranch("Leading_el_phi") !=0 ) Leading_el_phi = { fReader,"Leading_el_phi"}; */
+  /* if (tree->GetBranch("Subleading_el_pt") !=0 ) Subleading_el_pt = {  fReader,"Subleading_el_pt"}; */
+  /* if (tree->GetBranch("Subleading_el_eta") !=0 ) Subleading_el_eta = { fReader,"Subleading_el_eta"}; */
+  /* if (tree->GetBranch("Subleading_el_phi") !=0 ) Subleading_el_phi = { fReader,"Subleading_el_phi"}; */
+  /* if (tree->GetBranch("Leading_muon_pt") !=0 ) Leading_muon_pt = {fReader,"Leading_muon_pt"}; */
+  /* if (tree->GetBranch("Leading_muon_eta") !=0 ) Leading_muon_eta = {  fReader,"Leading_muon_eta"}; */
+  /* if (tree->GetBranch("Leading_muon_phi") !=0 ) Leading_muon_phi = {  fReader,"Leading_muon_phi"}; */
+  /* if (tree->GetBranch("Subleading_muon_pt") !=0 ) Subleading_muon_pt = {fReader,"Subleading_muon_pt"}; */
+  /* if (tree->GetBranch("Subleading_muon_eta") !=0 ) Subleading_muon_eta = {    fReader,"Subleading_muon_eta"}; */
+  /* if (tree->GetBranch("Subleading_muon_phi") !=0 ) Subleading_muon_phi = {    fReader,"Subleading_muon_phi"}; */
   if (tree->GetBranch("isData") !=0 ) isData = {    fReader,"isData"};
-  if (tree->GetBranch("nVLooseTau") !=0 ) nVLooseTau = {fReader,"nVLooseTau"};
+  //  if (tree->GetBranch("nVLooseTau") !=0 ) nVLooseTau = {fReader,"nVLooseTau"};
   if (tree->GetBranch("nVLooseTauFix") !=0 ) nVLooseTauFix = {fReader,"nVLooseTauFix"};
-  if (tree->GetBranch("nVLooseSITTau") !=0 ) nVLooseSITTau = {fReader,"nVLooseSITTau"};
+  //  if (tree->GetBranch("nVLooseSITTau") !=0 ) nVLooseSITTau = {fReader,"nVLooseSITTau"};
   if (tree->GetBranch("nMediumBJet") !=0 ) nMediumBJet = {  fReader,"nMediumBJet"};
   if (tree->GetBranch("nLoosePhoton") !=0 ) nLoosePhoton = { fReader,"nLoosePhoton"};
   if (tree->GetBranch("nLooseMuon") !=0 ) nLooseMuon = {fReader,"nLooseMuon"};
   if (tree->GetBranch("nVetoElectron") !=0 ) nVetoElectron = {fReader,"nVetoElectron"};
-  if (tree->GetBranch("met_filters_2017_data") !=0 ) met_filters_2017_data = {  fReader,"met_filters_2017_data"};
-  if (tree->GetBranch("met_filters_2017_mc") !=0 ) met_filters_2017_mc = {    fReader,"met_filters_2017_mc"};
-  if (tree->GetBranch("met_filters_2018_data") !=0 ) met_filters_2018_data = {  fReader,"met_filters_2018_data"};
-  if (tree->GetBranch("met_filters_2018_mc") !=0 ) met_filters_2018_mc = {    fReader,"met_filters_2018_mc"};
+  /* if (tree->GetBranch("met_filters_2017_data") !=0 ) met_filters_2017_data = {  fReader,"met_filters_2017_data"}; */
+  /* if (tree->GetBranch("met_filters_2017_mc") !=0 ) met_filters_2017_mc = {    fReader,"met_filters_2017_mc"}; */
+  /* if (tree->GetBranch("met_filters_2018_data") !=0 ) met_filters_2018_data = {  fReader,"met_filters_2018_data"}; */
+  /* if (tree->GetBranch("met_filters_2018_mc") !=0 ) met_filters_2018_mc = {    fReader,"met_filters_2018_mc"}; */
   if (tree->GetBranch("MetNoLep_CleanJet_mindPhi") !=0 ) MetNoLep_CleanJet_mindPhi = { fReader,"MetNoLep_CleanJet_mindPhi"};
   if (tree->GetBranch("MetNoLep_pt") !=0 ) MetNoLep_pt = {  fReader,"MetNoLep_pt"};
   if (tree->GetBranch("MetNoLep_phi") !=0 ) MetNoLep_phi = {  fReader,"MetNoLep_phi"};
-  if (tree->GetBranch("MET_pt") !=0 ) MET_pt = {    fReader,"MET_pt"};
-  if (tree->GetBranch("MET_phi") !=0 ) MET_phi = {   fReader,"MET_phi"};
-  if (tree->GetBranch("MET_sumEt") !=0 ) MET_sumEt = { fReader,"MET_sumEt"};
-  if (tree->GetBranch("CaloMET_pt") !=0 ) CaloMET_pt = {fReader,"CaloMET_pt"};
-  if (tree->GetBranch("CaloMET_phi") !=0 ) CaloMET_phi = {  fReader,"CaloMET_phi"};
-  if (tree->GetBranch("CaloMET_sumEt") !=0 ) CaloMET_sumEt = {fReader,"CaloMET_sumEt"};
-  if (tree->GetBranch("ChsMET_pt") !=0 ) ChsMET_pt = { fReader,"ChsMET_pt"};
-  if (tree->GetBranch("ChsMET_phi") !=0 ) ChsMET_phi = {fReader,"ChsMET_phi"};
-  if (tree->GetBranch("ChsMET_sumEt") !=0 ) ChsMET_sumEt = { fReader,"ChsMET_sumEt"};
+  /* if (tree->GetBranch("MET_pt") !=0 ) MET_pt = {    fReader,"MET_pt"}; */
+  /* if (tree->GetBranch("MET_phi") !=0 ) MET_phi = {   fReader,"MET_phi"}; */
+  /* if (tree->GetBranch("MET_sumEt") !=0 ) MET_sumEt = { fReader,"MET_sumEt"}; */
+  /* if (tree->GetBranch("CaloMET_pt") !=0 ) CaloMET_pt = {fReader,"CaloMET_pt"}; */
+  /* if (tree->GetBranch("CaloMET_phi") !=0 ) CaloMET_phi = {  fReader,"CaloMET_phi"}; */
+  /* if (tree->GetBranch("CaloMET_sumEt") !=0 ) CaloMET_sumEt = {fReader,"CaloMET_sumEt"}; */
+  /* if (tree->GetBranch("ChsMET_pt") !=0 ) ChsMET_pt = { fReader,"ChsMET_pt"}; */
+  /* if (tree->GetBranch("ChsMET_phi") !=0 ) ChsMET_phi = {fReader,"ChsMET_phi"}; */
+  /* if (tree->GetBranch("ChsMET_sumEt") !=0 ) ChsMET_sumEt = { fReader,"ChsMET_sumEt"}; */
   if (tree->GetBranch("nCleanJet30") !=0 ) nCleanJet30 = {  fReader,"nCleanJet30"};
   if (tree->GetBranch("Leading_jet_pt") !=0 ) Leading_jet_pt = { fReader,"Leading_jet_pt"};
   if (tree->GetBranch("Leading_jet_eta") !=0 ) Leading_jet_eta = {fReader,"Leading_jet_eta"};
@@ -400,25 +405,25 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("lMjj") !=0 ) lMjj = { fReader,"lMjj"};
   if (tree->GetBranch("lMjj_dijet_dphi") !=0 ) lMjj_dijet_dphi = { fReader,"lMjj_dijet_dphi"};
   if (tree->GetBranch("lMjj_dijet_deta") !=0 ) lMjj_dijet_deta = { fReader,"lMjj_dijet_deta"};
-  if (tree->GetBranch("DiCleanJet_mass") !=0 ) DiCleanJet_mass = { fReader,"DiCleanJet_mass"};
+  //  if (tree->GetBranch("DiCleanJet_mass") !=0 ) DiCleanJet_mass = { fReader,"DiCleanJet_mass"};
   if (tree->GetBranch("dijet_M") !=0 ) dijet_M = { fReader,"dijet_M"};
   if (tree->GetBranch("diCleanJet_dPhi") !=0 ) diCleanJet_dPhi = {fReader,"diCleanJet_dPhi"};
   if (tree->GetBranch("diCleanJet_dEta") !=0 ) diCleanJet_dEta = {fReader,"diCleanJet_dEta"};
-  if (tree->GetBranch("Pileup_nTrueInt") !=0 ) Pileup_nTrueInt = {fReader,"Pileup_nTrueInt"};
+  //  if (tree->GetBranch("Pileup_nTrueInt") !=0 ) Pileup_nTrueInt = {fReader,"Pileup_nTrueInt"};
   if (tree->GetBranch("Pileup_nPU") !=0 ) Pileup_nPU = {fReader,"Pileup_nPU"};
-  if (tree->GetBranch("PV_npvsGood") !=0 ) PV_npvsGood = {  fReader,"PV_npvsGood"};
-  if (tree->GetBranch("Gen_boson_pt") !=0 ) Gen_boson_pt = { fReader,"Gen_boson_pt"};
-  if (tree->GetBranch("Gen_Mjj") !=0 ) Gen_Mjj = {   fReader,"Gen_Mjj"};
-  if (tree->GetBranch("Gen_jet_pt") !=0 ) Gen_jet_pt = {fReader,"Gen_jet_pt"};
-  if (tree->GetBranch("decayLeptonId") !=0 ) decayLeptonId = {fReader,"decayLeptonId"};
-  if (tree->GetBranch("nGenDressedLepton") !=0 ) nGenDressedLepton = { fReader,"nGenDressedLepton"};
+  //  if (tree->GetBranch("PV_npvsGood") !=0 ) PV_npvsGood = {  fReader,"PV_npvsGood"};
+  //  if (tree->GetBranch("Gen_boson_pt") !=0 ) Gen_boson_pt = { fReader,"Gen_boson_pt"};
+  //  if (tree->GetBranch("Gen_Mjj") !=0 ) Gen_Mjj = {   fReader,"Gen_Mjj"};
+  //  if (tree->GetBranch("Gen_jet_pt") !=0 ) Gen_jet_pt = {fReader,"Gen_jet_pt"};
+  //  if (tree->GetBranch("decayLeptonId") !=0 ) decayLeptonId = {fReader,"decayLeptonId"};
+  //  if (tree->GetBranch("nGenDressedLepton") !=0 ) nGenDressedLepton = { fReader,"nGenDressedLepton"};
   if (tree->GetBranch("LHE_HT") !=0 ) LHE_HT = {    fReader,"LHE_HT"};
   if (tree->GetBranch("LHE_Vpt") !=0 ) LHE_Vpt = {   fReader,"LHE_Vpt"};
   if (tree->GetBranch("LHE_Njets") !=0 ) LHE_Njets = { fReader,"LHE_Njets"};
-  if (tree->GetBranch("LHE_Nb") !=0 ) LHE_Nb = {    fReader,"LHE_Nb"};
-  if (tree->GetBranch("LHE_Nc") !=0 ) LHE_Nc = {    fReader,"LHE_Nc"};
-  if (tree->GetBranch("LHE_Nuds") !=0 ) LHE_Nuds = {  fReader,"LHE_Nuds"};
-  if (tree->GetBranch("LHE_Nglu") !=0 ) LHE_Nglu = {  fReader,"LHE_Nglu"};
+  //  if (tree->GetBranch("LHE_Nb") !=0 ) LHE_Nb = {    fReader,"LHE_Nb"};
+  //  if (tree->GetBranch("LHE_Nc") !=0 ) LHE_Nc = {    fReader,"LHE_Nc"};
+  //  if (tree->GetBranch("LHE_Nuds") !=0 ) LHE_Nuds = {  fReader,"LHE_Nuds"};
+  //  if (tree->GetBranch("LHE_Nglu") !=0 ) LHE_Nglu = {  fReader,"LHE_Nglu"};
   if (tree->GetBranch("GenMET_pt") !=0 ) GenMET_pt = { fReader,"GenMET_pt"};
   if (tree->GetBranch("GenMET_phi") !=0 ) GenMET_phi = {fReader,"GenMET_phi"};
   if (tree->GetBranch("xs_weight") !=0 ) xs_weight = { fReader,"xs_weight"};
@@ -433,46 +438,46 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("hem_weight") !=0 ) hem_weight = {  fReader,"hem_weight"};
   if (tree->GetBranch("trigger_weight_METMHT2018") !=0 ) trigger_weight_METMHT2018 = { fReader,"trigger_weight_METMHT2018"};
   if (tree->GetBranch("trigger_weight_VBF2018") !=0 ) trigger_weight_VBF2018 = { fReader,"trigger_weight_VBF2018"};
-  if (tree->GetBranch("trigger_weight_SingleEle322018") !=0 ) trigger_weight_SingleEle322018 = { fReader,"trigger_weight_SingleEle322018"};
+  //  if (tree->GetBranch("trigger_weight_SingleEle322018") !=0 ) trigger_weight_SingleEle322018 = { fReader,"trigger_weight_SingleEle322018"};
   if (tree->GetBranch("trigger_weight_METMHT2017") !=0 ) trigger_weight_METMHT2017 = { fReader,"trigger_weight_METMHT2017"};
   if (tree->GetBranch("trigger_weight_VBF2017") !=0 ) trigger_weight_VBF2017 = { fReader,"trigger_weight_VBF2017"};
-  if (tree->GetBranch("trigger_weight_SingleEle352017") !=0 ) trigger_weight_SingleEle352017 = { fReader,"trigger_weight_SingleEle352017"};
+  //  if (tree->GetBranch("trigger_weight_SingleEle352017") !=0 ) trigger_weight_SingleEle352017 = { fReader,"trigger_weight_SingleEle352017"};
   if (tree->GetBranch("VetoElectron_eventSelW") !=0 ) VetoElectron_eventSelW = { fReader,"VetoElectron_eventSelW"};
-  if (tree->GetBranch("CRVetoElectron_eventSelW") !=0 ) CRVetoElectron_eventSelW = {    fReader,"CRVetoElectron_eventSelW"};
-  if (tree->GetBranch("CRTightElectron_eventSelW") !=0 ) CRTightElectron_eventSelW = { fReader,"CRTightElectron_eventSelW"};
+  /* if (tree->GetBranch("CRVetoElectron_eventSelW") !=0 ) CRVetoElectron_eventSelW = {    fReader,"CRVetoElectron_eventSelW"}; */
+  /* if (tree->GetBranch("CRTightElectron_eventSelW") !=0 ) CRTightElectron_eventSelW = { fReader,"CRTightElectron_eventSelW"}; */
   if (tree->GetBranch("VetoElectron_eventVetoW") !=0 ) VetoElectron_eventVetoW = {fReader,"VetoElectron_eventVetoW"};
-  if (tree->GetBranch("VetoElectron_eventVetoW_systRECO_up") !=0 ) VetoElectron_eventVetoW_systRECO_up = { fReader,"VetoElectron_eventVetoW_systRECO_up"};
-  if (tree->GetBranch("VetoElectron_eventVetoW_systRECO_down") !=0 ) VetoElectron_eventVetoW_systRECO_down = {  fReader,"VetoElectron_eventVetoW_systRECO_down"};
-  if (tree->GetBranch("VetoElectron_eventVetoW_systIDISO_up") !=0 ) VetoElectron_eventVetoW_systIDISO_up = {fReader,"VetoElectron_eventVetoW_systIDISO_up"};
-  if (tree->GetBranch("VetoElectron_eventVetoW_systIDISO_down") !=0 ) VetoElectron_eventVetoW_systIDISO_down = {   fReader,"VetoElectron_eventVetoW_systIDISO_down"};
+  /* if (tree->GetBranch("VetoElectron_eventVetoW_systRECO_up") !=0 ) VetoElectron_eventVetoW_systRECO_up = { fReader,"VetoElectron_eventVetoW_systRECO_up"}; */
+  /* if (tree->GetBranch("VetoElectron_eventVetoW_systRECO_down") !=0 ) VetoElectron_eventVetoW_systRECO_down = {  fReader,"VetoElectron_eventVetoW_systRECO_down"}; */
+  /* if (tree->GetBranch("VetoElectron_eventVetoW_systIDISO_up") !=0 ) VetoElectron_eventVetoW_systIDISO_up = {fReader,"VetoElectron_eventVetoW_systIDISO_up"}; */
+  /* if (tree->GetBranch("VetoElectron_eventVetoW_systIDISO_down") !=0 ) VetoElectron_eventVetoW_systIDISO_down = {   fReader,"VetoElectron_eventVetoW_systIDISO_down"}; */
   if (tree->GetBranch("LooseMuon_eventSelW") !=0 ) LooseMuon_eventSelW = {    fReader,"LooseMuon_eventSelW"};
-  if (tree->GetBranch("CRLooseMuon_eventSelW") !=0 ) CRLooseMuon_eventSelW = {  fReader,"CRLooseMuon_eventSelW"};
-  if (tree->GetBranch("CRTightMuon_eventSelW") !=0 ) CRTightMuon_eventSelW = {  fReader,"CRTightMuon_eventSelW"};
+  /* if (tree->GetBranch("CRLooseMuon_eventSelW") !=0 ) CRLooseMuon_eventSelW = {  fReader,"CRLooseMuon_eventSelW"}; */
+  /* if (tree->GetBranch("CRTightMuon_eventSelW") !=0 ) CRTightMuon_eventSelW = {  fReader,"CRTightMuon_eventSelW"}; */
   if (tree->GetBranch("LooseMuon_eventVetoW") !=0 ) LooseMuon_eventVetoW = {   fReader,"LooseMuon_eventVetoW"};
-  if (tree->GetBranch("LooseMuon_eventVetoW_systID_up") !=0 ) LooseMuon_eventVetoW_systID_up = { fReader,"LooseMuon_eventVetoW_systID_up"};
-  if (tree->GetBranch("LooseMuon_eventVetoW_systID_down") !=0 ) LooseMuon_eventVetoW_systID_down = {    fReader,"LooseMuon_eventVetoW_systID_down"};
-  if (tree->GetBranch("LooseMuon_eventVetoW_systISO_up") !=0 ) LooseMuon_eventVetoW_systISO_up = {fReader,"LooseMuon_eventVetoW_systISO_up"};
-  if (tree->GetBranch("LooseMuon_eventVetoW_systISO_down") !=0 ) LooseMuon_eventVetoW_systISO_down = {   fReader,"LooseMuon_eventVetoW_systISO_down"};
-  if (tree->GetBranch("VLooseTau_eventVetoW") !=0 ) VLooseTau_eventVetoW = {   fReader,"VLooseTau_eventVetoW"};
-  if (tree->GetBranch("VLooseTau_eventVetoW_up") !=0 ) VLooseTau_eventVetoW_up = {fReader,"VLooseTau_eventVetoW_up"};
-  if (tree->GetBranch("VLooseTau_eventVetoW_down") !=0 ) VLooseTau_eventVetoW_down = { fReader,"VLooseTau_eventVetoW_down"};
-  if (tree->GetBranch("VLooseSITTau_eventVetoW") !=0 ) VLooseSITTau_eventVetoW = {fReader,"VLooseSITTau_eventVetoW"};
-  if (tree->GetBranch("VLooseSITTau_eventVetoW_up") !=0 ) VLooseSITTau_eventVetoW_up = {fReader,"VLooseSITTau_eventVetoW_up"};
-  if (tree->GetBranch("VLooseSITTau_eventVetoW_down") !=0 ) VLooseSITTau_eventVetoW_down = {   fReader,"VLooseSITTau_eventVetoW_down"};
+  //  if (tree->GetBranch("LooseMuon_eventVetoW_systID_up") !=0 ) LooseMuon_eventVetoW_systID_up = { fReader,"LooseMuon_eventVetoW_systID_up"};
+  //  if (tree->GetBranch("LooseMuon_eventVetoW_systID_down") !=0 ) LooseMuon_eventVetoW_systID_down = {    fReader,"LooseMuon_eventVetoW_systID_down"};
+  //  if (tree->GetBranch("LooseMuon_eventVetoW_systISO_up") !=0 ) LooseMuon_eventVetoW_systISO_up = {fReader,"LooseMuon_eventVetoW_systISO_up"};
+  //  if (tree->GetBranch("LooseMuon_eventVetoW_systISO_down") !=0 ) LooseMuon_eventVetoW_systISO_down = {   fReader,"LooseMuon_eventVetoW_systISO_down"};
+  //  if (tree->GetBranch("VLooseTau_eventVetoW") !=0 ) VLooseTau_eventVetoW = {   fReader,"VLooseTau_eventVetoW"};
+  /* if (tree->GetBranch("VLooseTau_eventVetoW_up") !=0 ) VLooseTau_eventVetoW_up = {fReader,"VLooseTau_eventVetoW_up"}; */
+  /* if (tree->GetBranch("VLooseTau_eventVetoW_down") !=0 ) VLooseTau_eventVetoW_down = { fReader,"VLooseTau_eventVetoW_down"}; */
+  //  if (tree->GetBranch("VLooseSITTau_eventVetoW") !=0 ) VLooseSITTau_eventVetoW = {fReader,"VLooseSITTau_eventVetoW"};
+  /* if (tree->GetBranch("VLooseSITTau_eventVetoW_up") !=0 ) VLooseSITTau_eventVetoW_up = {fReader,"VLooseSITTau_eventVetoW_up"}; */
+  /* if (tree->GetBranch("VLooseSITTau_eventVetoW_down") !=0 ) VLooseSITTau_eventVetoW_down = {   fReader,"VLooseSITTau_eventVetoW_down"}; */
   if (tree->GetBranch("VLooseTauFix_eventVetoW") !=0 ) VLooseTauFix_eventVetoW = {   fReader,"VLooseTauFix_eventVetoW"};
-  if (tree->GetBranch("VLooseTauFix_eventVetoW_up") !=0 ) VLooseTauFix_eventVetoW_up = {fReader,"VLooseTauFix_eventVetoW_up"};
-  if (tree->GetBranch("VLooseTauFix_eventVetoW_down") !=0 ) VLooseTauFix_eventVetoW_down = { fReader,"VLooseTauFix_eventVetoW_down"};
+  /* if (tree->GetBranch("VLooseTauFix_eventVetoW_up") !=0 ) VLooseTauFix_eventVetoW_up = {fReader,"VLooseTauFix_eventVetoW_up"}; */
+  /* if (tree->GetBranch("VLooseTauFix_eventVetoW_down") !=0 ) VLooseTauFix_eventVetoW_down = { fReader,"VLooseTauFix_eventVetoW_down"}; */
 
   if (tree->GetBranch("MediumBJet_eventVetoW") !=0 ) MediumBJet_eventVetoW = {  fReader,"MediumBJet_eventVetoW"};
   if (tree->GetBranch("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60") !=0 ) HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60 = {fReader,"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"};
   if (tree->GetBranch("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight") !=0 ) HLT_PFMETNoMu120_PFMHTNoMu120_IDTight = {  fReader,"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"};
   if (tree->GetBranch("HLT_DiJet110_35_Mjj650_PFMET110") !=0 ) HLT_DiJet110_35_Mjj650_PFMET110 = {fReader,"HLT_DiJet110_35_Mjj650_PFMET110"};
   if (tree->GetBranch("HLT_TripleJet110_35_35_Mjj650_PFMET110") !=0 ) HLT_TripleJet110_35_35_Mjj650_PFMET110 = {   fReader,"HLT_TripleJet110_35_35_Mjj650_PFMET110"};
-  if (tree->GetBranch("HLT_Ele35_WPTight_Gsf") !=0 ) HLT_Ele35_WPTight_Gsf = {  fReader,"HLT_Ele35_WPTight_Gsf"};
-  if (tree->GetBranch("HLT_Ele32_WPTight_Gsf") !=0 ) HLT_Ele32_WPTight_Gsf = {  fReader,"HLT_Ele32_WPTight_Gsf"};
-  if (tree->GetBranch("HLT_IsoMu27") !=0 ) HLT_IsoMu27 = {  fReader,"HLT_IsoMu27"};
-  if (tree->GetBranch("HLT_Ele32_WPTight_Gsf_L1DoubleEG") !=0 ) HLT_Ele32_WPTight_Gsf_L1DoubleEG = {    fReader,"HLT_Ele32_WPTight_Gsf_L1DoubleEG"};
-  if (tree->GetBranch("HLT_Photon200") !=0 ) HLT_Photon200 = {    fReader,"HLT_Photon200"};
+  /* if (tree->GetBranch("HLT_Ele35_WPTight_Gsf") !=0 ) HLT_Ele35_WPTight_Gsf = {  fReader,"HLT_Ele35_WPTight_Gsf"}; */
+  /* if (tree->GetBranch("HLT_Ele32_WPTight_Gsf") !=0 ) HLT_Ele32_WPTight_Gsf = {  fReader,"HLT_Ele32_WPTight_Gsf"}; */
+  /* if (tree->GetBranch("HLT_IsoMu27") !=0 ) HLT_IsoMu27 = {  fReader,"HLT_IsoMu27"}; */
+  /* if (tree->GetBranch("HLT_Ele32_WPTight_Gsf_L1DoubleEG") !=0 ) HLT_Ele32_WPTight_Gsf_L1DoubleEG = {    fReader,"HLT_Ele32_WPTight_Gsf_L1DoubleEG"}; */
+  /* if (tree->GetBranch("HLT_Photon200") !=0 ) HLT_Photon200 = {    fReader,"HLT_Photon200"}; */
 
   if (tree->GetBranch("HLT_PFJet40") !=0 ) HLT_PFJet40 = {    fReader,"HLT_PFJet40"};
   if (tree->GetBranch("HLT_PFJet60") !=0 ) HLT_PFJet60 = {    fReader,"HLT_PFJet60"};
@@ -489,25 +494,26 @@ void Events::Init(TTree *tree)
 
  if (tree->GetBranch("Met") !=0 )		 Met = { fReader, "Met"};		 
  if (tree->GetBranch("TkMET_pt") !=0 )	 TkMET_pt = { fReader, "TkMET_pt"};	 
- if (tree->GetBranch("SoftActivityJetHT10") !=0 ) SoftActivityJetHT10= { fReader, "SoftActivityJetHT10"}; 
- if (tree->GetBranch("softActivityJet1_eta") !=0 ) softActivityJet1_eta= { fReader,"softActivityJet1_eta"}; 
- if (tree->GetBranch("softActivityJet1_phi") !=0 ) softActivityJet1_phi= { fReader,"softActivityJet1_phi"}; 
- if (tree->GetBranch("softActivityJet2_eta") !=0 ) softActivityJet2_eta= { fReader,"softActivityJet2_eta"}; 
- if (tree->GetBranch("softActivityJet2_phi") !=0 ) softActivityJet2_phi= { fReader,"softActivityJet2_phi"}; 
- if (tree->GetBranch("softActivityJet3_eta") !=0 ) softActivityJet3_eta= { fReader,"softActivityJet3_eta"}; 
- if (tree->GetBranch("softActivityJet3_phi") !=0 ) softActivityJet3_phi= { fReader,"softActivityJet3_phi"}; 
- if (tree->GetBranch("softActivityJet4_eta") !=0 ) softActivityJet4_eta= { fReader,"softActivityJet4_eta"}; 
- if (tree->GetBranch("softActivityJet4_phi") !=0 ) softActivityJet4_phi= { fReader,"softActivityJet4_phi"}; 
- if (tree->GetBranch("softActivityJet5_eta") !=0 ) softActivityJet5_eta= { fReader,"softActivityJet5_eta"}; 
- if (tree->GetBranch("softActivityJet5_phi") !=0 ) softActivityJet5_phi= { fReader,"softActivityJet5_phi"}; 
- if (tree->GetBranch("softActivityJet6_eta") !=0 ) softActivityJet6_eta= { fReader,"softActivityJet6_eta"}; 
- if (tree->GetBranch("softActivityJet6_phi") !=0 ) softActivityJet6_phi= { fReader,"softActivityJet6_phi"}; 
- if (tree->GetBranch("isoTrack1_eta") !=0 )	 isoTrack1_eta= { fReader, "isoTrack1_eta"};	 
- if (tree->GetBranch("isoTrack1_phi") !=0 )	 isoTrack1_phi= { fReader, "isoTrack1_phi"};	 
- if (tree->GetBranch("isoTrack2_eta") !=0 )	 isoTrack2_eta= { fReader, "isoTrack2_eta"};	 
- if (tree->GetBranch("isoTrack2_phi") !=0 )	 isoTrack2_phi= { fReader, "isoTrack2_phi"};	 
- if (tree->GetBranch("isoTrack3_eta") !=0 )	 isoTrack3_eta= { fReader, "isoTrack3_eta"};	 
- if (tree->GetBranch("isoTrack3_phi") !=0 ) isoTrack3_phi= { fReader, "isoTrack3_phi"};   
+
+ /* if (tree->GetBranch("SoftActivityJetHT10") !=0 ) SoftActivityJetHT10= { fReader, "SoftActivityJetHT10"};  */
+ /* if (tree->GetBranch("softActivityJet1_eta") !=0 ) softActivityJet1_eta= { fReader,"softActivityJet1_eta"};  */
+ /* if (tree->GetBranch("softActivityJet1_phi") !=0 ) softActivityJet1_phi= { fReader,"softActivityJet1_phi"};  */
+ /* if (tree->GetBranch("softActivityJet2_eta") !=0 ) softActivityJet2_eta= { fReader,"softActivityJet2_eta"};  */
+ /* if (tree->GetBranch("softActivityJet2_phi") !=0 ) softActivityJet2_phi= { fReader,"softActivityJet2_phi"};  */
+ /* if (tree->GetBranch("softActivityJet3_eta") !=0 ) softActivityJet3_eta= { fReader,"softActivityJet3_eta"};  */
+ /* if (tree->GetBranch("softActivityJet3_phi") !=0 ) softActivityJet3_phi= { fReader,"softActivityJet3_phi"};  */
+ /* if (tree->GetBranch("softActivityJet4_eta") !=0 ) softActivityJet4_eta= { fReader,"softActivityJet4_eta"};  */
+ /* if (tree->GetBranch("softActivityJet4_phi") !=0 ) softActivityJet4_phi= { fReader,"softActivityJet4_phi"};  */
+ /* if (tree->GetBranch("softActivityJet5_eta") !=0 ) softActivityJet5_eta= { fReader,"softActivityJet5_eta"};  */
+ /* if (tree->GetBranch("softActivityJet5_phi") !=0 ) softActivityJet5_phi= { fReader,"softActivityJet5_phi"};  */
+ /* if (tree->GetBranch("softActivityJet6_eta") !=0 ) softActivityJet6_eta= { fReader,"softActivityJet6_eta"};  */
+ /* if (tree->GetBranch("softActivityJet6_phi") !=0 ) softActivityJet6_phi= { fReader,"softActivityJet6_phi"};  */
+ /* if (tree->GetBranch("isoTrack1_eta") !=0 )	 isoTrack1_eta= { fReader, "isoTrack1_eta"};	  */
+ /* if (tree->GetBranch("isoTrack1_phi") !=0 )	 isoTrack1_phi= { fReader, "isoTrack1_phi"};	  */
+ /* if (tree->GetBranch("isoTrack2_eta") !=0 )	 isoTrack2_eta= { fReader, "isoTrack2_eta"};	  */
+ /* if (tree->GetBranch("isoTrack2_phi") !=0 )	 isoTrack2_phi= { fReader, "isoTrack2_phi"};	  */
+ /* if (tree->GetBranch("isoTrack3_eta") !=0 )	 isoTrack3_eta= { fReader, "isoTrack3_eta"};	  */
+ /* if (tree->GetBranch("isoTrack3_phi") !=0 ) isoTrack3_phi= { fReader, "isoTrack3_phi"};    */
 
 
  if (tree->GetBranch("jet_chf_nhf_cut") !=0 ) jet_chf_nhf_cut= { fReader, "jet_chf_nhf_cut"};   
