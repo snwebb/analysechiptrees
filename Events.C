@@ -137,8 +137,6 @@ void Events::Begin(TTree * /*tree*/)
   variable3D CentralEtaMTR_ForwardEtaMTR_MetNoLep_CleanJet_mindPhi{ .name1 = "CentralEtaMTR", .name2 = "ForwardEtaMTR", "MetNoLep_CleanJet_mindPhi", .nBins1 = 50, .nBins2 = 50, .nBins3 = 160, .binMin1 = -5., .binMin2 = -5., .binMin3 = 0, .binMax1 = 5., .binMax2 = 5., .binMax3 = 3.2};
 
 
-
-
   std::vector<variable> list_of_variables;
   std::vector<variable2D> list_of_variables2D;
   std::vector<variable3D> list_of_variables3D;
@@ -713,12 +711,12 @@ Bool_t Events::PassSelection(){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutMTR"]));
     pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < HFcut || abs(lTreeContent["Subleading_jet_eta"]) < HFcut );
 
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.0 ); //#1
+    //pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.0 ); //#1
     //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) >= 2.0 && abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#2
     //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) >= 2.8 ); //#3
     //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) < 2.0 ); //#4
     //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) >= 2.0 ); //#5
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#6
+        pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#6
     //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) >= 2.8 ); //#7
     //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) < 2.4 ); //#8
     //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) >= 2.4 ); //#9
@@ -728,8 +726,8 @@ Bool_t Events::PassSelection(){
     //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) > 2.4 ) && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#10 C
     //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) > 2.4 ) && ( abs(lTreeContent["ForwardEtaMTR"]) > 3.2 ); //#10 D
 
-    pass = pass && !( (abs(lTreeContent["Leading_jet_eta"]) < 3.2 && abs(lTreeContent["Leading_jet_eta"]) > 2.8) ||  
-    		      (abs(lTreeContent["Subleading_jet_eta"]) < 3.2 && abs(lTreeContent["Subleading_jet_eta"]) > 2.8) );
+    // pass = pass && !( (abs(lTreeContent["Leading_jet_eta"]) < 3.2 && abs(lTreeContent["Leading_jet_eta"]) > 2.8) ||  
+    // 		      (abs(lTreeContent["Subleading_jet_eta"]) < 3.2 && abs(lTreeContent["Subleading_jet_eta"]) > 2.8) );
 
 
 
@@ -749,15 +747,14 @@ Bool_t Events::PassSelection(){
   else if (mCat==CatType::VTR){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutVTR"]));
     pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < HFcut || abs(lTreeContent["lMjj_jet2_eta"]) < HFcut );
-    
 
     //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.0 ); //#1
     //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) >= 2.0 && abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#2
     //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) >= 2.8 ); //#3
     //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) < 2.0 ); //#4
     //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) >= 2.0 ); //#5
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#6
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) >= 2.8 ); //#7
+    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#6
+    //pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) >= 2.8 ); //#7
     //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) < 2.4 ); //#8
     //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) >= 2.4 ); //#9
     //pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) < 2.4 ) && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#10 A
@@ -766,8 +763,8 @@ Bool_t Events::PassSelection(){
     //     pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) > 2.4 ) && ( abs(lTreeContent["ForwardEtaVTR"]) > 3.2 ); //#10 D
 
 
-    pass = pass && !( (abs(lTreeContent["lMjj_jet1_eta"]) < 3.2 && abs(lTreeContent["lMjj_jet1_eta"]) > 2.8) ||  
-    		      (abs(lTreeContent["lMjj_jet2_eta"]) < 3.2 && abs(lTreeContent["lMjj_jet2_eta"]) > 2.8) );
+    // pass = pass && !( (abs(lTreeContent["lMjj_jet1_eta"]) < 3.2 && abs(lTreeContent["lMjj_jet1_eta"]) > 2.8) ||  
+    // 		      (abs(lTreeContent["lMjj_jet2_eta"]) < 3.2 && abs(lTreeContent["lMjj_jet2_eta"]) > 2.8) );
 
 
     //    pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < HFcut && abs(lTreeContent["lMjj_jet2_eta"]) < HFcut );
