@@ -17,7 +17,6 @@ Events::Events(TTree *){
   mLumiPb=41800.;
   mProc = "QCD";
   lTreeContent.clear();
-  //  Initialise();
 }
 
 Events::~Events(){
@@ -26,7 +25,7 @@ Events::~Events(){
   mVarVec3D.clear();
   lTreeContent.clear();
   for (unsigned iR(RegionType::SR); iR!=RegionType::Last; ++iR){//loop on region
-    for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on region
+    for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on category
       mHistVec[iR][iC].clear();
       mHistVec2D[iR][iC].clear();
       mHistVec3D[iR][iC].clear();
@@ -36,15 +35,23 @@ Events::~Events(){
 
 void Events::Begin(TTree * /*tree*/)
 {
+  //////////////////////////////////////////////////////
+  //                                                  //
+  //   The USER does not need to edit the following   //
+  //   unless adding new variables to plot            //
+  //                                                  //
+  //////////////////////////////////////////////////////
+
+
   // The Begin() function is called at the start of the query.
   // When running with PROOF Begin() is only called on the client.
   // The tree argument is deprecated (on PROOF 0 is passed).
 
-  fileMTR.open ("MTR.txt");
-  
   TString option = GetOption();
   mFout = TFile::Open(mOutFile.c_str(),"RECREATE");
-  
+
+  //The following structs are use to organise the histograms that are created 
+  //(separate structs for 1D, 2D and 3D histograms).
   struct variable {
     std::string name;
     std::string title;
@@ -79,7 +86,7 @@ void Events::Begin(TTree * /*tree*/)
     double binMax3 = -999;
   } ;
  
-
+  //Define all the possible variables to plot in 1D, 2D and 3D
   variable MetNoLep_pt{ .name = "MetNoLep_pt", .title = "E_{T}^{miss,no #mu} (GeV)", .nBins = 350, .binMin = 100, .binMax = 600};
   variable diCleanJet_M{ .name = "diCleanJet_M", .title = "M_{jj} (GeV)", .nBins = 380, .binMin = 200, .binMax = 4000};
   variable lMjj{ .name = "lMjj", .title = "M_{jj} (GeV)", .nBins = 350, .binMin = 200, .binMax = 4000}; 
@@ -113,7 +120,6 @@ void Events::Begin(TTree * /*tree*/)
   variable diCleanJet_M_binned{ .name ="diCleanJet_M", .title = "M_{jj} (GeV)", .nBins = 10, .binMin = -999};
   variable diCleanJet_M_binned_reduced{ .name ="diCleanJet_M", .title = "M_{jj} (GeV)", .nBins = 6, .binMin = -998};
      
-
   variable2D MetNoLep_CleanJet_mindPhi_MetNoLep_pt{ .name1 = "MetNoLep_CleanJet_mindPhi", .name2 = "MetNoLep_pt", .nBins1 = 32, .nBins2 = 500, .binMin1 = 0, .binMin2 = 100, .binMax1 = 3.2, .binMax2 = 600};
   variable2D MetNoLep_CleanJet_mindPhi_diCleanJet_dPhi{ .name1 = "MetNoLep_CleanJet_mindPhi", .name2 = "diCleanJet_dPhi", .nBins1 = 32, .nBins2 = 50, .binMin1 = 0, .binMin2 = 0, .binMax1 = 3.2, .binMax2 = 2.5};
   variable2D MetNoLep_CleanJet_mindPhi_lMjj_dijet_dphi{ .name1 = "MetNoLep_CleanJet_mindPhi", .name2 = "lMjj_dijet_dphi", .nBins1 = 32, .nBins2 = 50, .binMin1 = 0, .binMin2 = 0, .binMax1 = 3.2, .binMax2 = 2.5};
@@ -132,14 +138,22 @@ void Events::Begin(TTree * /*tree*/)
   variable2D CentralEtaMTR_ForwardEtaMTR{ .name1 = "CentralEtaMTR", .name2 = "ForwardEtaMTR", .nBins1 = 32,.nBins2 = 32,.binMin1 = -997};
   variable2D CentralEtaVTR_ForwardEtaVTR{ .name1 = "CentralEtaVTR", .name2 = "ForwardEtaVTR", .nBins1 = 32,.nBins2 = 32,.binMin1 = -997};
 
-
   variable3D CentralEtaVTR_ForwardEtaVTR_MetNoLep_CleanJet_mindPhi{ .name1 = "CentralEtaVTR", .name2 = "ForwardEtaVTR", "MetNoLep_CleanJet_mindPhi", .nBins1 = 50, .nBins2 = 50, .nBins3 = 160, .binMin1 = -5., .binMin2 = -5., .binMin3 = 0, .binMax1 = 5., .binMax2 = 5., .binMax3 = 3.2};
   variable3D CentralEtaMTR_ForwardEtaMTR_MetNoLep_CleanJet_mindPhi{ .name1 = "CentralEtaMTR", .name2 = "ForwardEtaMTR", "MetNoLep_CleanJet_mindPhi", .nBins1 = 50, .nBins2 = 50, .nBins3 = 160, .binMin1 = -5., .binMin2 = -5., .binMin3 = 0, .binMax1 = 5., .binMax2 = 5., .binMax3 = 3.2};
-
 
   std::vector<variable> list_of_variables;
   std::vector<variable2D> list_of_variables2D;
   std::vector<variable3D> list_of_variables3D;
+
+
+  ////////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////
+  //                                                  //
+  //   The USER chooses which variables to include    //
+  //   in the output files                            //
+  //                                                  //
+  //////////////////////////////////////////////////////
 
   list_of_variables.push_back(MetNoLep_pt);
   list_of_variables.push_back(diCleanJet_M);
@@ -205,19 +219,24 @@ void Events::Begin(TTree * /*tree*/)
     mVarVec3D.push_back(std::make_tuple(var.name1,var.name2,var.name3));
   }
 
+  //////////////////////////////////////////
+
+  // The creation of the histograms takes place here
+  // Generally shouldn't need to edit
+  // The case of variable bin sized histograms are handled
+  // as special cases in the code below
 
   double mjjbins[11] = {0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000};
   double mjjbins_reduced[7] = {200,500,800,1250,2000,2800,5000};
   double etabins[17] = {-4.7,-3.2,-3.0,-2.8,-2.4,-2.0,-1.5,-1.0,0,1.0,1.5,2.0,2.4,2.8,3.0,3.2,4.7};
   for (unsigned iR(RegionType::SR); iR!=RegionType::Last; ++iR){//loop on region
     std::string lreg = GetRegionStr(static_cast<RegionType>(iR));
-    for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on cat
+    for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on category
       std::string lcat = GetCatStr(static_cast<CatType>(iC));
       mFout->mkdir((lreg+"/"+lcat).c_str());
       mFout->cd((lreg+"/"+lcat).c_str());
 
-      for (auto var: list_of_variables){ //loop on variables
-	//      for (unsigned iV(0); iV<nVars; ++iV){//loop on variables
+      for (auto var: list_of_variables){ //loop on variables for 1D
 	std::ostringstream label;
 	label << "h_" << lreg << "_" << lcat << "_" << var.name;
 	TH1F *hTmp = 0;
@@ -237,8 +256,7 @@ void Events::Begin(TTree * /*tree*/)
 	mHistVec[iR][iC].push_back(hTmp);
       }
       
-      for (auto var: list_of_variables2D){ //loop on variables
-	//      for (unsigned iV2D = 0;iV2D<lVar2D.size();iV2D++){
+      for (auto var: list_of_variables2D){ //loop on variables for 2D
       	std::ostringstream label;
       	label << "h_" << lreg << "_" << lcat << "_" << var.name1 << "_" << var.name2;
       	TH2D *hTmp2D = 0;
@@ -254,7 +272,7 @@ void Events::Begin(TTree * /*tree*/)
       	hTmp2D->Sumw2();
       	mHistVec2D[iR][iC].push_back(hTmp2D);
       }
-      for (auto var: list_of_variables3D){ //loop on variables
+      for (auto var: list_of_variables3D){ //loop on variables for 3D
       	std::ostringstream label;
       	label << "h_" << lreg << "_" << lcat << "_" << var.name1 << "_" << var.name2 << "_" << var.name3;
       	TH3D *hTmp3D = 0;
@@ -262,12 +280,10 @@ void Events::Begin(TTree * /*tree*/)
       	hTmp3D->Sumw2();
       	mHistVec3D[iR][iC].push_back(hTmp3D);
       }
-
-
     }
   }
    
-}
+}//end of Begin() function
 
 void Events::SlaveBegin(TTree * /*tree*/)
 {
@@ -279,57 +295,6 @@ void Events::SlaveBegin(TTree * /*tree*/)
 
 }
 
-void Events::SetOutFileName(const std::string aName){
-  mOutFile = aName;
-}
-
-void Events::SetProcess(const std::string aProcess){
-  mProc = aProcess;
-}
-void Events::SetMC(bool aisMC){
-  misMC = aisMC;
-}
-void Events::SetYear(const std::string aYear){
-  mYear = aYear;
-}
-void Events::SetAM(bool aisAM){
-  misAM = aisAM;
-}
-void Events::SetSystematic(const std::string aSyst){
-  mSyst = aSyst;
-}
-
-std::string Events::GetOutFileName(){
-  return mOutFile;
-}
-
-
-void Events::SetCategory(const CatType & aCategory){
-  mCat = aCategory;
-}
-
-std::string Events::GetRegionStr(const RegionType & aRegion){
-  std::string reg[4] = {"SR","QCDCR","QCDA","QCDB"};
-  if (aRegion==RegionType::Last) return "";
-  return reg[static_cast<unsigned>(aRegion)];
-}
-
-std::string Events::GetCatStr(const CatType & aCat){
-  std::string cat[2] = {"MTR","VTR"};
-  if (aCat==CatType::LastCat) return "";
-  return cat[static_cast<unsigned>(aCat)];
-}
-
-void Events::SetRegion(const RegionType & aRegion){
-  mReg = aRegion;
-}
-
-void Events::SetLumiPb(const double & aLumi){
-  mLumiPb = aLumi;
-  std::cout << " -- INFO: setting lumi to " << mLumiPb << " pb " << std::endl;
-}
-
-
 bool Events::CheckValue(ROOT::Internal::TTreeReaderValueBase& value) {
   if (value.GetSetupStatus() < 0) {
     std::cerr << "Error " << value.GetSetupStatus()
@@ -340,15 +305,105 @@ bool Events::CheckValue(ROOT::Internal::TTreeReaderValueBase& value) {
 }
 
 
+///////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////
+  //                                                  //
+  //   The USER does not need to edit the following   //
+  //                                                  //
+  //////////////////////////////////////////////////////
+
+//Various small utility functions
+
+//Setting output file name
+void Events::SetOutFileName(const std::string aName){
+  mOutFile = aName;
+}
+
+//Getting output file name
+std::string Events::GetOutFileName(){
+  return mOutFile;
+}
+
+//Setting process
+void Events::SetProcess(const std::string aProcess){
+  mProc = aProcess;
+}
+
+//Setting whether MC or data
+void Events::SetMC(bool aisMC){
+  misMC = aisMC;
+}
+
+//Setting the year
+void Events::SetYear(const std::string aYear){
+  mYear = aYear;
+}
+
+//Setting if using Anne-Marie's trees 
+//(slightly different naming convention
+void Events::SetAM(bool aisAM){
+  misAM = aisAM;
+}
+
+//Set the systematic (only interested in
+//"Nominal" in this analysis)
+void Events::SetSystematic(const std::string aSyst){
+  mSyst = aSyst;
+}
+
+//Set the region (SR, QCDCR, QCDA or QCDB)
+void Events::SetRegion(const RegionType & aRegion){
+  mReg = aRegion;
+}
+
+//Set the category (MTR or VTR)
+void Events::SetCategory(const CatType & aCategory){
+  mCat = aCategory;
+}
+
+//Get the region in string format
+std::string Events::GetRegionStr(const RegionType & aRegion){
+  std::string reg[4] = {"SR","QCDCR","QCDA","QCDB"};
+  if (aRegion==RegionType::Last) return "";
+  return reg[static_cast<unsigned>(aRegion)];
+}
+
+//Get the category in string format
+std::string Events::GetCatStr(const CatType & aCat){
+  std::string cat[2] = {"MTR","VTR"};
+  if (aCat==CatType::LastCat) return "";
+  return cat[static_cast<unsigned>(aCat)];
+}
+
+//Set the luminosity to scale the MC by 
+//(which is different for 2017 and 2018)
+void Events::SetLumiPb(const double & aLumi){
+  mLumiPb = aLumi;
+  std::cout << " -- INFO: setting lumi to " << mLumiPb << " pb " << std::endl;
+}
+
+///////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////
+  //                                                  //
+  //   The USER does not need to edit the following   //
+  //   unless adding new input variables from the     //
+  //   tree                                           //
+  //                                                  //
+  //////////////////////////////////////////////////////
+
+//Load the variables from the input ROOT trees
 void Events::SetTreeContent(std::string year){
 
   bool isMC = !static_cast<int>(*isData + 0.5);
-  bool includeAll = false;
+  bool includeAll = false;//Set to false for speed. If set to
+                          // true you will also need to uncomment 
+                          //the corresponding variables in Events.h
   SetMC(isMC);
 
-  //Both Data and MC
+  //Need for both Data and MC
   lTreeContent["event"] = *event;
-
   lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"] = *HLT_PFMETNoMu120_PFMHTNoMu120_IDTight;
   lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"] = *HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60;
   lTreeContent["Subleading_jet_eta"] = *Subleading_jet_eta;
@@ -359,7 +414,6 @@ void Events::SetTreeContent(std::string year){
   lTreeContent["nVetoElectron"] = *nVetoElectron;
   lTreeContent["Leading_jet_pt"] = *Leading_jet_pt;
   lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"] = *HLT_DiJet110_35_Mjj650_PFMET110;
-
   lTreeContent["Leading_jet_phi"] = *Leading_jet_phi;
   lTreeContent["Subleading_jet_phi"] = *Subleading_jet_phi;
   lTreeContent["Leading_jet_eta"] = *Leading_jet_eta;
@@ -368,14 +422,14 @@ void Events::SetTreeContent(std::string year){
   lTreeContent["nLoosePhoton"] = *nLoosePhoton;
   lTreeContent["nLooseMuon"] = *nLooseMuon;
   lTreeContent["Subleading_jet_pt"] = *Subleading_jet_pt;
+
   if ( includeAll ){
     lTreeContent["Wenu_flag"] = *Wenu_flag;
     lTreeContent["Zee_flag"] = *Zee_flag;
     lTreeContent["Wmunu_flag"] = *Wmunu_flag;
     lTreeContent["Zmumu_flag"] = *Zmumu_flag;
     lTreeContent["Leading_el_pt"] = *Leading_el_pt;
-
-  lTreeContent["Leading_el_phi"] = *Leading_el_phi;
+    lTreeContent["Leading_el_phi"] = *Leading_el_phi;
     lTreeContent["Subleading_el_pt"] = *Subleading_el_pt;
     lTreeContent["Subleading_el_eta"] = *Subleading_el_eta;
     lTreeContent["Subleading_el_phi"] = *Subleading_el_phi;
@@ -398,8 +452,7 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["MET_pt"] = *MET_pt;
   }
 
-
-
+  //Specific Treatment for 2017 and 2018
   if ( year == "2017"){
     lTreeContent["L1PreFiringWeight_Nom"] = *L1PreFiringWeight_Nom;
     lTreeContent["trigger_weight_METMHT"] = *trigger_weight_METMHT2017;
@@ -408,7 +461,6 @@ void Events::SetTreeContent(std::string year){
       lTreeContent["trigger_weight_SingleEle35"] = *trigger_weight_SingleEle352017;
     }
   }
-
   else if  ( year == "2018"){
     lTreeContent["L1PreFiringWeight_Nom"] = 1;
     lTreeContent["trigger_weight_METMHT"] = *trigger_weight_METMHT2018;
@@ -418,99 +470,8 @@ void Events::SetTreeContent(std::string year){
     }
   }
 
-  //Just MC
-
-  if ( isMC ){
-
-    lTreeContent["LooseMuon_eventVetoW"] = *LooseMuon_eventVetoW;
-    lTreeContent["xs_weight"] = *xs_weight;
-    lTreeContent["VLooseTauFix_eventVetoW"] = *VLooseTauFix_eventVetoW;
-    lTreeContent["MediumBJet_eventVetoW"] = *MediumBJet_eventVetoW;
-    lTreeContent["puWeight"] = *puWeight;
-    lTreeContent["LHE_Vpt"] = *LHE_Vpt;
-    lTreeContent["LHE_Njets"] = *LHE_Njets;
-    lTreeContent["LHE_HT"] = *LHE_HT;
-    lTreeContent["VetoElectron_eventVetoW"] = *VetoElectron_eventVetoW;
-    lTreeContent["VetoElectron_eventSelW"] = *VetoElectron_eventSelW;
-    lTreeContent["LooseMuon_eventSelW"] = *LooseMuon_eventSelW;
-    lTreeContent["Pileup_nPU"] = *Pileup_nPU;
-    lTreeContent["fnlo_SF_EWK_corr"] = *fnlo_SF_EWK_corr;
-    lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"] = *fnlo_SF_QCD_corr_QCD_proc_MTR;
-    lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"] = *fnlo_SF_QCD_corr_QCD_proc_VTR;
-    lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
-    lTreeContent["jetemW_MTR"] = *jetemW_MTR;
-    lTreeContent["jetemW_VTR"] = *jetemW_VTR;
-
-    if (includeAll){
-
-      lTreeContent["decayLeptonId"] = *decayLeptonId;
-      lTreeContent["CRLooseMuon_eventSelW"] = *CRLooseMuon_eventSelW;
-      lTreeContent["CRVetoElectron_eventSelW"] = *CRVetoElectron_eventSelW;
-      lTreeContent["GenMET_pt"] = *GenMET_pt;
-      lTreeContent["Pileup_nTrueInt"] = *Pileup_nTrueInt;
-      lTreeContent["VLooseSITTau_eventVetoW"] = *VLooseSITTau_eventVetoW;
-      lTreeContent["VLooseTau_eventVetoW"] = *VLooseTau_eventVetoW;
-      lTreeContent["LHE_Nb"] = *LHE_Nb;
-      lTreeContent["LHE_Nglu"] = *LHE_Nglu;
-      lTreeContent["LHE_Nuds"] = *LHE_Nuds;
-      lTreeContent["LHE_Nc"] = *LHE_Nc;
-      lTreeContent["CRTightElectron_eventSelW"] = *CRTightElectron_eventSelW;
-      lTreeContent["CRTightMuon_eventSelW"] = *CRTightMuon_eventSelW;
-    
-    }
-
-  
-    if ( year == "2017" ){
-      if ( includeAll ) 
-	lTreeContent["met_filters"] = *met_filters_2017_mc;
-      lTreeContent["hem_weight"] = 1;
-    }
-    else if  ( year == "2018" ){
-      if ( includeAll ) 
-	lTreeContent["met_filters"] = *met_filters_2018_mc;
-      lTreeContent["hem_weight"] = *hem_weight;
-    }
-  }
-  else if ( !isMC ){
-    lTreeContent["hem_weight"] = 1;
-
-    if ( includeAll ){
-      if ( year == "2017" )
-	lTreeContent["met_filters"] = *met_filters_2017_data;
-      else if  ( year == "2018" )
-	lTreeContent["met_filters"] = *met_filters_2018_data;
-    }
-
-  }
-
-  if ( !misAM ){
-    lTreeContent["HLT_PFJet40"] = *HLT_PFJet40;
-    lTreeContent["HLT_PFJet60"] = *HLT_PFJet60;
-    lTreeContent["HLT_PFJet80"] = *HLT_PFJet80;
-    lTreeContent["HLT_PFJet140"] = *HLT_PFJet140;
-    lTreeContent["HLT_PFJet200"] = *HLT_PFJet200;
-    lTreeContent["HLT_PFJet260"] = *HLT_PFJet260;
-    lTreeContent["HLT_PFJet320"] = *HLT_PFJet320;
-    lTreeContent["HLT_PFJet400"] = *HLT_PFJet400;
-    lTreeContent["HLT_PFJet450"] = *HLT_PFJet450;
-    lTreeContent["HLT_PFJet500"] = *HLT_PFJet500;
-    lTreeContent["HLT_PFJet550"] = *HLT_PFJet550;
-  }
-  else{
-    lTreeContent["HLT_PFJet40"] = 1;
-    lTreeContent["HLT_PFJet60"] = 1;
-    lTreeContent["HLT_PFJet80"] = 1;
-    lTreeContent["HLT_PFJet140"] = 1;
-    lTreeContent["HLT_PFJet200"] = 1;
-    lTreeContent["HLT_PFJet260"] = 1;
-    lTreeContent["HLT_PFJet320"] = 1;
-    lTreeContent["HLT_PFJet400"] = 1;
-    lTreeContent["HLT_PFJet450"] = 1;
-    lTreeContent["HLT_PFJet500"] = 1;
-    lTreeContent["HLT_PFJet550"] = 1;
-  }
-
-
+  //Variables that have a different name
+  //if running over Anne Marie's trees
   if (misAM){
     lTreeContent["diCleanJet_M"] = *dijet_M;
     lTreeContent["MetNoLep_CleanJet_mindPhi"] = *JetMetmindPhi; 
@@ -550,6 +511,18 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["isoTrack2_phi"] = *isoTrack2_phi;
     lTreeContent["isoTrack3_eta"] = *isoTrack3_eta;
     lTreeContent["isoTrack3_phi"] = *isoTrack3_phi;
+
+    lTreeContent["HLT_PFJet40"] = 1;
+    lTreeContent["HLT_PFJet60"] = 1;
+    lTreeContent["HLT_PFJet80"] = 1;
+    lTreeContent["HLT_PFJet140"] = 1;
+    lTreeContent["HLT_PFJet200"] = 1;
+    lTreeContent["HLT_PFJet260"] = 1;
+    lTreeContent["HLT_PFJet320"] = 1;
+    lTreeContent["HLT_PFJet400"] = 1;
+    lTreeContent["HLT_PFJet450"] = 1;
+    lTreeContent["HLT_PFJet500"] = 1;
+    lTreeContent["HLT_PFJet550"] = 1;
     
     lTreeContent["VBF_MTR_QCD_CR_eff_Sel"] = 1;   
     lTreeContent["VBF_VTR_QCD_CR_eff_Sel"] = 1; 
@@ -579,6 +552,18 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["diCleanJet_dEta"] = *diCleanJet_dEta;
     lTreeContent["diCleanJet_dPhi"] = *diCleanJet_dPhi;
 
+    lTreeContent["HLT_PFJet40"] = *HLT_PFJet40;
+    lTreeContent["HLT_PFJet60"] = *HLT_PFJet60;
+    lTreeContent["HLT_PFJet80"] = *HLT_PFJet80;
+    lTreeContent["HLT_PFJet140"] = *HLT_PFJet140;
+    lTreeContent["HLT_PFJet200"] = *HLT_PFJet200;
+    lTreeContent["HLT_PFJet260"] = *HLT_PFJet260;
+    lTreeContent["HLT_PFJet320"] = *HLT_PFJet320;
+    lTreeContent["HLT_PFJet400"] = *HLT_PFJet400;
+    lTreeContent["HLT_PFJet450"] = *HLT_PFJet450;
+    lTreeContent["HLT_PFJet500"] = *HLT_PFJet500;
+    lTreeContent["HLT_PFJet550"] = *HLT_PFJet550;
+
     lTreeContent["VBF_MTR_QCD_CR_eff_Sel"] = * VBF_MTR_QCD_CR_eff_Sel;  
     lTreeContent["VBF_VTR_QCD_CR_eff_Sel"] = * VBF_VTR_QCD_CR_eff_Sel;
     lTreeContent["VBF_MTR_QCD_SR_eff_Sel"] = * VBF_MTR_QCD_SR_eff_Sel;
@@ -592,20 +577,80 @@ void Events::SetTreeContent(std::string year){
 
   }
 
+  //Variables that are only needed for Monte Carlo
+
+  if ( isMC ){
+    lTreeContent["LooseMuon_eventVetoW"] = *LooseMuon_eventVetoW;
+    lTreeContent["xs_weight"] = *xs_weight;
+    lTreeContent["VLooseTauFix_eventVetoW"] = *VLooseTauFix_eventVetoW;
+    lTreeContent["MediumBJet_eventVetoW"] = *MediumBJet_eventVetoW;
+    lTreeContent["puWeight"] = *puWeight;
+    lTreeContent["LHE_Vpt"] = *LHE_Vpt;
+    lTreeContent["LHE_Njets"] = *LHE_Njets;
+    lTreeContent["LHE_HT"] = *LHE_HT;
+    lTreeContent["VetoElectron_eventVetoW"] = *VetoElectron_eventVetoW;
+    lTreeContent["VetoElectron_eventSelW"] = *VetoElectron_eventSelW;
+    lTreeContent["LooseMuon_eventSelW"] = *LooseMuon_eventSelW;
+    lTreeContent["Pileup_nPU"] = *Pileup_nPU;
+    lTreeContent["fnlo_SF_EWK_corr"] = *fnlo_SF_EWK_corr;
+    lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"] = *fnlo_SF_QCD_corr_QCD_proc_MTR;
+    lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"] = *fnlo_SF_QCD_corr_QCD_proc_VTR;
+    lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
+    lTreeContent["jetemW_MTR"] = *jetemW_MTR;
+    lTreeContent["jetemW_VTR"] = *jetemW_VTR;
+
+    if (includeAll){
+      lTreeContent["decayLeptonId"] = *decayLeptonId;
+      lTreeContent["CRLooseMuon_eventSelW"] = *CRLooseMuon_eventSelW;
+      lTreeContent["CRVetoElectron_eventSelW"] = *CRVetoElectron_eventSelW;
+      lTreeContent["GenMET_pt"] = *GenMET_pt;
+      lTreeContent["Pileup_nTrueInt"] = *Pileup_nTrueInt;
+      lTreeContent["VLooseSITTau_eventVetoW"] = *VLooseSITTau_eventVetoW;
+      lTreeContent["VLooseTau_eventVetoW"] = *VLooseTau_eventVetoW;
+      lTreeContent["LHE_Nb"] = *LHE_Nb;
+      lTreeContent["LHE_Nglu"] = *LHE_Nglu;
+      lTreeContent["LHE_Nuds"] = *LHE_Nuds;
+      lTreeContent["LHE_Nc"] = *LHE_Nc;
+      lTreeContent["CRTightElectron_eventSelW"] = *CRTightElectron_eventSelW;
+      lTreeContent["CRTightMuon_eventSelW"] = *CRTightMuon_eventSelW;
+    }
+
+    //Specific Treatment for 2017 and 2018  
+    if ( year == "2017" ){
+      if ( includeAll ) 
+	lTreeContent["met_filters"] = *met_filters_2017_mc;
+      lTreeContent["hem_weight"] = 1;
+    }
+    else if  ( year == "2018" ){
+      if ( includeAll ) 
+	lTreeContent["met_filters"] = *met_filters_2018_mc;
+      lTreeContent["hem_weight"] = *hem_weight;
+    }
+  }  
+  else if ( !isMC ){//Specific treatment for Data
+    lTreeContent["hem_weight"] = 1;
+
+    if ( includeAll ){
+      if ( year == "2017" )
+	lTreeContent["met_filters"] = *met_filters_2017_data;
+      else if  ( year == "2018" )
+	lTreeContent["met_filters"] = *met_filters_2018_data;
+    }
+
+  }
+
   
 }
 
-
+//Apply the base selection to the events
 Bool_t Events::BaseSelection(){
   
   bool pass=kTRUE;
-  std::string catStr = GetCatStr(mCat);
+  if (mCat==CatType::MTR){
 
-
-  if (catStr.find("MTR")!=catStr.npos){
-
-
-    if ( misAM ){ //Needed if we don't have the flags
+    //If we are using Anne-Marie's trees we need
+    //to apply some additional cuts
+    if ( misAM ){ 
       pass = lTreeContent["nCleanJet30"]>=2;
       pass = pass && (lTreeContent["Leading_jet_pt"] > 80);
       pass = pass && (std::abs(lTreeContent["Leading_jet_eta"] < 4.7));
@@ -630,40 +675,34 @@ Bool_t Events::BaseSelection(){
       }
 
     }
-    else{
-      pass = pass && (static_cast<int>(lTreeContent["jet_chf_nhf_cut"]));
-    }
-             
   }
-  else if (catStr.find("VTR")!=catStr.npos){
-    pass = kTRUE;
-    pass = pass && (static_cast<int>(lTreeContent["jet_chf_nhf_vtr_cut"]));
-  }
-  
+
+  //Remove events with HT < 100 in the QCD sample 
+  //due to very low statistics
   if ( mProc == "QCD" || mProc == "QCDRELAX" ){
-
     pass = pass && lTreeContent["LHE_HT"]>100; 
-
   }
-
 
   return pass;
 
 }
 
+//Calculate the base weight of the event
 Double_t Events::BaseWeight(){
-  std::string catStr = GetCatStr(mCat);
-  double w = (lTreeContent["puWeight"])*(lTreeContent["xs_weight"])*mLumiPb*(lTreeContent["L1PreFiringWeight_Nom"]);
 
-  double tauveto = lTreeContent["VLooseTauFix_eventVetoW"];
-  double electronveto = lTreeContent["VetoElectron_eventVetoW"];
-  double muonveto = lTreeContent["LooseMuon_eventVetoW"];
+  double w = 1.0;
 
-  w *= tauveto*electronveto*muonveto;
-
-  w*=lTreeContent["hem_weight"];//1 for data and MC in 2017
-  
-  if ( !misMC ) w = 1.0;//Data
+  //Only calculate the weight for Monte Carlo
+  if ( misMC ){
+    double w = (lTreeContent["puWeight"])*(lTreeContent["xs_weight"])*mLumiPb*(lTreeContent["L1PreFiringWeight_Nom"]);
+    
+    double tauveto = lTreeContent["VLooseTauFix_eventVetoW"];
+    double electronveto = lTreeContent["VetoElectron_eventVetoW"];
+    double muonveto = lTreeContent["LooseMuon_eventVetoW"];
+    w *= tauveto*electronveto*muonveto;
+    
+    w*=lTreeContent["hem_weight"];//1 for data and MC in 2017
+  }
 
   return w;
 
@@ -672,24 +711,27 @@ Double_t Events::BaseWeight(){
 Bool_t Events::PassSelection(){
 
   bool pass = kTRUE;
-  
   std::string lcat = "";
+  double cut_lMjj_dijet_dphi = 2.5;
+
+  //////////////////////////////////
+
+  //Special weights to calculate if we are using Anne Marie's trees    
     
   bool lCleanCut0 = true;
   bool lCleanCut1 = true;
   bool lCleanCut2 = true;
   bool lCleanCut3 = true;
 
-  double cut_lMjj_dijet_dphi = 2.5;
-    
   if ( misAM ){
-    //      bool lCleanCut0 = !(std::abs(lTreeContent["Met"] - lTreeContent["TkMET_pt"])/lTreeContent["Met"] >= 0.8 && ((std::abs(lTreeContent["Leading_jet_eta"])>=2.8 && std::abs(lTreeContent["Leading_jet_eta"]) <= 3.2) || (std::abs(lTreeContent["Subleading_jet_eta"])>=2.8 && std::abs(lTreeContent["Subleading_jet_eta"]) <= 3.2)));
-    //      lCleanCut0 = !((lTreeContent["Met"] - lTreeContent["TkMET_pt"])/lTreeContent["Met"] >= 0.8 && ((std::abs(lTreeContent["Leading_jet_eta"])>=2.8 && std::abs(lTreeContent["Leading_jet_eta"]) <= 3.2) || (std::abs(lTreeContent["Subleading_jet_eta"])>=2.8 && std::abs(lTreeContent["Subleading_jet_eta"]) <= 3.2)));
+
     lCleanCut0 = !((lTreeContent["MetNoLep_pt"] - lTreeContent["TkMET_pt"])/lTreeContent["MetNoLep_pt"] >= 0.8 && ((std::abs(lTreeContent["Leading_jet_eta"])>=2.8 && std::abs(lTreeContent["Leading_jet_eta"]) <= 3.2) || (std::abs(lTreeContent["Subleading_jet_eta"])>=2.8 && std::abs(lTreeContent["Subleading_jet_eta"]) <= 3.2)));
     lCleanCut1 = !(lTreeContent["SoftActivityJetHT10"]<100 && ((std::abs(lTreeContent["Leading_jet_eta"])>=2.8 && std::abs(lTreeContent["Leading_jet_eta"]) <= 3.2) || (std::abs(lTreeContent["Subleading_jet_eta"])>=2.8 && std::abs(lTreeContent["Subleading_jet_eta"]) <= 3.2)));
     lCleanCut2 = !(((lTreeContent["softActivityJet1_eta"] > -3 && lTreeContent["softActivityJet1_eta"] < -1.2 && lTreeContent["softActivityJet1_phi"] < -0.5 && lTreeContent["softActivityJet1_phi"] > - 1.9) || (lTreeContent["softActivityJet2_eta"] > -3 && lTreeContent["softActivityJet2_eta"] < -1.2 && lTreeContent["softActivityJet2_phi"] < -0.5 && lTreeContent["softActivityJet2_phi"] > - 1.9) || (lTreeContent["softActivityJet3_eta"] > -3 && lTreeContent["softActivityJet3_eta"] < -1.2 && lTreeContent["softActivityJet3_phi"] < -0.5 && lTreeContent["softActivityJet3_phi"] > - 1.9) || (lTreeContent["softActivityJet4_eta"] > -3 && lTreeContent["softActivityJet4_eta"] < -1.2 && lTreeContent["softActivityJet4_phi"] < -0.5 && lTreeContent["softActivityJet4_phi"] > - 1.9) || (lTreeContent["softActivityJet5_eta"] > -3 && lTreeContent["softActivityJet5_eta"] < -1.2 && lTreeContent["softActivityJet5_phi"] < -0.5 && lTreeContent["softActivityJet5_phi"] > - 1.9) || (lTreeContent["softActivityJet6_eta"] > -3 && lTreeContent["softActivityJet6_eta"] < -1.2 && lTreeContent["softActivityJet6_phi"] < -0.5 && lTreeContent["softActivityJet6_phi"] > - 1.9)) && lTreeContent["MetPhiNoLep"]>-1.6 && lTreeContent["MetPhiNoLep"]<-0.8);
     lCleanCut3 = !(((lTreeContent["isoTrack1_eta"] > -3 && lTreeContent["isoTrack1_eta"] < -1.2 && lTreeContent["isoTrack1_phi"] < -0.5 && lTreeContent["isoTrack1_phi"] > - 1.9) || (lTreeContent["isoTrack2_eta"] > -3 && lTreeContent["isoTrack2_eta"] < -1.2 && lTreeContent["isoTrack2_phi"] < -0.5 && lTreeContent["isoTrack2_phi"] > - 1.9) || (lTreeContent["isoTrack3_eta"] > -3 && lTreeContent["isoTrack3_eta"] < -1.2 && lTreeContent["isoTrack3_phi"] < -0.5 && lTreeContent["isoTrack3_phi"] > - 1.9)) && lTreeContent["MetPhiNoLep"]>-1.6 && lTreeContent["MetPhiNoLep"]<-0.8);
+
   }  
+
   pass = pass && lCleanCut0;
   pass = pass && lCleanCut1;
   
@@ -699,103 +741,37 @@ Bool_t Events::PassSelection(){
   }
 
 
+  //////////////////////////////////
 
-
-  CalculateAdditionalVariables1();
-
-
+  CalculateAdditionalVariables_Stage1();
 
   double HFcut = 3.0;
-  //Circular Cut and HF HF removal
+  //Apply the circular Cut and HF HF removal 
+  //(circular cut usually already applied in the trees)
   if (mCat==CatType::MTR){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutMTR"]));
     pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < HFcut || abs(lTreeContent["Subleading_jet_eta"]) < HFcut );
-
-    //pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.0 ); //#1
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) >= 2.0 && abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#2
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) >= 2.8 ); //#3
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) < 2.0 ); //#4
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) >= 2.0 ); //#5
-        pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#6
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaMTR"]) >= 2.8 ); //#7
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) < 2.4 ); //#8
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) >= 2.4 ); //#9
-
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) < 2.4 ) && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#10 A
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) < 2.4 ) && ( abs(lTreeContent["ForwardEtaMTR"]) > 3.2 ); //#10 B
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) > 2.4 ) && ( abs(lTreeContent["ForwardEtaMTR"]) < 2.8 ); //#10 C
-    //    pass = pass && ( abs(lTreeContent["CentralEtaMTR"]) > 2.4 ) && ( abs(lTreeContent["ForwardEtaMTR"]) > 3.2 ); //#10 D
-
-    // pass = pass && !( (abs(lTreeContent["Leading_jet_eta"]) < 3.2 && abs(lTreeContent["Leading_jet_eta"]) > 2.8) ||  
-    // 		      (abs(lTreeContent["Subleading_jet_eta"]) < 3.2 && abs(lTreeContent["Subleading_jet_eta"]) > 2.8) );
-
-
-
-    //    pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < HFcut && abs(lTreeContent["Subleading_jet_eta"]) < HFcut );
-    //    pass = pass && (std::abs(lTreeContent["diCleanJet_dEta"])<5);    
-
-    //New idea 01.12.20
-    // pass = pass && (
-    // 		    (std::abs(lTreeContent["Leading_jet_eta"])<2.8) &&
-    // 		    (std::abs(lTreeContent["Subleading_jet_eta"])<2.8) ) ;    
-
-    // pass = pass && (
-    // 		    (std::abs(lTreeContent["Leading_jet_eta"])>2.8) ||
-    // 		    (std::abs(lTreeContent["Subleading_jet_eta"])>2.8) ) ;    
-
   }
   else if (mCat==CatType::VTR){
     pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutVTR"]));
     pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < HFcut || abs(lTreeContent["lMjj_jet2_eta"]) < HFcut );
-
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.0 ); //#1
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) >= 2.0 && abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#2
-    //    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) >= 2.8 ); //#3
-    //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) < 2.0 ); //#4
-    //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) >= 2.0 ); //#5
-    pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#6
-    //pass = pass && ( abs(lTreeContent["ForwardEtaVTR"]) >= 2.8 ); //#7
-    //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) < 2.4 ); //#8
-    //    pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) >= 2.4 ); //#9
-    //pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) < 2.4 ) && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#10 A
-    //pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) < 2.4 ) && ( abs(lTreeContent["ForwardEtaVTR"]) > 3.2 ); //#10 B
-    //     pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) > 2.4 ) && ( abs(lTreeContent["ForwardEtaVTR"]) < 2.8 ); //#10 C
-    //     pass = pass && ( abs(lTreeContent["CentralEtaVTR"]) > 2.4 ) && ( abs(lTreeContent["ForwardEtaVTR"]) > 3.2 ); //#10 D
-
-
-    // pass = pass && !( (abs(lTreeContent["lMjj_jet1_eta"]) < 3.2 && abs(lTreeContent["lMjj_jet1_eta"]) > 2.8) ||  
-    // 		      (abs(lTreeContent["lMjj_jet2_eta"]) < 3.2 && abs(lTreeContent["lMjj_jet2_eta"]) > 2.8) );
-
-
-    //    pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < HFcut && abs(lTreeContent["lMjj_jet2_eta"]) < HFcut );
-    //    pass = pass && (std::abs(lTreeContent["lMjj_dijet_deta"])<5);    
-
-
-    //New idea 01.12.20
-    // pass = pass && (
-    // 		    (std::abs(lTreeContent["lMjj_jet1_eta"])<2.8) &&
-    // 		    (std::abs(lTreeContent["lMjj_jet2_eta"])<2.8) ) ;    
-
-    // pass = pass && (
-    // 		    (std::abs(lTreeContent["lMjj_jet1_eta"])>2.8) ||
-    // 		    (std::abs(lTreeContent["lMjj_jet2_eta"])>2.8) ) ;    
-
-
   }
 
-  //Triggers
+  //Apply the trigger selection
   if (mCat==CatType::MTR){
     lcat = "MTR";
 
+    //The MET and triggers are used in the SR and QCDCR, 
+    //whilst the JetHT triggers are used in the QCDA and QCDB region
     if (mReg==RegionType::SR || (mReg==RegionType::QCDCR) ){
       pass = pass && (static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"])==1 || static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"])==1);
     }
     else{
       pass = pass && (
-		      // static_cast<int>(lTreeContent["HLT_PFJet40"])==1 
-		      // || static_cast<int>(lTreeContent["HLT_PFJet60"])==1
-		      // || static_cast<int>(lTreeContent["HLT_PFJet80"])==1
-		      // || static_cast<int>(lTreeContent["HLT_PFJet140"])==1
+		      // static_cast<int>(lTreeContent["HLT_PFJet40"])==1 //Too low statistics
+		      // || static_cast<int>(lTreeContent["HLT_PFJet60"])==1 //Too low statistics
+		      // || static_cast<int>(lTreeContent["HLT_PFJet80"])==1 //Too low statistics
+		      // || static_cast<int>(lTreeContent["HLT_PFJet140"])==1 //Too low statistics
 		      static_cast<int>(lTreeContent["HLT_PFJet200"])==1
 		      || static_cast<int>(lTreeContent["HLT_PFJet260"])==1
 		      || static_cast<int>(lTreeContent["HLT_PFJet320"])==1
@@ -805,7 +781,7 @@ Bool_t Events::PassSelection(){
 		      || static_cast<int>(lTreeContent["HLT_PFJet550"])==1
 		      );
       
-      pass = pass && (lTreeContent["Leading_jet_pt"] > 200);//should it be 250?
+      pass = pass && (lTreeContent["Leading_jet_pt"] > 200);//some say it should be 250?
     }
   }
   else if  (mCat==CatType::VTR){
@@ -814,12 +790,11 @@ Bool_t Events::PassSelection(){
       pass = pass && (static_cast<int>(lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"])==1 || static_cast<int>(lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"])==1);
     }
     else{
-      // if ( mProc == "DATA" || mProc == "QCD" ){  //Already set when defined below
       pass = pass && (
-		      // static_cast<int>(lTreeContent["HLT_PFJet40"])==1 
-		      // || static_cast<int>(lTreeContent["HLT_PFJet60"])==1
-		      // || static_cast<int>(lTreeContent["HLT_PFJet80"])==1
-		      // || static_cast<int>(lTreeContent["HLT_PFJet140"])==1
+		      // static_cast<int>(lTreeContent["HLT_PFJet40"])==1 //Too low statistics
+		      // || static_cast<int>(lTreeContent["HLT_PFJet60"])==1 //Too low statistics
+		      // || static_cast<int>(lTreeContent["HLT_PFJet80"])==1 //Too low statistics
+		      // || static_cast<int>(lTreeContent["HLT_PFJet140"])==1 //Too low statistics
 		      static_cast<int>(lTreeContent["HLT_PFJet200"])==1
 		      || static_cast<int>(lTreeContent["HLT_PFJet260"])==1
 		      || static_cast<int>(lTreeContent["HLT_PFJet320"])==1
@@ -829,9 +804,15 @@ Bool_t Events::PassSelection(){
 		      || static_cast<int>(lTreeContent["HLT_PFJet550"])==1
 		      );
       
-      pass = pass && (lTreeContent["Leading_jet_pt"] > 200);
+      pass = pass && (lTreeContent["Leading_jet_pt"] > 200); //some say it should be 250?
     }    
   }//End of trigger section
+
+
+
+  //Now apply the specific cuts for each of the regions
+
+  //SIGNAL REGION
   
   if (mReg==RegionType::SR){
     
@@ -846,26 +827,26 @@ Bool_t Events::PassSelection(){
     }
     
     //////////////////////////////////
-    //Investigation into dijet dphi
+    //Get the estimate in the "Relaxed" QCD region. I.e. relaxing the requirements on dijet dphi
     
     if ( mProc == "QCDRELAX" ){
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
       
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi; 
-	//	pass = pass && lTreeContent["diCleanJet_dPhi"]>1.5; 
       }
       else if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
-	//	pass = pass && lTreeContent["lMjj_dijet_dphi"]>1.8;
       }
     }
     else{
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_SR_eff_Sel"]));
     }
-    
-    
+      
     //////////////////////////////////
+    // Apply the lepton vetoes on data
     
     if ( !misMC ){
       pass = pass 
@@ -876,7 +857,7 @@ Bool_t Events::PassSelection(){
     }
     
   }
-  else if (mReg==RegionType::QCDCR){
+  else if (mReg==RegionType::QCDCR){   //QCD CONTROL REGION
     
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] < 0.5;
@@ -887,28 +868,28 @@ Bool_t Events::PassSelection(){
       pass = pass && lTreeContent["MetNoLep_pt"] <= 250;   
       pass = pass && lTreeContent["MetNoLep_pt"] > 160;
     }
-    
+
     //////////////////////////////////
-    //Investigation into dijet dphi
+    //Get the estimate in the "Relaxed" QCD region. I.e. relaxing the requirements on dijet dphi
 
     if ( mProc == "QCDRELAX" ){
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
 
       if ( mCat == CatType::MTR ){
-	//	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi; 
-	//	pass = pass && lTreeContent["diCleanJet_dPhi"]>1.5; 
+	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi; 
       }
       else if ( mCat == CatType::VTR ){
-	//	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi; 
-	//	pass = pass && lTreeContent["lMjj_dijet_dphi"]>1.8; 
+	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi; 
       }
     }
     else{
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_CR_eff_Sel"]));
     }
     
-
     //////////////////////////////////
+    // Apply the lepton vetoes on data
     
     if ( !misMC ){
       pass = pass 
@@ -917,8 +898,9 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nVetoElectron"]) == 0
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
+
   }
-  else if (mReg==RegionType::QCDA){
+  else if (mReg==RegionType::QCDA){ //QCD REGION A "Control-like" region
     
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<0.5;
@@ -926,31 +908,32 @@ Bool_t Events::PassSelection(){
     else if ( mCat == CatType::VTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<1.8;
     }
+
     pass = pass && lTreeContent["MetNoLep_pt"]>100;
-    pass = pass && lTreeContent["MetNoLep_pt"]<=160;     
-    
-    
+    pass = pass && lTreeContent["MetNoLep_pt"]<=160;         
+
     //////////////////////////////////
-    //Investigation into dijet dphi
+    //Get the estimate in the "Relaxed" QCD region. I.e. relaxing the requirements on dijet dphi
+
     if ( mProc == "QCDRELAX" ){
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi;
-	//	pass = pass && lTreeContent["diCleanJet_dPhi"]>1.5;
       }
       else if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
-	//	pass = pass && lTreeContent["lMjj_dijet_dphi"]>1.8;
       }
 
     }
     else{
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_A_eff_Sel"]));
     }
     
-    
     //////////////////////////////////
-    
+    // Apply the lepton vetoes on data
+
     if ( !misMC ){
       pass = pass 
 	&& static_cast<int>(lTreeContent["nVLooseTauFix"]) == 0
@@ -960,7 +943,7 @@ Bool_t Events::PassSelection(){
     }
     
   }
-  else if (mReg==RegionType::QCDB){//"Signal-like" region
+  else if (mReg==RegionType::QCDB){  //QCD REGION B "Signal-like" region
         
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>0.5;
@@ -973,22 +956,26 @@ Bool_t Events::PassSelection(){
     pass = pass && lTreeContent["MetNoLep_pt"]<=160;     
 
     //////////////////////////////////
-    //Investigation into dijet dphi
+    //Get the estimate in the "Relaxed" QCD region. I.e. relaxing the requirements on dijet dphi
+
     if ( mProc == "QCDRELAX" ){
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi;
-	//	pass = pass && lTreeContent["diCleanJet_dPhi"]>1.5;
       }
       if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi; 
-	//	pass = pass && lTreeContent["lMjj_dijet_dphi"]>1.8; 
       }
     }
     else{
+      //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_B_eff_Sel"]));
-    }
-    
+    }  
+  
+    //////////////////////////////////
+    // Apply the lepton vetoes on data
+
     if ( !misMC ){
       pass = pass 
 	&& static_cast<int>(lTreeContent["nVLooseTauFix"]) == 0
@@ -996,16 +983,16 @@ Bool_t Events::PassSelection(){
 	&& static_cast<int>(lTreeContent["nVetoElectron"]) == 0
 	&& static_cast<int>(lTreeContent["nLooseMuon"]) == 0;
     }
-    
+   
   }
-  
   return pass;
 }
 
+//Calculate the full weight of the selected event
 Double_t Events::SelWeight(){
-  double w = 1.;
+  double w = 1.0;
 
-  //QCD k-factor SFs
+  //Apply QCD k-factor SFs to MC
   if ( misMC ) {
 
     if ( mCat == CatType::MTR ){
@@ -1022,7 +1009,9 @@ Double_t Events::SelWeight(){
 
   }
 
-  //Trigger SFs
+
+  //Apply trigger SFs
+  //In the SR and QCDCR only apply a weight to MC
   if (mReg==RegionType::SR || (mReg==RegionType::QCDCR) ){
     
     if ( misMC ) {
@@ -1032,12 +1021,13 @@ Double_t Events::SelWeight(){
       else if ( mCat == CatType::VTR ){
 	w *= lTreeContent["trigger_weight_VBF"];
       }
-      
     }
   }
   else{
-      
-    if ( mProc == "DATA" ){
+    //In the other regions we don't have a calculated
+    //trigger SF, but need to apply a weight to data
+    //to correct for the prescale
+    if ( mProc == "DATA" && !misMC ){//DATA is the name for the JetHT dataset
       
       double prescale = 1.;
       if (mYear == "2017"){
@@ -1063,6 +1053,8 @@ Double_t Events::SelWeight(){
 	else if (static_cast<int>(lTreeContent["HLT_PFJet200"])==1 ){
 	  prescale = 0.22 /  41.54 ;
 	}
+	//The following triggers are not used due to the low statistics
+
 	// else if (static_cast<int>(lTreeContent["HLT_PFJet140"])==1 ){
 	//   prescale = 0.0397 /  41.54 ;
 	// }
@@ -1099,6 +1091,8 @@ Double_t Events::SelWeight(){
 	else if (static_cast<int>(lTreeContent["HLT_PFJet200"])==1 ){
 	  prescale = 0.21 /  59.96 ;
 	}
+	//The following triggers are not used due to the low statistics
+
 	// else if (static_cast<int>(lTreeContent["HLT_PFJet140"])==1 ){
 	//   prescale =  0.0486 /  59.96 ;
 	// }
@@ -1121,8 +1115,9 @@ Double_t Events::SelWeight(){
   return w;
 }
 
-void Events::CalculateAdditionalVariables1(){
-
+void Events::CalculateAdditionalVariables_Stage1(){
+  
+  //Calculate the variables relating to the eta of the central and forward jets
   double CentralEtaMTR = 0;
   double ForwardEtaMTR = 0;
   double CentralEtaVTR = 0;
@@ -1141,7 +1136,10 @@ void Events::CalculateAdditionalVariables1(){
 
 }
 
-void Events::CalculateAdditionalVariables2(){
+void Events::CalculateAdditionalVariables_Stage2(){
+
+  //Calculate the dijet mass balance
+  //plus a couple of other auxiliary variables
 
   double dijet_met_balance = 0;
 
@@ -1168,6 +1166,16 @@ void Events::CalculateAdditionalVariables2(){
 }
 
 
+///////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////
+  //                                                  //
+  //   The USER does not need to edit the following   //
+  //                                                  //
+  //////////////////////////////////////////////////////
+
+//The main loop to calculate the weights, apply the selection,
+//calculate auxiliary variables and fill the histograms
 Bool_t Events::Process(Long64_t entry)
 {
 
@@ -1178,7 +1186,7 @@ Bool_t Events::Process(Long64_t entry)
   //   if ( entry > 100 ) Abort("maxevents");
 
   for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on cat
-    SetCategory(static_cast<CatType>(iC));
+    SetCategory(static_cast<sCatType>(iC));
     if (!BaseSelection()){
       continue;
     }
@@ -1189,15 +1197,7 @@ Bool_t Events::Process(Long64_t entry)
       }
       double weight = BaseWeight()*SelWeight();
 
-
-      CalculateAdditionalVariables2();
-
-      //Fill CSV file
-      if (mCat==CatType::MTR && GetRegionStr(static_cast<RegionType>(iR)) == "QCDA"){
-	if ( lTreeContent["LHE_HT"] > 700 && lTreeContent["LHE_HT"] < 1000){
-	  fileMTR << std::fixed << std::setprecision(3)<< lTreeContent["LHE_HT"] << ", " << std::setprecision(0)  << lTreeContent["event"] << std::setprecision(4) <<  ", " << lTreeContent["diCleanJet_M"] << ", "<< lTreeContent["MetNoLep_pt"] << ", " << lTreeContent["diCleanJet_dPhi"] <<  ", " << lTreeContent["Leading_jet_pt"] << ", " << lTreeContent["Subleading_jet_pt"] << std::setprecision(9) << ", "  << GetRegionStr(static_cast<RegionType>(iR)) << ", " << weight << std::endl;
-	}
-      }
+      CalculateAdditionalVariables_Stage2();
 
       for (unsigned iV(0); iV<mHistVec[iR][iC].size(); ++iV){
 	mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);
@@ -1235,6 +1235,5 @@ void Events::Terminate()
   mFout->Write();
   mFout->Close();
 
-  fileMTR.close();
 }
 #endif

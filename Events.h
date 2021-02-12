@@ -30,14 +30,8 @@
 #include <functional>
 #include <tuple>
 
-//enum RegionType { SR=0, We=1, Wmu=2, Zee=3, Zmumu=4, QCDCR=5, QCDA=6, QCDB=7, Last };
-
-enum RegionType { SR=0, QCDCR=1,  QCDA=2, QCDB=3,Last,  };
-
-//enum CatType { MTR=0, MTRvetoTau=1, MTRvetoB=2, MTRvetoLep=3, MTRveto=4, LastCat };
-//enum CatType { MTR=0, LastCat, MTRvetoTau=1, MTRvetoB=2, MTRvetoLep=3, MTRveto=4 };
-
-enum CatType { MTR=0,  VTR=1,  LastCat, MTRvetoTau=2, MTRvetoB=3, MTRvetoLep=4, MTRveto=5 };
+enum RegionType { SR=0, QCDCR=1,  QCDA=2, QCDB=3,Last};
+enum CatType { MTR=0,  VTR=1,  LastCat };
 
 class Events : public TSelector {
   
@@ -78,8 +72,8 @@ class Events : public TSelector {
    void SetLumiPb(const double & aLumi);
    void SetTreeContent(std::string year);
    bool CheckValue(ROOT::Internal::TTreeReaderValueBase& value);
-   void CalculateAdditionalVariables1();
-   void CalculateAdditionalVariables2();
+   void CalculateAdditionalVariables_Stage1();
+   void CalculateAdditionalVariables_Stage2();
 
    
  private:
@@ -328,8 +322,10 @@ void Events::Init(TTree *tree)
    // Init() will be called many times when running on PROOF
    // (once per file to be processed).
 
-
   // Readers to access the data (delete the ones you do not need).
+
+  //Uncomment if you want to access those variables that are commented.
+  //They are commented to avoid spending time running over unused variables
 
   if (tree->GetBranch("event") !=0 ) event = {  fReader,"event"};
   /* if (tree->GetBranch("Zee_flag") !=0 ) Zee_flag = {  fReader,"Zee_flag"}; */

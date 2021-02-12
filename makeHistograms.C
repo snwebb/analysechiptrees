@@ -153,7 +153,6 @@ int makeHistograms(){//main
 	  selector->SetSystematic("Nominal");
 	  selector->SetOutFileName(lPlotDir+"Histos_Nominal_"+proc[iP]+"_" + year + ".root");
 	  std::cout << " -- Tree Nominal " << proc[iP] << " entries = " << tree->GetEntries() << ", outfile: " << selector->GetOutFileName() << std::endl;
-	  //	tree[iS][iP]->Process(selector);
 	  tree->Process(selector);
 	}
 	else {
