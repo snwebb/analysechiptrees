@@ -26,11 +26,14 @@
 //#include "TDRStyle.h"
 
 
-int makeHistograms(){//main
+int makeHistograms(){ //Main function
 
-  bool isAM = false;
   TH1::SetDefaultSumw2();
 
+  //Set whether we are using Anne-Marie's trees, or the standard set of trees
+  bool isAM = false;
+
+  //Location of the QCD trees
   std::string baseDir = "";
   if (isAM){
     //    baseDir = "/vols/cms/magnan/Hinvisible/Run2/200402/";
@@ -40,54 +43,22 @@ int makeHistograms(){//main
     baseDir = "/vols/cms/snwebb/Common/";
     //    baseDir = "/vols/cms/snwebb/Common/August";
 
-    //    baseDir = "/home/hep/snwebb/invisible/Nick/analysis/temp-znn-q";
-  //    std::string baseDir = "/home/hep/snwebb/invisible/MakeTrees/CHIP/analysis/output_skims/";
+  //Plotting directory
   std::string lPlotDir = "Plots/";
-  
+
+  //Luminosity in 2017 and 2018
   double lLumi_2017 = 41529;
-  //  double lLumi_2017 = 1;
   double lLumi_2018 = 59741;
-
-  //  std::string syst[5] = {"Nominal","JESUP","JESDOWN","JERUP","JERDOWN"};
-  //  std::vector<std::string> syst = {"Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown",};
-  //  std::vector<std::string> syst = {"Nominal"};
-  //  const unsigned nP = 13;//QCDW,Z,EWKW,Z
-  // std::string proc[6] = {"QCDW","QCDZinv","QCDZll","EWKW","EWKZinv","EWKZll"};
-  // std::string name[6] = {"WJETS","ZJETS","DY","EWKW","EWKZNUNU","EWKZll"};
-
-  // std::string proc[6] = {"QCDZinv","QCDZll","EWKW","EWKZinv","EWKZll"};
-  // std::string name[6] = {"ZJETS","DY","EWKW","EWKZNUNU","EWKZll"};
-  //
-
-  //std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "SingleElectron",  "WJETS","TOP","MET"};
   
+  //Choose which years to process
+  std::vector<std::string> years = {"2017","2018"};  
 
-
-  
-
+  //Choose which samples to process
   std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
-
   //  std::vector<std::string> proc = { "QCD", "QCDRELAX"};
 
-
-
-
-  //
-  //  std::vector<std::string> proc = { "DATA","QCDRELAX"};
-  //std::vector<std::string> proc = { "ZNN"};
-
-    // std::vector<std::string> name = { "Nominal/qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/ewkznunu",  "Nominal/vv",  "Nominal/ewkzll",  "Nominal/ewkw",  "Nominal/zjets"  ,  "Nominal/dy",  "Nominal/wjets","Nominal/topincl","Data/MET"};
-
-
-
-
-  //  std::vector<std::string> proc = { "DY"};
-  //  std::vector<std::string> proc = { "DATA"};
-    std::vector<std::string> years = {"2017","2018"};
-  //  std::vector<std::string> years = {"2017"};
-    //    std::vector<std::string> years = {"2018"};
-  //  std::string year = "2018";
-
+  //Name of the ROOT tree corresponding to each process. 
+  //Generally it is the same as name of the process
   std::vector<std::string> name;
 
   if ( !isAM ){
@@ -105,67 +76,57 @@ int makeHistograms(){//main
   }
   else{
     name = { "Data/MET", "Nominal/all_qcd", "Nominal/ggF125",  "Nominal/VBF125",  "Nominal/all_ewkznunu",  "Nominal/all_vv",  "Nominal/all_ewkzll",  "Nominal/all_ewkw",  "Nominal/all_zjets"  ,  "Nominal/all_dy",  "Nominal/all_wjets","Nominal/all_topincl","Data/MET"};
-    //  name = { "Data/MET" };
   }
 
-  // std::vector<TFile*> fin;
-  // std::vector<TTree*> tree;
 
-  // TFile* fin[nS][nP];
-  // TTree* tree[nS][nP];
-
-  //  for (unsigned iS(0); iS<nS; ++iS){//loop on syst
-
-
-  //  for (unsigned iS(0); iS<syst.size(); ++iS){//loop on syst
   TFile * fin = 0;
   TTree * tree = 0;
-  //crashes at MET in AM code.
-  for (auto year: years){
-    for (unsigned iP(0); iP<proc.size(); ++iP){//loop on proc      
+
+  for (auto year: years){//loop over years
+    for (unsigned iP(0); iP<proc.size(); ++iP){//loop over processes
       if ( isAM ){
-	if ( proc[iP] == "QCDRELAX" ) continue;
-	if ( proc[iP] == "DATA" ) continue;
-	fin = new TFile( (baseDir+"/output_skims_"+year+"/"+name[iP]+".root").c_str() , "READ" );//Temp for AM  
+	if ( proc[iP] == "QCDRELAX" ) continue; //Relaxed QCD events not selected in Anne-Marie's trees
+	if ( proc[iP] == "DATA" ) continue; //JetHT dataset missing for Anne-Marie's trees
+	fin = new TFile( (baseDir+"/output_skims_"+year+"/"+name[iP]+".root").c_str() , "READ" );
       }
       else 
 	fin = new TFile( (baseDir+"/"+year+"/"+name[iP]+".root").c_str() , "READ" );
-      //fin.push_back(TFile::Open((baseDir+"/"+year+"/"+name[iP]+".root").c_str()))
+
       if ( fin ){
-	//      if (fin[iS][iP]){
-	//fin[iS][iP]->cd();
 	fin->cd();
 	tree = (TTree*) fin->Get( "Events" );
 
-	//	tree[iS][iP] = (TTree*)gDirectory->Get("Events");
-	//	if (tree[iS][iP]){
 	if (tree){
 	  
-	  Events * selector = (Events*)TSelector::GetSelector("Events.C+");
+	  Events * selector = (Events*)TSelector::GetSelector("Events.C+");//Compile the selector
+
+	  //Set the appropriate luminosity
 	  if ( year == "2017" )
 	    selector->SetLumiPb(lLumi_2017);
 	  else if ( year == "2018" )
 	    selector->SetLumiPb(lLumi_2018);
-	  selector->SetProcess(proc[iP]);
-	  selector->SetAM(isAM);
-	  std::cout << "Set Year" << std::endl;
+	  	  
+	  selector->SetProcess(proc[iP]);//Set the process
+	  selector->SetAM(isAM);//Set if Anne-Marie's trees
+	  std::cout << "Set Year" << std::endl; //Set the year
 	  selector->SetYear(year);
-	  selector->SetSystematic("Nominal");
-	  selector->SetOutFileName(lPlotDir+"Histos_Nominal_"+proc[iP]+"_" + year + ".root");
+	  selector->SetSystematic("Nominal");//Set the systematic to "Nominal" (only option available currently)
+	  selector->SetOutFileName(lPlotDir+"Histos_Nominal_"+proc[iP]+"_" + year + ".root"); //Set output file name
 	  std::cout << " -- Tree Nominal " << proc[iP] << " entries = " << tree->GetEntries() << ", outfile: " << selector->GetOutFileName() << std::endl;
-	  tree->Process(selector);
+
+	  tree->Process(selector);//Main tree loop
 	}
 	else {
 	  std::cout << " -- Tree not found for Nominal " << proc[iP] << std::endl;
 	}
 	
 	fin->Close();
-    }
-    }//loop on proc
-    //  }//loop on syst
+      }
+
+    }//loop over process
     
-  }
+  }//loop over years
   return 0;
   
-}//main
+}//end of main function
 
