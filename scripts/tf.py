@@ -2,22 +2,16 @@
 import sys,os
 import subprocess
 from array import array
-sys.argv.append( '-b' )
-# os.mkdir("CR")
-# os.mkdir("A")
-# os.mkdir("B")
 import ROOT
+sys.argv.append( '-b' )
 ROOT.TH1.SetDefaultSumw2()
 
-directory_name = sys.argv[1]
-plotname = sys.argv[2]
-log = int(sys.argv[3])
-##directory_name = "Plots/20201016-Histos-DeltaEtaLessThan5"
-#directory_name = "Plots/20201016-Histos-DeltaEtaGreaterThan5"
-#directory_name = "Plots/20201016-Histos-Full"
-#directory_name = "Plots/"
+directory_name = sys.argv[1]#Input Histograms created using makeHistograms.C
+plotname = sys.argv[2]#Output directory name
+log = int(sys.argv[3])#Plot the histograms using a log scale
+rebin = 2 #Rebin mjj - necessary if splitting data based on eta of forward jet #0 nominal, 1 Central, 2 Forward 
 
-
+#Make the relevant directories
 if os.path.exists("Plots/"+plotname) == False:
     os.mkdir("Plots/"+plotname)
 if os.path.exists("Plots/"+plotname+"/A") == False:
@@ -29,32 +23,23 @@ if os.path.exists("Plots/"+plotname+"/SR") == False:
 if os.path.exists("Plots/"+plotname+"/CR") == False:
     os.mkdir("Plots/"+plotname+"/CR")
 
-#listOfSysts = ["Nominal","ElectronVetoUp","ElectronVetoDown","MuonVetoUp","MuonVetoDown","TauVetoUp","TauVetoDown","BjetVetoUp","BjetVetoDown"]
-#listOfSysts = ["Nominal","ElectronVetoUp","MuonVetoUp","TauVetoUp","BjetVetoUp"]
-#listOfSysts = ["Nominal"]
-
-#samples = ["DATA","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","MET"]
+#Choose which years to plot
 years = ["2017","2018"]
-#years = ["2017"]
-#samples = ["MET","QCD","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","SingleElectron","TOP","VV","WJETS","ZJETS"]
-#samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
+
+#Choose which samples to include on the plots
 #samples = ["MET","VV","TOP","DY","EWKZll","GluGluHtoInv","VBFHtoInv","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
 samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
-regions = ["MTR","VTR"]
-#variables = ["diCleanJet_M_binned"]
 
-#variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","diCleanJet_dEtaCmF","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta","lMjj_dijet_detaCmF", "lMjj_dijet_dphi"]
+#Choose which regions to plot
+regions = ["MTR","VTR"]
+
+
+#List of variables to plot
 
 #variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_M_LeadingPosEta","diCleanJet_M_LeadingNegEta","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","nCleanJet30","MetNoLep_CleanJet_mindPhi","LHE_Vpt","LHE_HT","dijet_met_balance","lMjj_binned","diCleanJet_M_binned","diCleanJet_M_binned_reduced","lMjj_dijet_deta", "lMjj_dijet_dphi"]
-
 variables = ["MetNoLep_pt","diCleanJet_M","diCleanJet_dEta","CentralEtaMTR","ForwardEtaMTR","CentralEtaVTR","ForwardEtaVTR","diCleanJet_dPhi","Leading_jet_pt","Subleading_jet_pt","Leading_jet_eta","Subleading_jet_eta","MetNoLep_CleanJet_mindPhi","lMjj_binned","diCleanJet_M_binned","lMjj_dijet_deta", "lMjj_dijet_dphi"]
 
-# nick = {}
-# nick[("MTR","2017")] = ROOT.TFile("out_MTR_2017.root_qcdDD.root","READ")
-# nick[("VTR","2017")] = ROOT.TFile("out_VTR_2017.root_qcdDD.root","READ")
-# nick[("MTR","2018")] = ROOT.TFile("out_MTR_2018.root_qcdDD.root","READ")
-# nick[("VTR","2018")] = ROOT.TFile("out_VTR_2018.root_qcdDD.root","READ")
-
+#Set the colours of the plots
 colors = {}
 colors["VV"] = '#7bc345'
 colors["TOP"]  =  '#CF3721'
@@ -73,7 +58,6 @@ for region in regions:
     for variable in variables:
         for year in years:
 
-            #samples = ["DATA","QCD","DY"]
             files = []
 
             SRs = []
@@ -82,15 +66,7 @@ for region in regions:
             Bs = []
             TFs = []
 
-            #year=sys.argv[1]
-
-            # for syst in listOfSysts:
-            #     files.append( ROOT.TFile.Open("../Plots/Histos_"+syst+"_QCD_2017.root"))
-            #     SRs.append(files[-1].Get("SR/MTR/h_SR_MTR_dijet_M_binned"))
-            #     CRs.append(files[-1].Get("QCDCR/MTR/h_QCDCR_MTR_dijet_M_binned"))
-
-
-            #for syst in listOfSysts:
+            #Load all input histograms to memory
             for sample in samples:
                 files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/"+directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
                 Bs.append(files[-1].Get("QCDB/"+region+"/h_QCDB_"+region+"_" + variable))
@@ -98,28 +74,40 @@ for region in regions:
                 SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
                 CRs.append(files[-1].Get("QCDCR/"+region+"/h_QCDCR_"+region+"_" + variable))
 
-            #rebin if necessary
-            # for i,(A,B,SR,CR) in enumerate(zip(As,Bs,SRs,CRs)):
-            #     if variable == "diCleanJet_M_binned":
-            #         mjjbins=array('d',[0,200,400,600,900,1200,1500,2000,2750,5000])
-            #         As[i] = A.Rebin(len(mjjbins)-1,"A_rebinned",mjjbins)
-            #         Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
-            #         CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
-            #         SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
-            #     elif variable == "lMjj_binned":
-            #         mjjbins=array('d',[0,900,1200,1500,2000,5000])
-            #         As[i] = A.Rebin(len(mjjbins)-1,"A_rebinned",mjjbins)
-            #         Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
-            #         CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
-            #         SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
-                #print (SRs[-1].Integral(),CRs[-1].Integral())
+            #Processing of Method A, i.e. calculating the background-subtracted data and the 
+            #transfer-factors in the mjj distribution
 
-            #Get Data - background subtracted
-            #DRAWING
+            #Rebin the mjj distribution if necessary
+            for i,(A,B,SR,CR) in enumerate(zip(As,Bs,SRs,CRs)):
+                if variable == "diCleanJet_M_binned":
+                    if rebin == 0:
+                        mjjbins=array('d',[0,200,400,600,900,1200,1500,2000,2750,3500,5000])
+                    elif rebin == 1:
+                        mjjbins=array('d',[0,200,400,600,900,1200,1500,2000,2750,5000])
+                    elif rebin == 2:
+                        mjjbins=array('d',[0,200,900,1200,1500,2000,2750,3500,5000])
+                    As[i] = A.Rebin(len(mjjbins)-1,"A_rebinned",mjjbins)
+                    Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
+                    CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
+                    SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
+                elif variable == "lMjj_binned":
+                    if rebin == 0:
+                        mjjbins=array('d',[0,900,1200,1500,2000,2750,5000])
+                    elif rebin == 1:
+                        mjjbins=array('d',[0,900,1200,1500,5000])
+                    elif rebin == 2:
+                        mjjbins=array('d',[0,900,1200,1500,2000,2750,5000])
+
+                    As[i] = A.Rebin(len(mjjbins)-1,"A_rebinned",mjjbins)
+                    Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
+                    CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
+                    SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
+
 
 
             if (  (variable=="diCleanJet_M_binned" and region == "MTR" ) or (variable=="lMjj_binned" and region == "VTR" )  ):
                 
+                #Get Data - background subtracted for the mjj distribution                
                 file_out = ROOT.TFile("Plots/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
                 BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_SR")
                 BackgroundSubtractedData_CR = CRs[0].Clone("BackgroundSubtractedData_CR")
@@ -144,10 +132,9 @@ for region in regions:
                         continue
                     BackgroundSubtractedData_B.Add(B,-1)
 
-                #Get QCD Transfer factor
-                #QCD relax = -2
-                #QCD normal = -3
-
+                #Get QCD Transfer factors
+                #For QCD relaxed, qcdchoice= -2
+                #For QCD normal, qcdchoice = -3
                 qcdchoice = -3
 
                 QCDTransferFactor_SR = SRs[qcdchoice].Clone("QCDTransferFactor_SR")
@@ -170,16 +157,14 @@ for region in regions:
                 QCDMC_B = Bs[-3].Clone("QCDMC_B")
                 JETHT_B = Bs[-1].Clone("JETHT_B")
 
-
-
-                #Write all relevant hists:
+                #Write all relevant hists to output root file:
 
                 for i,(sr,cr,a,b) in enumerate(zip(SRs,CRs,As,Bs)):
                     sr.Write(samples[i]+"_SR")
                     cr.Write(samples[i]+"_CR")
                     a.Write(samples[i]+"_A")
                     b.Write(samples[i]+"_B")
-
+                
                 QCDTransferFactor_SR.Write()
                 QCDTransferFactor_B.Write()
 
@@ -193,6 +178,8 @@ for region in regions:
 
                 QCDMC_SR.Write()
                 QCDMC_CR.Write()
+
+                #Plotting relevant histograms:
 
                 #QCD TRANSFER FACTORS
                 c_1 = ROOT.TCanvas("QCDTransferFactor_SR")
@@ -215,27 +202,20 @@ for region in regions:
                 c_2.Close()
 
                 #FINAL QCD
-                #nicks = nick[(region,year)].Get("rebin_QCD_hist_counts")
                 c_3 = ROOT.TCanvas("FinalQCD")
                 FinalQCDSR.Draw()
                 FinalQCDSR.GetYaxis().SetTitle("Number of Events")
                 FinalQCDSR.GetYaxis().SetRangeUser(0.1,50000)
                 QCDMC_SR.SetLineColor(ROOT.kRed)
                 QCDMC_SR.Draw("same")
-                #nicks.SetLineColor(ROOT.kBlack)
-                #nicks.SetMarkerSize(0)
-                #nicks.Draw("Esame")
                 print ( "Data-Driven MJ prediction in " + region + " in " + year + " is "  + str(FinalQCDSR.Integral()) )
                 print ( "MC MJ prediction in " + region + " in " + year + " is "  + str(QCDMC_SR.Integral()) )
 
                 ROOT.gPad.SetLogy(1)
                 leg_3 = ROOT.TLegend(0.4,0.6,0.89,0.89)
                 leg_3.SetBorderSize(0);
-                #leg_3.AddEntry(FinalQCDSR,"Estimate using QCD MC transfer factor","L")
                 leg_3.AddEntry(FinalQCDSR,"Data driven method A","L")
                 leg_3.AddEntry(QCDMC_SR,"QCD MC","L")
-                #leg_3.AddEntry(nicks,"Fully data-driven estimate","L")
-                #leg_3.AddEntry(nicks,"Data driven method B","L")
                 leg_3.Draw()
 
                 ROOT.gStyle.SetOptStat(0);
@@ -252,14 +232,12 @@ for region in regions:
                 if ( region == "VTR"):
                     FinalQCDB.GetYaxis().SetRangeUser(0,1000)
                 FinalQCDB.GetYaxis().SetTitle("Number of Events")
-                # QCDMC_B.SetLineColor(ROOT.kRed)
-                # QCDMC_B.Draw("same")
+
                 JETHT_B.SetLineColor(ROOT.kRed)
                 JETHT_B.Draw("same")
                 leg_4 = ROOT.TLegend(0.5,0.5,0.89,0.89)
                 leg_4.SetBorderSize(0);
                 leg_4.AddEntry(FinalQCDB,"Data-driven QCD prediction","L")
-                #leg_4.AddEntry(QCDMC_B,"Estimate from using QCD MC","L")
                 leg_4.AddEntry(JETHT_B,"Data in \"B\" region","L")
                 leg_4.Draw()
                 ROOT.gStyle.SetOptStat(0);
@@ -284,14 +262,11 @@ for region in regions:
                 c_5.SaveAs("Plots/"+plotname + "/FinalQCDBRatio_" + region + "_" + year + ".pdf" )
                 c_5.Close()
 
-
                 #Data Driven Transfer Factor (B/A)
                 c_6 = ROOT.TCanvas("DataDrivenQCDTransferFactor")
                 ratio = BackgroundSubtractedData_B.Clone(BackgroundSubtractedData_B.GetName() + "_ratio" )
                 ratio.Divide(BackgroundSubtractedData_A)
                 ratio.Draw()
-                # if ( region == "MTR"):
-                #     ratio.GetYaxis().SetRangeUser(0,3)
                 ratio.GetYaxis().SetTitle("Ratio")
                 ROOT.gStyle.SetOptStat(0);
                 c_6.Draw()
@@ -303,10 +278,14 @@ for region in regions:
                 file_out_2 = ROOT.TFile("QCD_" + region + "_" + year+ ".root","RECREATE")
                 FinalQCDSR.Write("QCD")
                 file_out_2.Close()
-                
                 file_out.Close()
 
-            # QCDCR   
+
+
+            #Plot the other variables as a cross-check:
+
+
+            # QCDCR  
             leg = ROOT.TLegend(0.45,0.75,0.87,0.89)
             leg.SetNColumns(2)
             ROOT.gStyle.SetLegendBorderSize(0)
@@ -328,8 +307,6 @@ for region in regions:
                 if ( samples[i] == "QCD"):
                     CR.SetLineColor(1)
 
-                # CR.SetFillColor(30+(i*2))
-                # CR.SetLineColor(30+(i*2))
                 leg.AddEntry(CR,samples[i],"F")
                 stack.Add(CR)
 
@@ -350,9 +327,10 @@ for region in regions:
             c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".png")
             c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".pdf")
             c.Close()
-            #file_out.Close()
 
-            # SR   
+
+
+            #SR   
             leg_SR = ROOT.TLegend(0.45,0.75,0.87,0.89)
             leg_SR.SetNColumns(2)
             ROOT.gStyle.SetLegendBorderSize(0)
@@ -375,13 +353,8 @@ for region in regions:
                     SR = SR.Rebin(len(xbins)-1,"SR_rebinned",xbins)
                     SRs[i] = SR
 
-                #if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
-                #Removing QCD from ratio sum as requested by AM
-                #if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
                 if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
                     continue
-                # SR.SetFillColor(30+(i*2))
-                # SR.SetLineColor(30+(i*2))
                 SR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 SR.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 if ( samples[i] == "QCD"):
@@ -420,10 +393,11 @@ for region in regions:
             c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".C")
             c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
             c_SR.Close()
-            #file_out.Close()
 
 
-            #A 
+
+
+            #Region A 
             leg_A = ROOT.TLegend(0.45,0.75,0.87,0.89)
             leg_A.SetNColumns(2)
             ROOT.gStyle.SetLegendBorderSize(0)
@@ -438,8 +412,6 @@ for region in regions:
                 if ( samples[i] == "QCD"):
                     A.SetLineColor(1)
 
-                # A.SetFillColor(30+(i*2))
-                # A.SetLineColor(30+(i*2))
                 leg_A.AddEntry(A,samples[i],"F")
                 stack_A.Add(A)
             As[-1].Draw()
@@ -451,12 +423,13 @@ for region in regions:
             c_A.SaveAs("Plots/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".png")
             c_A.SaveAs("Plots/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".pdf")
             c_A.Close()
-            #file_out.Close()
 
-            #B
+
+
+
+            #Region B
             leg_B = ROOT.TLegend(0.45,0.75,0.87,0.89)
             leg_B.SetNColumns(2)
-            #leg_B = ROOT.TLegend(0.65,0.55,0.87,0.89)
             ROOT.gStyle.SetLegendBorderSize(0)
             c_B = ROOT.TCanvas("stackplot_" + variable)
             stack_B = ROOT.THStack("hs_B","")
@@ -470,8 +443,6 @@ for region in regions:
                 if ( samples[i] == "QCD"):
                     B.SetLineColor(1)
 
-                # B.SetFillColor(30+(i*2))
-                # B.SetLineColor(30+(i*2))
                 leg_B.AddEntry(B,samples[i],"F")
                 stack_B.Add(B)
             if Bs[-1].Integral()>0:
@@ -492,19 +463,7 @@ for region in regions:
 
 
 
-
-            
-
-
-        # for i,tf in enumerate(TFs):
-        #     tf.SetLineColor(i+1)
-        #     tf.SaveAs("tf_" + year + ".root")
-        #     tf.Draw("same")
-
-        #c.Draw()
-        #c.Print("plot_"+year+".root")
-
-#For Nick's method
+#Output to be used in the calculation of Method B
 variables = ["MetNoLep_CleanJet_mindPhi"]
 
 for region in regions:
@@ -526,7 +485,6 @@ for region in regions:
 
             file_out = ROOT.TFile("Plots/"+ plotname + "/out_" + region + "_" + year+ ".root","UPDATE")
             
-
             file_out.mkdir("MetNoLep_CleanJet_mindPhi")
             file_out.cd("MetNoLep_CleanJet_mindPhi")
 
@@ -553,30 +511,15 @@ for region in regions:
                 if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                     continue
                 BackgroundSum_CR.Add(cr)
-
             BackgroundSum_CR.Write()
 
             for i,a in enumerate(As):
                 if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                     continue
                 BackgroundSum_A.Add(a)
-
             BackgroundSum_A.Write()
 
-            # BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_MetNoLep_CleanJet_mindPhi_SR")
 
-            # for i,CR in enumerate(CRs):
-            #     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET"):
-            #         continue
-            #     BackgroundSubtractedData_CR.Add(CR,-1)
-            # for i,SR in enumerate(SRs):
-            #     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET"):
-            #         continue
-            #     BackgroundSubtractedData_SR.Add(SR,-1)
-
-            # BackgroundSubtractedData_CR.Add(BackgroundSubtractedData_SR)
-            # #Write all relevant hists:
-            # BackgroundSubtractedData_CR.Write()
 
             file_out.Close()
 
