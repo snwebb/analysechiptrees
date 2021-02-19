@@ -4,11 +4,11 @@
 
 Here follows a short recipe of how to run the code, in addition to the information given in the code comments.
 
-The purpose of these programs is to take a `ROOT` tree output from the `CHIP` framework and produce the input to the QCD m=Method B fitting code (produced by Nicholas Wardle). The QCD estimate using Method A will also be produced, as well as various supplementary control plots.
+The purpose of these programs is to take a `ROOT` tree output from the `CHIP` framework and produce the input to the QCD Method B fitting code (produced by Nicholas Wardle). The QCD estimate using Method A will also be produced, as well as various supplementary control plots.
 
 There are two main stages to this routine, `makeHistograms.C` (process trees and get base `ROOT` histograms), and `scripts/tf.py` (make the final plot images and `ROOT` files for input to the next stage).
 
-##`makeHistograms.C`
+## `makeHistograms.C`
 
 The code is run like:
 
@@ -18,13 +18,13 @@ The `makeHistograms.C` file internally compiles the main analysis loop in `Event
 
 The output `ROOT` histogram files (one for each sample and year) will be stored in `/Plots` by default.
 
-##`scripts/tf.py`
+## `scripts/tf.py`
 
 The code is run like:
 
 `./scripts/tf.py input_directory output_directory log`
 
-where `input_directory` is the path to the `ROOT` histograms in the first stage, `output_directory` is the name of the output directory for the plots (will be stored under `/Plots/output_directory` by default), and `log` is either `0` or `1` (whether the control plots are output using a log-y scale or not).
+where `input_directory` is the path to the `ROOT` histograms in the first stage, `output_directory` is the name of the output directory for the plots (will be stored under `/Plots/output_directory` by default), and `log` is either `1` or `0` (whether the control plots are output using a log-y scale or not, respectively).
 
 The output files relevant for passing to the next stage, in order to evaluate Method B are called:
 
@@ -35,4 +35,4 @@ out_VTR_2017.root
 out_VTR_2018.root
 ```
 
-The plots relevant for Method A are also produced, as well as the control plots for each region, within the appropriate directory (`SR`, `CR`, `A`, and `B`)
+The plots relevant for Method A are also produced, as well as the control plots for each region, within the appropriate directory (`SR`, `CR`, `A`, and `B`).
