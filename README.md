@@ -36,3 +36,11 @@ out_VTR_2018.root
 ```
 
 The plots relevant for Method A are also produced, as well as the control plots for each region, within the appropriate directory (`SR`, `CR`, `A`, and `B`).
+
+## `scripts/tf2d.py`
+
+A supplementary script to produce 2D control distributions from the output of the `makeHistograms.C` stage. The code is run like:
+
+`./scripts/tf.py input_directory output_directory`
+
+where `input_directory` is the path to the `ROOT` histograms in the first stage, and `output_directory` is the name of the output directory for the plots (will be stored under `/Plots/output_directory` by default).
