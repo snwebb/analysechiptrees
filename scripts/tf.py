@@ -9,7 +9,7 @@ ROOT.TH1.SetDefaultSumw2()
 directory_name = sys.argv[1]#Input Histograms created using makeHistograms.C
 plotname = sys.argv[2]#Output directory name
 log = int(sys.argv[3])#Plot the histograms using a log scale
-rebin = 2 #Rebin mjj - necessary if splitting data based on eta of forward jet #0 nominal, 1 Central, 2 Forward 
+rebin = 0 #Rebin mjj - necessary if splitting data based on eta of forward jet #0 nominal, 1 Central, 2 Forward 
 
 #Make the relevant directories
 if os.path.exists("Plots/"+plotname) == False:

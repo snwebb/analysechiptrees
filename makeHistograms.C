@@ -52,6 +52,7 @@ int makeHistograms(){ //Main function
   
   //Choose which years to process
   std::vector<std::string> years = {"2017","2018"};  
+  //  std::vector<std::string> years = {"2018"};  
 
   //Choose which samples to process
   std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};

@@ -95,8 +95,12 @@ class Events : public TSelector {
    bool misMC;
    TString mSyst;
    double mLumiPb;
-   
+   bool mreweight_met_phi;
+   TH1D * Met_phi_SF;
+
+   Double_t MetPhiWeight();
    Bool_t BaseSelection();
+   Bool_t BaseSelectionAM();
    Double_t BaseWeight();
    Bool_t PassSelection();
    Double_t SelWeight();

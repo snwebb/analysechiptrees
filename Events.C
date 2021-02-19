@@ -47,6 +47,15 @@ void Events::Begin(TTree * /*tree*/)
   // When running with PROOF Begin() is only called on the client.
   // The tree argument is deprecated (on PROOF 0 is passed).
 
+  //Reweight based on MET_Phi
+  mreweight_met_phi = false;
+  Met_phi_SF = 0;
+  if ( mreweight_met_phi ){
+    TFile * file_Met_phi_SF = new TFile("Met_phi_Wmunu_2018_ratio.root", "READ");
+    TH1D * gethist = (TH1D*)file_Met_phi_SF->Get("Met_phi_Wmunu_2018_ratio");
+    Met_phi_SF = (TH1D*) gethist->Clone("Met_phi_Wmunu_2018_ratio_clone");
+  }
+
   TString option = GetOption();
   mFout = TFile::Open(mOutFile.c_str(),"RECREATE");
 
@@ -476,6 +485,7 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["diCleanJet_M"] = *dijet_M;
     lTreeContent["MetNoLep_CleanJet_mindPhi"] = *JetMetmindPhi; 
     lTreeContent["MetNoLep_pt"] = *MetNoLep;
+    lTreeContent["MetNoLep_phi"] = *MetNoLep_phi;
     lTreeContent["CaloMET_pt"] = *CaloMET_pt;
     lTreeContent["Leading_jet_chHEF"] = *Leading_jet_chHEF;
     lTreeContent["Leading_jet_neHEF"] = *Leading_jet_neHEF;
@@ -540,6 +550,7 @@ void Events::SetTreeContent(std::string year){
 
     lTreeContent["MetNoLep_CleanJet_mindPhi"] = *MetNoLep_CleanJet_mindPhi;
     lTreeContent["MetNoLep_pt"] = *MetNoLep_pt;
+    lTreeContent["MetNoLep_phi"] = *MetNoLep_phi;
     lTreeContent["jet_chf_nhf_cut"] = *jet_chf_nhf_cut;
     lTreeContent["jet_chf_nhf_vtr_cut"] = *jet_chf_nhf_vtr_cut;
     lTreeContent["lMjj_dijet_dphi"] = *lMjj_dijet_dphi;
@@ -646,6 +657,21 @@ void Events::SetTreeContent(std::string year){
 Bool_t Events::BaseSelection(){
   
   bool pass=kTRUE;
+
+  //Remove events with HT < 100 in the QCD sample 
+  //due to very low statistics
+  if ( mProc == "QCD" || mProc == "QCDRELAX" ){
+    pass = pass && lTreeContent["LHE_HT"]>100; 
+  }
+
+  return pass;
+
+}
+
+//Apply the base selection to the events
+Bool_t Events::BaseSelectionAM(){
+  
+  bool pass=kTRUE;
   if (mCat==CatType::MTR){
 
     //If we are using Anne-Marie's trees we need
@@ -694,7 +720,7 @@ Double_t Events::BaseWeight(){
 
   //Only calculate the weight for Monte Carlo
   if ( misMC ){
-    double w = (lTreeContent["puWeight"])*(lTreeContent["xs_weight"])*mLumiPb*(lTreeContent["L1PreFiringWeight_Nom"]);
+    w = (lTreeContent["puWeight"])*(lTreeContent["xs_weight"])*mLumiPb*(lTreeContent["L1PreFiringWeight_Nom"]);
     
     double tauveto = lTreeContent["VLooseTauFix_eventVetoW"];
     double electronveto = lTreeContent["VetoElectron_eventVetoW"];
@@ -739,7 +765,6 @@ Bool_t Events::PassSelection(){
     pass = pass && lCleanCut2;
     pass = pass && lCleanCut3;
   }
-
 
   //////////////////////////////////
 
@@ -815,6 +840,8 @@ Bool_t Events::PassSelection(){
   //SIGNAL REGION
   
   if (mReg==RegionType::SR){
+
+  
     
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] > 0.5;
@@ -988,9 +1015,23 @@ Bool_t Events::PassSelection(){
   return pass;
 }
 
+//Reweight the MC based on the MET phi distribution
+//in the single muon control region
+Double_t Events::MetPhiWeight(){
+  double sf = Met_phi_SF->GetBinContent( Met_phi_SF->FindBin( lTreeContent["MetNoLep_phi"] ) );
+  return sf;
+}
+
 //Calculate the full weight of the selected event
 Double_t Events::SelWeight(){
   double w = 1.0;
+
+  //Get MET phi SF if neccessary
+  if ( misMC ){
+    if ( mreweight_met_phi ){
+      w *= MetPhiWeight();
+    }
+  }
 
   //Apply QCD k-factor SFs to MC
   if ( misMC ) {
@@ -1186,18 +1227,27 @@ Bool_t Events::Process(Long64_t entry)
   //   if ( entry > 100 ) Abort("maxevents");
 
   for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on cat
-    SetCategory(static_cast<sCatType>(iC));
-    if (!BaseSelection()){
-      continue;
+    SetCategory(static_cast<CatType>(iC));
+    if ( !misAM ){
+      if (!BaseSelection()){
+	continue;
+      }
     }
     for (unsigned iR(RegionType::SR); iR!=RegionType::Last; ++iR){//loop on region
       SetRegion(static_cast<RegionType>(iR));
+      if ( misAM ){
+	if (!BaseSelectionAM()){//Anne-Marie's trees require some additional cuts
+	  continue;
+	}
+      }
       if (!PassSelection()){
 	continue;
       }
       double weight = BaseWeight()*SelWeight();
 
       CalculateAdditionalVariables_Stage2();
+
+      
 
       for (unsigned iV(0); iV<mHistVec[iR][iC].size(); ++iV){
 	mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);

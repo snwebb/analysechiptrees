@@ -8,14 +8,12 @@ if os.path.exists("Plots/"+plotname) == False:
     os.mkdir("Plots/"+plotname)
 
 years = ["2017","2018"]
-#years = ["2017"]
 samples = ["MET","QCD","QCDRELAX","DY","EWKW","EWKZNUNU","EWKZll","GluGluHtoInv","TOP","VV","WJETS","ZJETS","DATA"]
 regions = ["MTR","VTR"]
 
 variables = ["MetNoLep_CleanJet_mindPhi_MetNoLep_pt","MetNoLep_CleanJet_mindPhi_diCleanJet_dPhi","MetNoLep_CleanJet_mindPhi_diCleanJet_dEta","MetNoLep_CleanJet_mindPhi_Leading_jet_pt","MetNoLep_CleanJet_mindPhi_Subleading_jet_pt","MetNoLep_CleanJet_mindPhi_dijet_met_balance","MetNoLep_CleanJet_mindPhi_Pileup_nPU","MetNoLep_CleanJet_mindPhi_diCleanJet_M","MetNoLep_CleanJet_mindPhi_lMjj","diCleanJet_dPhi_dijet_met_balance","diCleanJet_dEta_diCleanJet_M","lMjj_dijet_deta_lMjj","diCleanJet_dEta_LHE_HT","lMjj_dijet_deta_LHE_HT"]
 
 files = {}
-#PlotDir = "Plots"
 PlotDir = sys.argv[1]
 for year in years:
     for sample in samples:
@@ -47,8 +45,6 @@ def newplot(name,hist,xtitle,ytitle,ymin=None,ymax=None,norm=False):
     ROOT.gStyle.SetOptStat(0)
     return c
 
-#For Nick's method
-#variables = ["MetNoLep_CleanJet_mindPhi_MetNoLep_pt"]
 for region in regions:
     for year in years:
 
@@ -113,7 +109,6 @@ for region in regions:
                 if ( variable.find("mindPhi")!=-1):
                     x = variable.split("mindPhi",1)[0]+"mindPhi" 
                     y = variable.split("mindPhi",1)[1][1:]
-                    #elif (variable.find("diCleanJet_dEta_diCleanJet_M")!=-1):
                 elif (variable.find("diCleanJet_dEta")!=-1):
                     x = variable.split("dEta",1)[0]+"dEta" 
                     y = variable.split("dEta",1)[1][1:]
@@ -128,13 +123,8 @@ for region in regions:
                 if variable == "MetNoLep_CleanJet_mindPhi_lMjj" or variable == "MetNoLep_CleanJet_mindPhi_diCleanJet_M":
                     x = "min#Delta#Phi(jets,E_{T}^{miss,no #mu})"
                     y = "M_{jj} (GeV)"
-                print (x)
-                print (y)
                 ymin = None
                 ymax = None
-                # if ( variable == "MetNoLep_CleanJet_mindPhi_MetNoLep_pt" ):
-                #     ymin = 100
-                #     ymax = 160
                     
                 qcd = newplot(variable + "QCD",CRs[1],x,y,ymin,ymax, norm=True)
                 qcd.Draw()
@@ -149,7 +139,6 @@ for region in regions:
                 data.Draw()
                 data.SaveAs("Plots/" + plotname + "/MET_" + variable + "_" + region + "_" + year + ".png" )
                 data.Close()
-
 
 
 
