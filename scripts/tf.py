@@ -186,6 +186,7 @@ for region in regions:
                 QCDTransferFactor_SR.Draw()
                 QCDTransferFactor_SR.GetYaxis().SetTitle("Transfer factor, r")
                 QCDTransferFactor_SR.SetMinimum(-0.0001)
+                QCDTransferFactor_SR.SetMaximum(0.5)
                 ROOT.gStyle.SetOptStat(0);
                 c_1.Draw()
                 c_1.SaveAs("Plots/"+plotname + "/QCDTransferFactor_SR_" + region + "_" + year + ".png" )

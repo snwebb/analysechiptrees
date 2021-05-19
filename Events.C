@@ -609,6 +609,8 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
     lTreeContent["jetemW_MTR"] = *jetemW_MTR;
     lTreeContent["jetemW_VTR"] = *jetemW_VTR;
+    lTreeContent["jetHFW_MTR"] = *jetHFW_MTR;
+    lTreeContent["jetHFW_VTR"] = *jetHFW_VTR;
 
     if (includeAll){
       lTreeContent["decayLeptonId"] = *decayLeptonId;
@@ -663,6 +665,8 @@ Bool_t Events::BaseSelection(){
   if ( mProc == "QCD" || mProc == "QCDRELAX" ){
     pass = pass && lTreeContent["LHE_HT"]>100; 
   }
+
+  //pass = pass && (std::abs(lTreeContent["Leading_jet_eta"] < 2.9));//TEMP
 
   return pass;
 
@@ -774,12 +778,12 @@ Bool_t Events::PassSelection(){
   //Apply the circular Cut and HF HF removal 
   //(circular cut usually already applied in the trees)
   if (mCat==CatType::MTR){
-    pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutMTR"]));
-    pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < HFcut || abs(lTreeContent["Subleading_jet_eta"]) < HFcut );
+    //    pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutMTR"]));
+    //    pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < HFcut || abs(lTreeContent["Subleading_jet_eta"]) < HFcut );
   }
   else if (mCat==CatType::VTR){
-    pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutVTR"]));
-    pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < HFcut || abs(lTreeContent["lMjj_jet2_eta"]) < HFcut );
+    //    pass = pass && (static_cast<int>(lTreeContent["VecBDPhiCutVTR"]));
+    //    pass = pass && ( abs(lTreeContent["lMjj_jet1_eta"]) < HFcut || abs(lTreeContent["lMjj_jet2_eta"]) < HFcut );
   }
 
   //Apply the trigger selection
@@ -1039,10 +1043,12 @@ Double_t Events::SelWeight(){
     if ( mCat == CatType::MTR ){
       w *= lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"];
       w *= lTreeContent["jetemW_MTR"];
+      w *= lTreeContent["jetHFW_MTR"];
     }
     else if ( mCat == CatType::VTR ){
       w *= lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"];
       w *= lTreeContent["jetemW_VTR"];
+      w *= lTreeContent["jetHFW_VTR"];
     }
 
     w *= lTreeContent["fnlo_SF_QCD_corr_EWK_proc"];

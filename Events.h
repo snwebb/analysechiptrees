@@ -222,6 +222,8 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> fnlo_SF_QCD_corr_EWK_proc ;
    TTreeReaderValue<Double_t> jetemW_MTR ;
    TTreeReaderValue<Double_t> jetemW_VTR ;
+   TTreeReaderValue<Double_t> jetHFW_MTR ;
+   TTreeReaderValue<Double_t> jetHFW_VTR ;
    TTreeReaderValue<Double_t> hem_weight ;
    TTreeReaderValue<Double_t> trigger_weight_METMHT2018 ;
    TTreeReaderValue<Double_t> trigger_weight_VBF2018 ;
@@ -435,6 +437,8 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("fnlo_SF_QCD_corr_EWK_proc") !=0 ) fnlo_SF_QCD_corr_EWK_proc = { fReader,"fnlo_SF_QCD_corr_EWK_proc"};
   if (tree->GetBranch("jetemW_MTR") !=0 ) jetemW_MTR = {  fReader,"jetemW_MTR"};
   if (tree->GetBranch("jetemW_VTR") !=0 ) jetemW_VTR = {  fReader,"jetemW_VTR"};
+  if (tree->GetBranch("jetHFW_MTR") !=0 ) jetHFW_MTR = {  fReader,"jetHFW_MTR"};
+  if (tree->GetBranch("jetHFW_VTR") !=0 ) jetHFW_VTR = {  fReader,"jetHFW_VTR"};
   if (tree->GetBranch("hem_weight") !=0 ) hem_weight = {  fReader,"hem_weight"};
   if (tree->GetBranch("trigger_weight_METMHT2018") !=0 ) trigger_weight_METMHT2018 = { fReader,"trigger_weight_METMHT2018"};
   if (tree->GetBranch("trigger_weight_VBF2018") !=0 ) trigger_weight_VBF2018 = { fReader,"trigger_weight_VBF2018"};
