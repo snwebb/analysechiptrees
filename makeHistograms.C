@@ -52,11 +52,12 @@ int makeHistograms(){ //Main function
   
   //Choose which years to process
   std::vector<std::string> years = {"2017","2018"};  
-  //  std::vector<std::string> years = {"2018"};  
+  //std::vector<std::string> years = {"2018"};  
 
   //Choose which samples to process
   std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
   //  std::vector<std::string> proc = { "QCD", "QCDRELAX"};
+  //  std::vector<std::string> proc = { "MET"};
 
   //Name of the ROOT tree corresponding to each process. 
   //Generally it is the same as name of the process

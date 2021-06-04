@@ -22,9 +22,14 @@ if os.path.exists("Plots/"+plotname+"/SR") == False:
     os.mkdir("Plots/"+plotname+"/SR")
 if os.path.exists("Plots/"+plotname+"/CR") == False:
     os.mkdir("Plots/"+plotname+"/CR")
+if os.path.exists("Plots/"+plotname+"/HFNoise") == False:
+    os.mkdir("Plots/"+plotname+"/HFNoise")
+if os.path.exists("Plots/"+plotname+"/HFNoiseCR") == False:
+    os.mkdir("Plots/"+plotname+"/HFNoiseCR")
 
 #Choose which years to plot
 years = ["2017","2018"]
+#years = ["2018"]
 
 #Choose which samples to include on the plots
 #samples = ["MET","VV","TOP","DY","EWKZll","GluGluHtoInv","VBFHtoInv","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
@@ -64,6 +69,8 @@ for region in regions:
             CRs = []
             As = []
             Bs = []
+            HFs = []
+            HFCRs = []
             TFs = []
 
             #Load all input histograms to memory
@@ -72,13 +79,15 @@ for region in regions:
                 Bs.append(files[-1].Get("QCDB/"+region+"/h_QCDB_"+region+"_" + variable))
                 As.append(files[-1].Get("QCDA/"+region+"/h_QCDA_"+region+"_" + variable))
                 SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
+                HFs.append(files[-1].Get("HFNoise/"+region+"/h_HFNoise_"+region+"_" + variable))
+                HFCRs.append(files[-1].Get("HFNoiseCR/"+region+"/h_HFNoiseCR_"+region+"_" + variable))
                 CRs.append(files[-1].Get("QCDCR/"+region+"/h_QCDCR_"+region+"_" + variable))
 
             #Processing of Method A, i.e. calculating the background-subtracted data and the 
             #transfer-factors in the mjj distribution
 
             #Rebin the mjj distribution if necessary
-            for i,(A,B,SR,CR) in enumerate(zip(As,Bs,SRs,CRs)):
+            for i,(A,B,SR,HF,HFCR,CR) in enumerate(zip(As,Bs,SRs,HFs,HFCRs,CRs)):
                 if variable == "diCleanJet_M_binned":
                     if rebin == 0:
                         mjjbins=array('d',[0,200,400,600,900,1200,1500,2000,2750,3500,5000])
@@ -90,6 +99,8 @@ for region in regions:
                     Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
                     CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
                     SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
+                    HFs[i] = HF.Rebin(len(mjjbins)-1,"HF_rebinned",mjjbins)
+                    HFCRs[i] = HFCR.Rebin(len(mjjbins)-1,"HFCR_rebinned",mjjbins)
                 elif variable == "lMjj_binned":
                     if rebin == 0:
                         mjjbins=array('d',[0,900,1200,1500,2000,2750,5000])
@@ -102,6 +113,8 @@ for region in regions:
                     Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
                     CRs[i] = CR.Rebin(len(mjjbins)-1,"CR_rebinned",mjjbins)
                     SRs[i] = SR.Rebin(len(mjjbins)-1,"SR_rebinned",mjjbins)
+                    HFs[i] = HF.Rebin(len(mjjbins)-1,"HF_rebinned",mjjbins)
+                    HFCRs[i] = HFCR.Rebin(len(mjjbins)-1,"HFCR_rebinned",mjjbins)
 
 
 
@@ -110,6 +123,8 @@ for region in regions:
                 #Get Data - background subtracted for the mjj distribution                
                 file_out = ROOT.TFile("Plots/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
                 BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_SR")
+                BackgroundSubtractedData_HF = HFs[0].Clone("BackgroundSubtractedData_HF")
+                BackgroundSubtractedData_HFCR = HFCRs[0].Clone("HFTemplate")
                 BackgroundSubtractedData_CR = CRs[0].Clone("BackgroundSubtractedData_CR")
                 BackgroundSubtractedData_A = As[-1].Clone("BackgroundSubtractedData_A")
                 BackgroundSubtractedData_B = Bs[-1].Clone("BackgroundSubtractedData_B")
@@ -119,6 +134,14 @@ for region in regions:
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
                     BackgroundSubtractedData_SR.Add(SR,-1)
+                for i,HF in enumerate(HFs):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                        continue
+                    BackgroundSubtractedData_HF.Add(HF,-1)
+                for i,HFCR in enumerate(HFCRs):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                        continue
+                    BackgroundSubtractedData_HFCR.Add(HFCR,-1)
                 for i,CR in enumerate(CRs):
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
@@ -152,6 +175,8 @@ for region in regions:
                 FinalQCDB.Multiply(QCDTransferFactor_B)
 
                 QCDMC_SR = SRs[-3].Clone("QCDMC_SR")
+                QCDMC_HF = SRs[-3].Clone("QCDMC_HF")
+                QCDMC_HFCR = SRs[-3].Clone("QCDMC_HFCR")
                 QCDMC_CR = CRs[-3].Clone("QCDMC_CR")
 
                 QCDMC_B = Bs[-3].Clone("QCDMC_B")
@@ -159,11 +184,13 @@ for region in regions:
 
                 #Write all relevant hists to output root file:
 
-                for i,(sr,cr,a,b) in enumerate(zip(SRs,CRs,As,Bs)):
+                for i,(sr,cr,a,b,hf,hfcr) in enumerate(zip(SRs,CRs,As,Bs,HFs,HFCRs)):
                     sr.Write(samples[i]+"_SR")
                     cr.Write(samples[i]+"_CR")
                     a.Write(samples[i]+"_A")
                     b.Write(samples[i]+"_B")
+                    hf.Write(samples[i]+"_HFNoise")
+                    hfcr.Write(samples[i]+"_HFNoiseCR")
                 
                 QCDTransferFactor_SR.Write()
                 QCDTransferFactor_B.Write()
@@ -172,11 +199,15 @@ for region in regions:
                 BackgroundSubtractedData_B.Write()
                 BackgroundSubtractedData_CR.Write()
                 BackgroundSubtractedData_SR.Write()
+                BackgroundSubtractedData_HF.Write()
+                BackgroundSubtractedData_HFCR.Write()
 
                 FinalQCDSR.Write()
                 FinalQCDB.Write()
 
                 QCDMC_SR.Write()
+                QCDMC_HF.Write()
+                QCDMC_HFCR.Write()
                 QCDMC_CR.Write()
 
                 #Plotting relevant histograms:
@@ -395,6 +426,140 @@ for region in regions:
             c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
             c_SR.Close()
 
+
+
+
+
+            #HF   
+            leg_HF = ROOT.TLegend(0.45,0.75,0.87,0.89)
+            leg_HF.SetNColumns(2)
+            ROOT.gStyle.SetLegendBorderSize(0)
+            c_HF = ROOT.TCanvas("stackplot_" + variable)
+            p1_HF = ROOT.TPad("HFmain","",0,0.3,1,1)
+            p2_HF = ROOT.TPad("HFratio","",0,0,1,0.3)
+            p1_HF.Draw()
+            p1_HF.cd()
+            ROOT.gStyle.SetOptStat(0);
+            ROOT.gPad.SetBottomMargin(0)
+            stack_HF = ROOT.THStack("hs_HF","")
+            MCSum = CRs[0].Clone("HF_MCSum")
+            MCSum.Reset()
+            for i,HF in enumerate(HFs):
+                if ( variable == "MetNoLep_CleanJet_mindPhi" ):
+                    HF.Rebin(5)
+
+                if ( variable == "diCleanJet_M_LeadingPosEta" or variable == "diCleanJet_M_LeadingNegEta" ):
+                    xbins = array('d', [0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000])
+                    HF = HF.Rebin(len(xbins)-1,"HF_rebinned",xbins)
+                    HFs[i] = HF
+
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
+                    continue
+                HF.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                HF.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                if ( samples[i] == "QCD"):
+                    HF.SetLineColor(1)
+                leg_HF.AddEntry(HF,samples[i],"F")
+                MCSum.Add(HF)
+                stack_HF.Add(HF)
+            HFs[0].Draw()
+            HF_Ratio = HFs[0].Clone("HF_Ratio")
+            HF_Ratio.Divide(MCSum)
+            HFs[0].SetMinimum(0)
+            stack_HF.Draw("HISTsame")
+            stack_HF.SetMinimum(0)
+            HFs[0].Draw("same")
+            leg_HF.Draw()
+            if ( HFs[0].Integral()>0 ):
+                HFs[0].SetMinimum(1)
+                ROOT.gPad.SetLogy(log)
+                if ( log ):
+                    HFs[0].SetMaximum(HFs[0].GetMaximum()*10)
+                else:
+                    HFs[0].SetMaximum(HFs[0].GetMaximum()*1.5)
+            c_HF.cd()
+            p2_HF.Draw()
+            p2_HF.cd()
+            p2_HF.SetGrid()
+            ROOT.gPad.SetTopMargin(0)
+            ROOT.gPad.SetBottomMargin(0.3)
+            ROOT.gStyle.SetOptStat(0);
+            HF_Ratio.Draw()
+            
+            HF_Ratio.GetYaxis().SetRangeUser(0,2)
+            c_HF.cd()
+            c_HF.Draw()
+            c_HF.SaveAs("Plots/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".png")
+            c_HF.SaveAs("Plots/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".C")
+            c_HF.SaveAs("Plots/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".pdf")
+            c_HF.Close()
+
+
+
+
+            #HF CR
+            leg_HFCR = ROOT.TLegend(0.45,0.75,0.87,0.89)
+            leg_HFCR.SetNColumns(2)
+            ROOT.gStyle.SetLegendBorderSize(0)
+            c_HFCR = ROOT.TCanvas("stackplot_" + variable)
+            p1_HFCR = ROOT.TPad("HFCRmain","",0,0.3,1,1)
+            p2_HFCR = ROOT.TPad("HFCRratio","",0,0,1,0.3)
+            p1_HFCR.Draw()
+            p1_HFCR.cd()
+            ROOT.gStyle.SetOptStat(0);
+            ROOT.gPad.SetBottomMargin(0)
+            stack_HFCR = ROOT.THStack("hs_HFCR","")
+            MCSum = CRs[0].Clone("HFCR_MCSum")
+            MCSum.Reset()
+            for i,HFCR in enumerate(HFCRs):
+                if ( variable == "MetNoLep_CleanJet_mindPhi" ):
+                    HFCR.Rebin(5)
+
+                if ( variable == "diCleanJet_M_LeadingPosEta" or variable == "diCleanJet_M_LeadingNegEta" ):
+                    xbins = array('d', [0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000])
+                    HFCR = HFCR.Rebin(len(xbins)-1,"HFCR_rebinned",xbins)
+                    HFCRs[i] = HFCR
+
+                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
+                    continue
+                HFCR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                HFCR.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
+                if ( samples[i] == "QCD"):
+                    HFCR.SetLineColor(1)
+                leg_HFCR.AddEntry(HFCR,samples[i],"F")
+                MCSum.Add(HFCR)
+                stack_HFCR.Add(HFCR)
+            HFCRs[0].Draw()
+            HFCR_Ratio = HFCRs[0].Clone("HFCR_Ratio")
+            HFCR_Ratio.Divide(MCSum)
+            HFCRs[0].SetMinimum(0)
+            stack_HFCR.Draw("HISTsame")
+            stack_HFCR.SetMinimum(0)
+            HFCRs[0].Draw("same")
+            leg_HFCR.Draw()
+            if ( HFCRs[0].Integral()>0 ):
+                HFCRs[0].SetMinimum(1)
+                ROOT.gPad.SetLogy(log)
+                if ( log ):
+                    HFCRs[0].SetMaximum(HFCRs[0].GetMaximum()*10)
+                else:
+                    HFCRs[0].SetMaximum(HFCRs[0].GetMaximum()*1.5)
+            c_HFCR.cd()
+            p2_HFCR.Draw()
+            p2_HFCR.cd()
+            p2_HFCR.SetGrid()
+            ROOT.gPad.SetTopMargin(0)
+            ROOT.gPad.SetBottomMargin(0.3)
+            ROOT.gStyle.SetOptStat(0);
+            HFCR_Ratio.Draw()
+            
+            HFCR_Ratio.GetYaxis().SetRangeUser(0,2)
+            c_HFCR.cd()
+            c_HFCR.Draw()
+            c_HFCR.SaveAs("Plots/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".png")
+            c_HFCR.SaveAs("Plots/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".C")
+            c_HFCR.SaveAs("Plots/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".pdf")
+            c_HFCR.Close()
 
 
 
