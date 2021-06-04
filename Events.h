@@ -30,7 +30,7 @@
 #include <functional>
 #include <tuple>
 
-enum RegionType { SR=0, QCDCR=1,  QCDA=2, QCDB=3,Last};
+enum RegionType { SR=0, QCDCR=1,  QCDA=2, QCDB=3, HFNoise=4, HFNoiseCR=5, Last};
 enum CatType { MTR=0,  VTR=1,  LastCat };
 
 class Events : public TSelector {
@@ -99,6 +99,7 @@ class Events : public TSelector {
    TH1D * Met_phi_SF;
 
    Double_t MetPhiWeight();
+   Double_t HFNoiseWeight();
    Bool_t BaseSelection();
    Bool_t BaseSelectionAM();
    Double_t BaseWeight();
@@ -127,6 +128,10 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> VBF_VTR_QCD_CR_eff_Sel ;
    TTreeReaderValue<Double_t> VBF_MTR_QCD_SR_eff_Sel ;
    TTreeReaderValue<Double_t> VBF_VTR_QCD_SR_eff_Sel ;
+   TTreeReaderValue<Double_t> VBF_MTR_QCD_HFNoise_eff_Sel ;
+   TTreeReaderValue<Double_t> VBF_VTR_QCD_HFNoise_eff_Sel ;
+   TTreeReaderValue<Double_t> VBF_MTR_QCD_HFNoiseCR_eff_Sel ;
+   TTreeReaderValue<Double_t> VBF_VTR_QCD_HFNoiseCR_eff_Sel ;
    TTreeReaderValue<Double_t> VBF_MTR_QCD_A_eff_Sel ;
    TTreeReaderValue<Double_t> VBF_VTR_QCD_A_eff_Sel ;
    TTreeReaderValue<Double_t> VBF_MTR_QCD_B_eff_Sel ;
@@ -162,6 +167,9 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> MetNoLep_CleanJet_mindPhi ;
    TTreeReaderValue<Double_t> MetNoLep_pt ;
    TTreeReaderValue<Double_t> MetNoLep_phi ;
+   TTreeReaderValue<Double_t> min_dphi ;
+   TTreeReaderValue<Double_t> CorrectedMetNoLep_pt ;
+   TTreeReaderValue<Double_t> CorrectedMetNoLep_phi ;
    TTreeReaderValue<Double_t> MET_pt ;
    TTreeReaderValue<Double_t> MET_phi ;
    TTreeReaderValue<Double_t> MET_sumEt ;
@@ -224,6 +232,8 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> jetemW_VTR ;
    TTreeReaderValue<Double_t> jetHFW_MTR ;
    TTreeReaderValue<Double_t> jetHFW_VTR ;
+   TTreeReaderValue<Double_t> jetHFW_NoiseRateMTR ;
+   TTreeReaderValue<Double_t> jetHFW_NoiseRateVTR ;
    TTreeReaderValue<Double_t> hem_weight ;
    TTreeReaderValue<Double_t> trigger_weight_METMHT2018 ;
    TTreeReaderValue<Double_t> trigger_weight_VBF2018 ;
@@ -342,6 +352,10 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("VBF_VTR_QCD_CR_eff_Sel") !=0 ) VBF_VTR_QCD_CR_eff_Sel = { fReader,"VBF_VTR_QCD_CR_eff_Sel"};
   if (tree->GetBranch("VBF_MTR_QCD_SR_eff_Sel") !=0 ) VBF_MTR_QCD_SR_eff_Sel = { fReader,"VBF_MTR_QCD_SR_eff_Sel"};
   if (tree->GetBranch("VBF_VTR_QCD_SR_eff_Sel") !=0 ) VBF_VTR_QCD_SR_eff_Sel = { fReader,"VBF_VTR_QCD_SR_eff_Sel"};
+  if (tree->GetBranch("VBF_MTR_QCD_HFNoise_eff_Sel") !=0 ) VBF_MTR_QCD_HFNoise_eff_Sel = { fReader,"VBF_MTR_QCD_HFNoise_eff_Sel"};
+  if (tree->GetBranch("VBF_VTR_QCD_HFNoise_eff_Sel") !=0 ) VBF_VTR_QCD_HFNoise_eff_Sel = { fReader,"VBF_VTR_QCD_HFNoise_eff_Sel"};
+  if (tree->GetBranch("VBF_MTR_QCD_HFNoiseCR_eff_Sel") !=0 ) VBF_MTR_QCD_HFNoiseCR_eff_Sel = { fReader,"VBF_MTR_QCD_HFNoiseCR_eff_Sel"};
+  if (tree->GetBranch("VBF_VTR_QCD_HFNoiseCR_eff_Sel") !=0 ) VBF_VTR_QCD_HFNoiseCR_eff_Sel = { fReader,"VBF_VTR_QCD_HFNoiseCR_eff_Sel"};
   if (tree->GetBranch("VBF_MTR_QCD_A_eff_Sel") !=0 ) VBF_MTR_QCD_A_eff_Sel = {  fReader,"VBF_MTR_QCD_A_eff_Sel"};
   if (tree->GetBranch("VBF_VTR_QCD_A_eff_Sel") !=0 ) VBF_VTR_QCD_A_eff_Sel = {  fReader,"VBF_VTR_QCD_A_eff_Sel"};
   if (tree->GetBranch("VBF_MTR_QCD_B_eff_Sel") !=0 ) VBF_MTR_QCD_B_eff_Sel = {  fReader,"VBF_MTR_QCD_B_eff_Sel"};
@@ -377,6 +391,11 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("MetNoLep_CleanJet_mindPhi") !=0 ) MetNoLep_CleanJet_mindPhi = { fReader,"MetNoLep_CleanJet_mindPhi"};
   if (tree->GetBranch("MetNoLep_pt") !=0 ) MetNoLep_pt = {  fReader,"MetNoLep_pt"};
   if (tree->GetBranch("MetNoLep_phi") !=0 ) MetNoLep_phi = {  fReader,"MetNoLep_phi"};
+
+  if (tree->GetBranch("min_dphi") !=0 ) min_dphi = { fReader,"min_dphi"};
+  if (tree->GetBranch("CorrectedMetNoLep_pt") !=0 ) CorrectedMetNoLep_pt = {  fReader,"CorrectedMetNoLep_pt"};
+  if (tree->GetBranch("CorrectedMetNoLep_phi") !=0 ) CorrectedMetNoLep_phi = {  fReader,"CorrectedMetNoLep_phi"};
+
   /* if (tree->GetBranch("MET_pt") !=0 ) MET_pt = {    fReader,"MET_pt"}; */
   /* if (tree->GetBranch("MET_phi") !=0 ) MET_phi = {   fReader,"MET_phi"}; */
   /* if (tree->GetBranch("MET_sumEt") !=0 ) MET_sumEt = { fReader,"MET_sumEt"}; */
@@ -439,6 +458,8 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("jetemW_VTR") !=0 ) jetemW_VTR = {  fReader,"jetemW_VTR"};
   if (tree->GetBranch("jetHFW_MTR") !=0 ) jetHFW_MTR = {  fReader,"jetHFW_MTR"};
   if (tree->GetBranch("jetHFW_VTR") !=0 ) jetHFW_VTR = {  fReader,"jetHFW_VTR"};
+  if (tree->GetBranch("jetHFW_NoiseRateMTR") !=0 ) jetHFW_NoiseRateMTR = {  fReader,"jetHFW_NoiseRateMTR"};
+  if (tree->GetBranch("jetHFW_NoiseRateVTR") !=0 ) jetHFW_NoiseRateVTR = {  fReader,"jetHFW_NoiseRateVTR"};
   if (tree->GetBranch("hem_weight") !=0 ) hem_weight = {  fReader,"hem_weight"};
   if (tree->GetBranch("trigger_weight_METMHT2018") !=0 ) trigger_weight_METMHT2018 = { fReader,"trigger_weight_METMHT2018"};
   if (tree->GetBranch("trigger_weight_VBF2018") !=0 ) trigger_weight_VBF2018 = { fReader,"trigger_weight_VBF2018"};

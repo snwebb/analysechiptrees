@@ -373,7 +373,7 @@ void Events::SetCategory(const CatType & aCategory){
 
 //Get the region in string format
 std::string Events::GetRegionStr(const RegionType & aRegion){
-  std::string reg[4] = {"SR","QCDCR","QCDA","QCDB"};
+  std::string reg[6] = {"SR","QCDCR","QCDA","QCDB","HFNoise","HFNoiseCR"};
   if (aRegion==RegionType::Last) return "";
   return reg[static_cast<unsigned>(aRegion)];
 }
@@ -431,6 +431,8 @@ void Events::SetTreeContent(std::string year){
   lTreeContent["nLoosePhoton"] = *nLoosePhoton;
   lTreeContent["nLooseMuon"] = *nLooseMuon;
   lTreeContent["Subleading_jet_pt"] = *Subleading_jet_pt;
+  lTreeContent["jetHFW_NoiseRateMTR"] = *jetHFW_NoiseRateMTR;
+  lTreeContent["jetHFW_NoiseRateVTR"] = *jetHFW_NoiseRateVTR;
 
   if ( includeAll ){
     lTreeContent["Wenu_flag"] = *Wenu_flag;
@@ -542,15 +544,19 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["VBF_VTR_QCD_A_eff_Sel"] = 1; 
     lTreeContent["VBF_MTR_QCD_B_eff_Sel"] = 1; 
     lTreeContent["VBF_VTR_QCD_B_eff_Sel"] = 1; 
+    lTreeContent["VBF_MTR_QCD_HFNoise_eff_Sel"] = 1; 
+    lTreeContent["VBF_VTR_QCD_HFNoise_eff_Sel"] = 1; 
+    lTreeContent["VBF_MTR_QCD_HFNoiseCR_eff_Sel"] = 1; 
+    lTreeContent["VBF_VTR_QCD_HFNoiseCR_eff_Sel"] = 1; 
 
   }
   else{
     lTreeContent["diCleanJet_M"] = *diCleanJet_M;
     lTreeContent["lMjj"] = *lMjj;
 
-    lTreeContent["MetNoLep_CleanJet_mindPhi"] = *MetNoLep_CleanJet_mindPhi;
-    lTreeContent["MetNoLep_pt"] = *MetNoLep_pt;
-    lTreeContent["MetNoLep_phi"] = *MetNoLep_phi;
+    lTreeContent["MetNoLep_CleanJet_mindPhi"] = *min_dphi;
+    lTreeContent["MetNoLep_pt"] = *CorrectedMetNoLep_pt;
+    lTreeContent["MetNoLep_phi"] = *CorrectedMetNoLep_phi;
     lTreeContent["jet_chf_nhf_cut"] = *jet_chf_nhf_cut;
     lTreeContent["jet_chf_nhf_vtr_cut"] = *jet_chf_nhf_vtr_cut;
     lTreeContent["lMjj_dijet_dphi"] = *lMjj_dijet_dphi;
@@ -585,6 +591,10 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["VBF_VTR_QCD_B_eff_Sel"] = * VBF_VTR_QCD_B_eff_Sel; 
     lTreeContent["VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel"] = * VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel; 
     lTreeContent["VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel"] = * VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel; 
+    lTreeContent["VBF_MTR_QCD_HFNoise_eff_Sel"] = * VBF_MTR_QCD_HFNoise_eff_Sel;
+    lTreeContent["VBF_VTR_QCD_HFNoise_eff_Sel"] = * VBF_VTR_QCD_HFNoise_eff_Sel;
+    lTreeContent["VBF_MTR_QCD_HFNoiseCR_eff_Sel"] = * VBF_MTR_QCD_HFNoiseCR_eff_Sel;
+    lTreeContent["VBF_VTR_QCD_HFNoiseCR_eff_Sel"] = * VBF_VTR_QCD_HFNoiseCR_eff_Sel;
 
   }
 
@@ -792,7 +802,7 @@ Bool_t Events::PassSelection(){
 
     //The MET and triggers are used in the SR and QCDCR, 
     //whilst the JetHT triggers are used in the QCDA and QCDB region
-    if (mReg==RegionType::SR || (mReg==RegionType::QCDCR) ){
+    if (mReg==RegionType::SR || mReg==RegionType::QCDCR || mReg==RegionType::HFNoise || mReg==RegionType::HFNoiseCR ){
       pass = pass && (static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"])==1 || static_cast<int>(lTreeContent["HLT_PFMETNoMu120_PFMHTNoMu120_IDTight"])==1);
     }
     else{
@@ -815,7 +825,7 @@ Bool_t Events::PassSelection(){
   }
   else if  (mCat==CatType::VTR){
     lcat = "VTR";
-    if (mReg==RegionType::SR || (mReg==RegionType::QCDCR) ){
+    if (mReg==RegionType::SR || mReg==RegionType::QCDCR || mReg==RegionType::HFNoise || mReg==RegionType::HFNoiseCR ){
       pass = pass && (static_cast<int>(lTreeContent["HLT_DiJet110_35_Mjj650_PFMET110"])==1 || static_cast<int>(lTreeContent["HLT_TripleJet110_35_35_Mjj650_PFMET110"])==1);
     }
     else{
@@ -841,11 +851,9 @@ Bool_t Events::PassSelection(){
 
   //Now apply the specific cuts for each of the regions
 
-  //SIGNAL REGION
+  //SIGNAL AND HFNOISE REGIONS
   
-  if (mReg==RegionType::SR){
-
-  
+  if (mReg==RegionType::SR || mReg==RegionType::HFNoise){  
     
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] > 0.5;
@@ -873,7 +881,7 @@ Bool_t Events::PassSelection(){
     }
     else{
       //This is the main selection flag encompassing all other cuts
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_SR_eff_Sel"]));
+      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_"+GetRegionStr(mReg)+"_eff_Sel"]));
     }
       
     //////////////////////////////////
@@ -888,7 +896,7 @@ Bool_t Events::PassSelection(){
     }
     
   }
-  else if (mReg==RegionType::QCDCR){   //QCD CONTROL REGION
+  else if (mReg==RegionType::QCDCR || mReg==RegionType::HFNoiseCR){   //QCD CONTROL REGION
     
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] < 0.5;
@@ -916,7 +924,10 @@ Bool_t Events::PassSelection(){
     }
     else{
       //This is the main selection flag encompassing all other cuts
-      pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_CR_eff_Sel"]));
+      if ( mReg==RegionType::QCDCR )
+	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_CR_eff_Sel"]));
+      else
+	pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_HFNoiseCR_eff_Sel"]));
     }
     
     //////////////////////////////////
@@ -1026,6 +1037,29 @@ Double_t Events::MetPhiWeight(){
   return sf;
 }
 
+
+//Calculate the HFNoiseRate of the selected event
+Double_t Events::HFNoiseWeight(){
+  double w = 1.0; 
+
+  if (mCat==CatType::MTR){   
+    if ( lTreeContent["jetHFW_NoiseRateMTR"] <= 0.99){
+      w = lTreeContent["jetHFW_NoiseRateMTR"]/(1-lTreeContent["jetHFW_NoiseRateMTR"]);
+    }
+    else{
+      std::cout << "weight is zero - should not happen" << std::endl;
+    }
+  }else if (mCat==CatType::VTR){
+    if ( lTreeContent["jetHFW_NoiseRateVTR"] <= 0.99){
+      w = lTreeContent["jetHFW_NoiseRateVTR"]/(1-lTreeContent["jetHFW_NoiseRateVTR"]);
+    }
+    else{
+      std::cout << "weight is zero - should not happen" << std::endl;
+    }
+  }
+
+  return w;
+}
 //Calculate the full weight of the selected event
 Double_t Events::SelWeight(){
   double w = 1.0;
@@ -1059,7 +1093,7 @@ Double_t Events::SelWeight(){
 
   //Apply trigger SFs
   //In the SR and QCDCR only apply a weight to MC
-  if (mReg==RegionType::SR || (mReg==RegionType::QCDCR) ){
+  if (mReg==RegionType::SR || mReg==RegionType::QCDCR || mReg==RegionType::HFNoise || mReg==RegionType::HFNoiseCR){
     
     if ( misMC ) {
       if ( mCat == CatType::MTR ){
@@ -1251,9 +1285,11 @@ Bool_t Events::Process(Long64_t entry)
       }
       double weight = BaseWeight()*SelWeight();
 
-      CalculateAdditionalVariables_Stage2();
+      if ( mReg == RegionType::HFNoise || mReg == RegionType::HFNoiseCR ){
+	weight *= HFNoiseWeight ();
+      }
 
-      
+      CalculateAdditionalVariables_Stage2();
 
       for (unsigned iV(0); iV<mHistVec[iR][iC].size(); ++iV){
 	mHistVec[iR][iC][iV]->Fill(lTreeContent[mVarVec[iV]],weight);
