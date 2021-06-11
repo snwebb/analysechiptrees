@@ -596,6 +596,8 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["VBF_MTR_QCD_HFNoiseCR_eff_Sel"] = * VBF_MTR_QCD_HFNoiseCR_eff_Sel;
     lTreeContent["VBF_VTR_QCD_HFNoiseCR_eff_Sel"] = * VBF_VTR_QCD_HFNoiseCR_eff_Sel;
 
+    lTreeContent["ContainedHFjet"] = * ContainedHFjet;
+
   }
 
   //Variables that are only needed for Monte Carlo
@@ -877,7 +879,14 @@ Bool_t Events::PassSelection(){
       }
       else if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
+      }      
+      if ( mReg==RegionType::SR ){ 
+	pass = pass && !(static_cast<int>(lTreeContent["ContainedHFjet"]));
       }
+      else{
+	pass = pass && (static_cast<int>(lTreeContent["ContainedHFjet"]));
+      }
+
     }
     else{
       //This is the main selection flag encompassing all other cuts
@@ -921,6 +930,13 @@ Bool_t Events::PassSelection(){
       else if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi; 
       }
+      if ( mReg==RegionType::SR ){ 
+	pass = pass && !(static_cast<int>(lTreeContent["ContainedHFjet"]));
+      }
+      else{
+	pass = pass && (static_cast<int>(lTreeContent["ContainedHFjet"]));
+      }
+
     }
     else{
       //This is the main selection flag encompassing all other cuts
@@ -960,13 +976,13 @@ Bool_t Events::PassSelection(){
     if ( mProc == "QCDRELAX" ){
       //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi;
       }
       else if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi;
       }
-
     }
     else{
       //This is the main selection flag encompassing all other cuts
@@ -1003,10 +1019,11 @@ Bool_t Events::PassSelection(){
     if ( mProc == "QCDRELAX" ){
       //This is the main selection flag encompassing all other cuts
       pass = pass && (static_cast<int>(lTreeContent["VBF_"+lcat+"_QCD_NoDijetDphiOrMetPt_eff_Sel"]));
+
       if ( mCat == CatType::MTR ){
 	pass = pass && lTreeContent["diCleanJet_dPhi"]<cut_lMjj_dijet_dphi;
       }
-      if ( mCat == CatType::VTR ){
+      else if ( mCat == CatType::VTR ){
 	pass = pass && lTreeContent["lMjj_dijet_dphi"]<cut_lMjj_dijet_dphi; 
       }
     }

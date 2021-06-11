@@ -138,6 +138,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> VBF_VTR_QCD_B_eff_Sel ;
    TTreeReaderValue<Double_t> VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel ;
    TTreeReaderValue<Double_t> VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel ;
+   TTreeReaderValue<Double_t> ContainedHFjet ;
    TTreeReaderValue<Double_t> DiVetoElectron_mass ;
    TTreeReaderValue<Double_t> DiLooseMuon_mass ;
    TTreeReaderValue<Double_t> Leading_el_pt ;
@@ -362,6 +363,8 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("VBF_VTR_QCD_B_eff_Sel") !=0 ) VBF_VTR_QCD_B_eff_Sel = {  fReader,"VBF_VTR_QCD_B_eff_Sel"};
   if (tree->GetBranch("VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel") !=0 ) VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel = {  fReader,"VBF_VTR_QCD_NoDijetDphiOrMetPt_eff_Sel"};
   if (tree->GetBranch("VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel") !=0 ) VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel = {  fReader,"VBF_MTR_QCD_NoDijetDphiOrMetPt_eff_Sel"};
+  if (tree->GetBranch("ContainedHFjet") !=0 ) ContainedHFjet = {  fReader,"ContainedHFjet"};
+
   //  if (tree->GetBranch("DiVetoElectron_mass") !=0 ) DiVetoElectron_mass = {    fReader,"DiVetoElectron_mass"};
   //  if (tree->GetBranch("DiLooseMuon_mass") !=0 ) DiLooseMuon_mass = {  fReader,"DiLooseMuon_mass"};
   /* if (tree->GetBranch("Leading_el_pt") !=0 ) Leading_el_pt = {fReader,"Leading_el_pt"}; */

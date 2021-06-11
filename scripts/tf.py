@@ -123,8 +123,8 @@ for region in regions:
                 #Get Data - background subtracted for the mjj distribution                
                 file_out = ROOT.TFile("Plots/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
                 BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_SR")
-                BackgroundSubtractedData_HF = HFs[0].Clone("BackgroundSubtractedData_HF")
-                BackgroundSubtractedData_HFCR = HFCRs[0].Clone("HFTemplate")
+                BackgroundSubtractedData_HF = HFs[0].Clone("HFTemplate")
+                BackgroundSubtractedData_HFCR = HFCRs[0].Clone("BackgroundSubtractedData_HFCR")
                 BackgroundSubtractedData_CR = CRs[0].Clone("BackgroundSubtractedData_CR")
                 BackgroundSubtractedData_A = As[-1].Clone("BackgroundSubtractedData_A")
                 BackgroundSubtractedData_B = Bs[-1].Clone("BackgroundSubtractedData_B")
