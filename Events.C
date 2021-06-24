@@ -387,9 +387,11 @@ std::string Events::GetCatStr(const CatType & aCat){
 
 //Set the luminosity to scale the MC by 
 //(which is different for 2017 and 2018)
-void Events::SetLumiPb(const double & aLumi){
+void Events::SetLumiPb(const double & aLumi, const double & aLumi_VTR){
   mLumiPb = aLumi;
-  std::cout << " -- INFO: setting lumi to " << mLumiPb << " pb " << std::endl;
+  mLumiPb_VTR = aLumi_VTR;
+  std::cout << " -- INFO: setting MTR lumi to " << mLumiPb << " pb " << std::endl;
+  std::cout << " -- INFO: setting VTR lumi to " << mLumiPb_VTR << " pb " << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -433,7 +435,6 @@ void Events::SetTreeContent(std::string year){
   lTreeContent["Subleading_jet_pt"] = *Subleading_jet_pt;
   lTreeContent["jetHFW_NoiseRateMTR"] = *jetHFW_NoiseRateMTR;
   lTreeContent["jetHFW_NoiseRateVTR"] = *jetHFW_NoiseRateVTR;
-
   if ( includeAll ){
     lTreeContent["Wenu_flag"] = *Wenu_flag;
     lTreeContent["Zee_flag"] = *Zee_flag;
@@ -459,28 +460,25 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["Subleading_muon_phi"] = *Subleading_muon_phi;
     lTreeContent["PV_npvsGood"] = *PV_npvsGood;
     lTreeContent["DiLooseMuon_mass"] = *DiLooseMuon_mass;
-    lTreeContent["MET_phi"] = *MET_phi;
-    lTreeContent["MET_pt"] = *MET_pt;
   }
-
   //Specific Treatment for 2017 and 2018
   if ( year == "2017"){
-    lTreeContent["L1PreFiringWeight_Nom"] = *L1PreFiringWeight_Nom;
+    lTreeContent["PrefireWeight"] = *PrefireWeight;
     lTreeContent["trigger_weight_METMHT"] = *trigger_weight_METMHT2017;
     lTreeContent["trigger_weight_VBF"] = *trigger_weight_VBF2017;
     if (includeAll){
       lTreeContent["trigger_weight_SingleEle35"] = *trigger_weight_SingleEle352017;
     }
+
   }
   else if  ( year == "2018"){
-    lTreeContent["L1PreFiringWeight_Nom"] = 1;
+    lTreeContent["PrefireWeight"] = 1;
     lTreeContent["trigger_weight_METMHT"] = *trigger_weight_METMHT2018;
     lTreeContent["trigger_weight_VBF"] = *trigger_weight_VBF2018;
     if (includeAll){
       lTreeContent["trigger_weight_SingleEle32"] = *trigger_weight_SingleEle322018;
     }
   }
-
   //Variables that have a different name
   //if running over Anne Marie's trees
   if (misAM){
@@ -492,6 +490,7 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["Leading_jet_chHEF"] = *Leading_jet_chHEF;
     lTreeContent["Leading_jet_neHEF"] = *Leading_jet_neHEF;
     lTreeContent["Subleading_jet_chHEF"] = *Subleading_jet_chHEF;
+
     lTreeContent["Subleading_jet_neHEF"] = *Subleading_jet_neHEF;
     lTreeContent["jet_chf_nhf_cut"] = 1;
     lTreeContent["jet_chf_nhf_vtr_cut"] = 1;
@@ -553,10 +552,11 @@ void Events::SetTreeContent(std::string year){
   else{
     lTreeContent["diCleanJet_M"] = *diCleanJet_M;
     lTreeContent["lMjj"] = *lMjj;
-
-    lTreeContent["MetNoLep_CleanJet_mindPhi"] = *min_dphi;
+    lTreeContent["MetNoLep_CleanJet_mindPhi"] = *min_dphi_MET; //Using MET rather than MetNoLep in the SR
     lTreeContent["MetNoLep_pt"] = *CorrectedMetNoLep_pt;
     lTreeContent["MetNoLep_phi"] = *CorrectedMetNoLep_phi;
+    lTreeContent["MET_phi"] = *CorrectedMET_phi;
+    lTreeContent["MET_pt"] = *CorrectedMET_pt;
     lTreeContent["jet_chf_nhf_cut"] = *jet_chf_nhf_cut;
     lTreeContent["jet_chf_nhf_vtr_cut"] = *jet_chf_nhf_vtr_cut;
     lTreeContent["lMjj_dijet_dphi"] = *lMjj_dijet_dphi;
@@ -595,15 +595,13 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["VBF_VTR_QCD_HFNoise_eff_Sel"] = * VBF_VTR_QCD_HFNoise_eff_Sel;
     lTreeContent["VBF_MTR_QCD_HFNoiseCR_eff_Sel"] = * VBF_MTR_QCD_HFNoiseCR_eff_Sel;
     lTreeContent["VBF_VTR_QCD_HFNoiseCR_eff_Sel"] = * VBF_VTR_QCD_HFNoiseCR_eff_Sel;
-
     lTreeContent["ContainedHFjet"] = * ContainedHFjet;
-
   }
 
   //Variables that are only needed for Monte Carlo
 
   if ( isMC ){
-    lTreeContent["LooseMuon_eventVetoW"] = *LooseMuon_eventVetoW;
+    lTreeContent["LooseMuon_eventVetoW"] = *LooseMuonFix_eventVetoW;
     lTreeContent["xs_weight"] = *xs_weight;
     lTreeContent["VLooseTauFix_eventVetoW"] = *VLooseTauFix_eventVetoW;
     lTreeContent["MediumBJet_eventVetoW"] = *MediumBJet_eventVetoW;
@@ -611,16 +609,14 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["LHE_Vpt"] = *LHE_Vpt;
     lTreeContent["LHE_Njets"] = *LHE_Njets;
     lTreeContent["LHE_HT"] = *LHE_HT;
-    lTreeContent["VetoElectron_eventVetoW"] = *VetoElectron_eventVetoW;
-    lTreeContent["VetoElectron_eventSelW"] = *VetoElectron_eventSelW;
-    lTreeContent["LooseMuon_eventSelW"] = *LooseMuon_eventSelW;
+    lTreeContent["VetoElectron_eventVetoW"] = *VetoElectronFix_eventVetoW;
     lTreeContent["Pileup_nPU"] = *Pileup_nPU;
     lTreeContent["fnlo_SF_EWK_corr"] = *fnlo_SF_EWK_corr;
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"] = *fnlo_SF_QCD_corr_QCD_proc_MTR;
     lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"] = *fnlo_SF_QCD_corr_QCD_proc_VTR;
     lTreeContent["fnlo_SF_QCD_corr_EWK_proc"] = *fnlo_SF_QCD_corr_EWK_proc;
-    lTreeContent["jetemW_MTR"] = *jetemW_MTR;
-    lTreeContent["jetemW_VTR"] = *jetemW_VTR;
+    // lTreeContent["jetemW_MTR"] = *jetemW_MTR;
+    // lTreeContent["jetemW_VTR"] = *jetemW_VTR;
     lTreeContent["jetHFW_MTR"] = *jetHFW_MTR;
     lTreeContent["jetHFW_VTR"] = *jetHFW_VTR;
 
@@ -638,6 +634,8 @@ void Events::SetTreeContent(std::string year){
       lTreeContent["LHE_Nc"] = *LHE_Nc;
       lTreeContent["CRTightElectron_eventSelW"] = *CRTightElectron_eventSelW;
       lTreeContent["CRTightMuon_eventSelW"] = *CRTightMuon_eventSelW;
+      lTreeContent["VetoElectron_eventSelW"] = *VetoElectron_eventSelW;
+      lTreeContent["LooseMuon_eventSelW"] = *LooseMuon_eventSelW;
     }
 
     //Specific Treatment for 2017 and 2018  
@@ -677,8 +675,6 @@ Bool_t Events::BaseSelection(){
   if ( mProc == "QCD" || mProc == "QCDRELAX" ){
     pass = pass && lTreeContent["LHE_HT"]>100; 
   }
-
-  //pass = pass && (std::abs(lTreeContent["Leading_jet_eta"] < 2.9));//TEMP
 
   return pass;
 
@@ -734,14 +730,23 @@ Double_t Events::BaseWeight(){
 
   double w = 1.0;
 
+  double lumi = 1.0;
+  if (mCat==CatType::MTR){
+    lumi = mLumiPb;
+  }
+  else if (mCat==CatType::VTR){
+    lumi = mLumiPb_VTR;
+  }
+
   //Only calculate the weight for Monte Carlo
   if ( misMC ){
-    w = (lTreeContent["puWeight"])*(lTreeContent["xs_weight"])*mLumiPb*(lTreeContent["L1PreFiringWeight_Nom"]);
+    w = (lTreeContent["puWeight"])*(lTreeContent["xs_weight"])*lumi*(lTreeContent["PrefireWeight"]);
     
     double tauveto = lTreeContent["VLooseTauFix_eventVetoW"];
     double electronveto = lTreeContent["VetoElectron_eventVetoW"];
     double muonveto = lTreeContent["LooseMuon_eventVetoW"];
-    w *= tauveto*electronveto*muonveto;
+    double bjetveto = lTreeContent["MediumBJet_eventVetoW"];
+    w *= tauveto*electronveto*muonveto*bjetveto;
     
     w*=lTreeContent["hem_weight"];//1 for data and MC in 2017
   }
@@ -859,12 +864,12 @@ Bool_t Events::PassSelection(){
     
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] > 0.5;
-      pass = pass && lTreeContent["MetNoLep_pt"] > 250;
+      pass = pass && lTreeContent["MET_pt"] > 250;
     }
     else if ( mCat == CatType::VTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] > 1.8;
-      pass = pass && lTreeContent["MetNoLep_pt"] <= 250;
-      pass = pass && lTreeContent["MetNoLep_pt"] > 160;
+      pass = pass && lTreeContent["MET_pt"] <= 250;
+      pass = pass && lTreeContent["MET_pt"] > 160;
     }
     
     //////////////////////////////////
@@ -909,12 +914,12 @@ Bool_t Events::PassSelection(){
     
     if ( mCat == CatType::MTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] < 0.5;
-      pass = pass && lTreeContent["MetNoLep_pt"] > 250; 
+      pass = pass && lTreeContent["MET_pt"] > 250; 
     }
     else if ( mCat == CatType::VTR ){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"] < 1.8;
-      pass = pass && lTreeContent["MetNoLep_pt"] <= 250;   
-      pass = pass && lTreeContent["MetNoLep_pt"] > 160;
+      pass = pass && lTreeContent["MET_pt"] <= 250;   
+      pass = pass && lTreeContent["MET_pt"] > 160;
     }
 
     //////////////////////////////////
@@ -967,8 +972,8 @@ Bool_t Events::PassSelection(){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]<1.8;
     }
 
-    pass = pass && lTreeContent["MetNoLep_pt"]>100;
-    pass = pass && lTreeContent["MetNoLep_pt"]<=160;         
+    pass = pass && lTreeContent["MET_pt"]>100;
+    pass = pass && lTreeContent["MET_pt"]<=160;         
 
     //////////////////////////////////
     //Get the estimate in the "Relaxed" QCD region. I.e. relaxing the requirements on dijet dphi
@@ -1010,8 +1015,8 @@ Bool_t Events::PassSelection(){
       pass = pass && lTreeContent["MetNoLep_CleanJet_mindPhi"]>1.8;
     }
     
-    pass = pass && lTreeContent["MetNoLep_pt"]>100;
-    pass = pass && lTreeContent["MetNoLep_pt"]<=160;     
+    pass = pass && lTreeContent["MET_pt"]>100;
+    pass = pass && lTreeContent["MET_pt"]<=160;     
 
     //////////////////////////////////
     //Get the estimate in the "Relaxed" QCD region. I.e. relaxing the requirements on dijet dphi
@@ -1093,12 +1098,12 @@ Double_t Events::SelWeight(){
 
     if ( mCat == CatType::MTR ){
       w *= lTreeContent["fnlo_SF_QCD_corr_QCD_proc_MTR"];
-      w *= lTreeContent["jetemW_MTR"];
+      //      w *= lTreeContent["jetemW_MTR"];
       w *= lTreeContent["jetHFW_MTR"];
     }
     else if ( mCat == CatType::VTR ){
       w *= lTreeContent["fnlo_SF_QCD_corr_QCD_proc_VTR"];
-      w *= lTreeContent["jetemW_VTR"];
+      //      w *= lTreeContent["jetemW_VTR"];
       w *= lTreeContent["jetHFW_VTR"];
     }
 
@@ -1244,7 +1249,7 @@ void Events::CalculateAdditionalVariables_Stage2(){
   TLorentzVector j1,j2;
   j1.SetPtEtaPhiM(lTreeContent["Leading_jet_pt"],lTreeContent["Leading_pt_eta"],lTreeContent["Leading_pt_phi"],0);
   j2.SetPtEtaPhiM(lTreeContent["Subleading_jet_pt"],lTreeContent["Subleading_pt_eta"],lTreeContent["Subleading_pt_phi"],0);
-  dijet_met_balance = ((j1+j2).Pt() - lTreeContent["MetNoLep_pt"])/(lTreeContent["MetNoLep_pt"]);
+  dijet_met_balance = ((j1+j2).Pt() - lTreeContent["MET_pt"])/(lTreeContent["MET_pt"]);
 
   lTreeContent["dijet_met_balance"] = dijet_met_balance;
 

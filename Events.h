@@ -69,7 +69,7 @@ class Events : public TSelector {
    void SetAM(const bool aisAM);
    void SetMC(const bool aisMC);
    void SetSystematic(const std::string aSystematic);
-   void SetLumiPb(const double & aLumi);
+   void SetLumiPb(const double & aLumi, const double & aLumi_VTR);
    void SetTreeContent(std::string year);
    bool CheckValue(ROOT::Internal::TTreeReaderValueBase& value);
    void CalculateAdditionalVariables_Stage1();
@@ -95,6 +95,7 @@ class Events : public TSelector {
    bool misMC;
    TString mSyst;
    double mLumiPb;
+   double mLumiPb_VTR;
    bool mreweight_met_phi;
    TH1D * Met_phi_SF;
 
@@ -169,8 +170,11 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> MetNoLep_pt ;
    TTreeReaderValue<Double_t> MetNoLep_phi ;
    TTreeReaderValue<Double_t> min_dphi ;
+   TTreeReaderValue<Double_t> min_dphi_MET ;
    TTreeReaderValue<Double_t> CorrectedMetNoLep_pt ;
    TTreeReaderValue<Double_t> CorrectedMetNoLep_phi ;
+   TTreeReaderValue<Double_t> CorrectedMET_pt ;
+   TTreeReaderValue<Double_t> CorrectedMET_phi ;
    TTreeReaderValue<Double_t> MET_pt ;
    TTreeReaderValue<Double_t> MET_phi ;
    TTreeReaderValue<Double_t> MET_sumEt ;
@@ -224,7 +228,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> GenMET_phi ;
    TTreeReaderValue<Double_t> xs_weight ;
    TTreeReaderValue<Double_t> puWeight ;
-   TTreeReaderValue<Double_t> L1PreFiringWeight_Nom ;
+   TTreeReaderValue<Double_t> PrefireWeight ;
    TTreeReaderValue<Double_t> fnlo_SF_EWK_corr ;
    TTreeReaderValue<Double_t> fnlo_SF_QCD_corr_QCD_proc_MTR ;
    TTreeReaderValue<Double_t> fnlo_SF_QCD_corr_QCD_proc_VTR ;
@@ -246,6 +250,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> CRVetoElectron_eventSelW ;
    TTreeReaderValue<Double_t> CRTightElectron_eventSelW ;
    TTreeReaderValue<Double_t> VetoElectron_eventVetoW ;
+   TTreeReaderValue<Double_t> VetoElectronFix_eventVetoW ;
    TTreeReaderValue<Double_t> VetoElectron_eventVetoW_systRECO_up ;
    TTreeReaderValue<Double_t> VetoElectron_eventVetoW_systRECO_down ;
    TTreeReaderValue<Double_t> VetoElectron_eventVetoW_systIDISO_up ;
@@ -254,6 +259,7 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> CRLooseMuon_eventSelW ;
    TTreeReaderValue<Double_t> CRTightMuon_eventSelW ;
    TTreeReaderValue<Double_t> LooseMuon_eventVetoW ;
+   TTreeReaderValue<Double_t> LooseMuonFix_eventVetoW ;
    TTreeReaderValue<Double_t> LooseMuon_eventVetoW_systID_up ;
    TTreeReaderValue<Double_t> LooseMuon_eventVetoW_systID_down ;
    TTreeReaderValue<Double_t> LooseMuon_eventVetoW_systISO_up ;
@@ -396,8 +402,11 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("MetNoLep_phi") !=0 ) MetNoLep_phi = {  fReader,"MetNoLep_phi"};
 
   if (tree->GetBranch("min_dphi") !=0 ) min_dphi = { fReader,"min_dphi"};
+  if (tree->GetBranch("min_dphi_MET") !=0 ) min_dphi_MET = { fReader,"min_dphi_MET"};
   if (tree->GetBranch("CorrectedMetNoLep_pt") !=0 ) CorrectedMetNoLep_pt = {  fReader,"CorrectedMetNoLep_pt"};
   if (tree->GetBranch("CorrectedMetNoLep_phi") !=0 ) CorrectedMetNoLep_phi = {  fReader,"CorrectedMetNoLep_phi"};
+  if (tree->GetBranch("CorrectedMET_pt") !=0 ) CorrectedMET_pt = {  fReader,"CorrectedMET_pt"};
+  if (tree->GetBranch("CorrectedMET_phi") !=0 ) CorrectedMET_phi = {  fReader,"CorrectedMET_phi"};
 
   /* if (tree->GetBranch("MET_pt") !=0 ) MET_pt = {    fReader,"MET_pt"}; */
   /* if (tree->GetBranch("MET_phi") !=0 ) MET_phi = {   fReader,"MET_phi"}; */
@@ -452,7 +461,7 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("GenMET_phi") !=0 ) GenMET_phi = {fReader,"GenMET_phi"};
   if (tree->GetBranch("xs_weight") !=0 ) xs_weight = { fReader,"xs_weight"};
   if (tree->GetBranch("puWeight") !=0 ) puWeight = {  fReader,"puWeight"};
-  if (tree->GetBranch("L1PreFiringWeight_Nom") !=0 ) L1PreFiringWeight_Nom = {  fReader,"L1PreFiringWeight_Nom"};
+  if (tree->GetBranch("PrefireWeight") !=0 ) PrefireWeight = {  fReader,"PrefireWeight"};
   if (tree->GetBranch("fnlo_SF_EWK_corr") !=0 ) fnlo_SF_EWK_corr = {  fReader,"fnlo_SF_EWK_corr"};
   if (tree->GetBranch("fnlo_SF_QCD_corr_QCD_proc_MTR") !=0 ) fnlo_SF_QCD_corr_QCD_proc_MTR = {  fReader,"fnlo_SF_QCD_corr_QCD_proc_MTR"};
   if (tree->GetBranch("fnlo_SF_QCD_corr_QCD_proc_VTR") !=0 ) fnlo_SF_QCD_corr_QCD_proc_VTR = {  fReader,"fnlo_SF_QCD_corr_QCD_proc_VTR"};
@@ -474,6 +483,7 @@ void Events::Init(TTree *tree)
   /* if (tree->GetBranch("CRVetoElectron_eventSelW") !=0 ) CRVetoElectron_eventSelW = {    fReader,"CRVetoElectron_eventSelW"}; */
   /* if (tree->GetBranch("CRTightElectron_eventSelW") !=0 ) CRTightElectron_eventSelW = { fReader,"CRTightElectron_eventSelW"}; */
   if (tree->GetBranch("VetoElectron_eventVetoW") !=0 ) VetoElectron_eventVetoW = {fReader,"VetoElectron_eventVetoW"};
+  if (tree->GetBranch("VetoElectronFix_eventVetoW") !=0 ) VetoElectronFix_eventVetoW = {fReader,"VetoElectronFix_eventVetoW"};
   /* if (tree->GetBranch("VetoElectron_eventVetoW_systRECO_up") !=0 ) VetoElectron_eventVetoW_systRECO_up = { fReader,"VetoElectron_eventVetoW_systRECO_up"}; */
   /* if (tree->GetBranch("VetoElectron_eventVetoW_systRECO_down") !=0 ) VetoElectron_eventVetoW_systRECO_down = {  fReader,"VetoElectron_eventVetoW_systRECO_down"}; */
   /* if (tree->GetBranch("VetoElectron_eventVetoW_systIDISO_up") !=0 ) VetoElectron_eventVetoW_systIDISO_up = {fReader,"VetoElectron_eventVetoW_systIDISO_up"}; */
@@ -482,6 +492,7 @@ void Events::Init(TTree *tree)
   /* if (tree->GetBranch("CRLooseMuon_eventSelW") !=0 ) CRLooseMuon_eventSelW = {  fReader,"CRLooseMuon_eventSelW"}; */
   /* if (tree->GetBranch("CRTightMuon_eventSelW") !=0 ) CRTightMuon_eventSelW = {  fReader,"CRTightMuon_eventSelW"}; */
   if (tree->GetBranch("LooseMuon_eventVetoW") !=0 ) LooseMuon_eventVetoW = {   fReader,"LooseMuon_eventVetoW"};
+  if (tree->GetBranch("LooseMuonFix_eventVetoW") !=0 ) LooseMuonFix_eventVetoW = {   fReader,"LooseMuonFix_eventVetoW"};
   //  if (tree->GetBranch("LooseMuon_eventVetoW_systID_up") !=0 ) LooseMuon_eventVetoW_systID_up = { fReader,"LooseMuon_eventVetoW_systID_up"};
   //  if (tree->GetBranch("LooseMuon_eventVetoW_systID_down") !=0 ) LooseMuon_eventVetoW_systID_down = {    fReader,"LooseMuon_eventVetoW_systID_down"};
   //  if (tree->GetBranch("LooseMuon_eventVetoW_systISO_up") !=0 ) LooseMuon_eventVetoW_systISO_up = {fReader,"LooseMuon_eventVetoW_systISO_up"};
