@@ -48,8 +48,8 @@ int makeHistograms(){ //Main function
 
   //Luminosity in 2017 and 2018
   double lLumi_2017 = 41529;
+  double lLumi_2017_VTR = 36700;
   double lLumi_2018 = 59741;
-  
   //Choose which years to process
   std::vector<std::string> years = {"2017","2018"};  
   //std::vector<std::string> years = {"2018"};  
@@ -57,7 +57,7 @@ int makeHistograms(){ //Main function
   //Choose which samples to process
   std::vector<std::string> proc = { "DATA","QCD","QCDRELAX","GluGluHtoInv",  "VBFHtoInv",  "EWKZNUNU",  "VV",  "EWKZll",  "EWKW",  "ZJETS"  ,  "DY",  "WJETS","TOP","MET"};
   //  std::vector<std::string> proc = { "QCD", "QCDRELAX"};
-  //  std::vector<std::string> proc = { "MET"};
+  //  std::vector<std::string> proc = { "VBFHtoInv"};
 
   //Name of the ROOT tree corresponding to each process. 
   //Generally it is the same as name of the process
@@ -104,9 +104,9 @@ int makeHistograms(){ //Main function
 
 	  //Set the appropriate luminosity
 	  if ( year == "2017" )
-	    selector->SetLumiPb(lLumi_2017);
+	    selector->SetLumiPb(lLumi_2017, lLumi_2017_VTR);
 	  else if ( year == "2018" )
-	    selector->SetLumiPb(lLumi_2018);
+	    selector->SetLumiPb(lLumi_2018, lLumi_2018);
 	  	  
 	  selector->SetProcess(proc[iP]);//Set the process
 	  selector->SetAM(isAM);//Set if Anne-Marie's trees
