@@ -29,7 +29,7 @@ if os.path.exists("Plots/"+plotname+"/HFNoiseCR") == False:
 
 #Choose which years to plot
 years = ["2017","2018"]
-#years = ["2018"]
+#years = ["2017"]
 
 #Choose which samples to include on the plots
 #samples = ["MET","VV","TOP","DY","EWKZll","GluGluHtoInv","VBFHtoInv","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
@@ -124,7 +124,7 @@ for region in regions:
                 file_out = ROOT.TFile("Plots/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
                 BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_SR")
                 BackgroundSubtractedData_HF = HFs[0].Clone("HFTemplate")
-                BackgroundSubtractedData_HFCR = HFCRs[0].Clone("BackgroundSubtractedData_HFCR")
+                BackgroundSubtractedData_HFCR = HFCRs[0].Clone("HFTemplate_CR")
                 BackgroundSubtractedData_CR = CRs[0].Clone("BackgroundSubtractedData_CR")
                 BackgroundSubtractedData_A = As[-1].Clone("BackgroundSubtractedData_A")
                 BackgroundSubtractedData_B = Bs[-1].Clone("BackgroundSubtractedData_B")
@@ -134,6 +134,7 @@ for region in regions:
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
                     BackgroundSubtractedData_SR.Add(SR,-1)
+                BackgroundSubtractedData_SR.Add(BackgroundSubtractedData_HF,-1)
                 for i,HF in enumerate(HFs):
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
@@ -146,6 +147,7 @@ for region in regions:
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
                     BackgroundSubtractedData_CR.Add(CR,-1)
+                BackgroundSubtractedData_CR.Add(BackgroundSubtractedData_HFCR,-1)
                 for i,A in enumerate(As):
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                         continue
@@ -641,6 +643,8 @@ for region in regions:
             CRs = []
             As = []
             Bs = []
+            HFs = []
+            HFCRs = []
 
             for sample in samples:
                 files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/"+directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
@@ -648,6 +652,8 @@ for region in regions:
                 CRs.append(files[-1].Get("QCDCR/"+region+"/h_QCDCR_"+region+"_" + variable))
                 As.append(files[-1].Get("QCDA/"+region+"/h_QCDA_"+region+"_" + variable))
                 Bs.append(files[-1].Get("QCDB/"+region+"/h_QCDB_"+region+"_" + variable))
+                HFs.append(files[-1].Get("HFNoise/"+region+"/h_HFNoise_"+region+"_" + variable))
+                HFCRs.append(files[-1].Get("HFNoiseCR/"+region+"/h_HFNoiseCR_"+region+"_" + variable))
 
             file_out = ROOT.TFile("Plots/"+ plotname + "/out_" + region + "_" + year+ ".root","UPDATE")
             
@@ -657,18 +663,30 @@ for region in regions:
             for CR,SR in zip(CRs,SRs):
                 CR.Add(SR)
 
+            for HFCR,HF in zip(HFCRs,HFs):
+                HFCR.Add(HF)
+
             for A,B in zip(As,Bs):
                 A.Add(B)
 
             for i,CR in enumerate(CRs):
                 CR.Rebin(5)
                 CR.Write(samples[i]+"_CR")
+
+            for i,HFCR in enumerate(HFCRs):
+                HFCR.Rebin(5)
+                HFCR.Write(samples[i]+"_HFCR")
+
             for i,A in enumerate(As):
                 A.Rebin(5)
                 A.Write(samples[i]+"_A")
 
             BackgroundSum_CR = CRs[0].Clone("BackgroundSum_CR")
             BackgroundSum_CR.Reset()
+
+            BackgroundSum_HFCR = HFCRs[0].Clone("BackgroundSum_HFCR")
+            HFTemplate_CR = HFCRs[0].Clone("HFNoise_CR")
+            BackgroundSum_HFCR.Reset()
 
             BackgroundSum_A = As[0].Clone("BackgroundSum_A")
             BackgroundSum_A.Reset()
@@ -677,6 +695,17 @@ for region in regions:
                 if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
                     continue
                 BackgroundSum_CR.Add(cr)
+
+            for i,hfcr in enumerate(HFCRs):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                    continue
+                BackgroundSum_HFCR.Add(hfcr)
+            BackgroundSum_HFCR.Write()
+
+            HFTemplate_CR.Add(BackgroundSum_HFCR,-1)
+            HFTemplate_CR.Write()
+
+            BackgroundSum_CR.Add(HFTemplate_CR,-1)
             BackgroundSum_CR.Write()
 
             for i,a in enumerate(As):
@@ -684,8 +713,6 @@ for region in regions:
                     continue
                 BackgroundSum_A.Add(a)
             BackgroundSum_A.Write()
-
-
 
             file_out.Close()
 
