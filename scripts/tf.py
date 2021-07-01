@@ -705,7 +705,7 @@ for region in regions:
             HFTemplate_CR.Add(BackgroundSum_HFCR,-1)
             HFTemplate_CR.Write()
 
-            BackgroundSum_CR.Add(HFTemplate_CR,-1)
+            BackgroundSum_CR.Add(HFTemplate_CR)
             BackgroundSum_CR.Write()
 
             for i,a in enumerate(As):
