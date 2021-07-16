@@ -66,7 +66,6 @@ class Events : public TSelector {
    void SetRegion(const RegionType & aRegion);
    void SetProcess(const std::string aProcess);
    void SetYear(const std::string aYear);
-   void SetAM(const bool aisAM);
    void SetMC(const bool aisMC);
    void SetSystematic(const std::string aSystematic);
    void SetLumiPb(const double & aLumi, const double & aLumi_VTR);
@@ -91,7 +90,6 @@ class Events : public TSelector {
    RegionType mReg;
    TString mProc;
    std::string mYear;
-   bool misAM;
    bool misMC;
    TString mSyst;
    double mLumiPb;
@@ -242,9 +240,11 @@ class Events : public TSelector {
    TTreeReaderValue<Double_t> hem_weight ;
    TTreeReaderValue<Double_t> trigger_weight_METMHT2018 ;
    TTreeReaderValue<Double_t> trigger_weight_VBF2018 ;
+   TTreeReaderValue<Double_t> trigger_weight_VBF20184D ;
    TTreeReaderValue<Double_t> trigger_weight_SingleEle322018 ;
    TTreeReaderValue<Double_t> trigger_weight_METMHT2017 ;
    TTreeReaderValue<Double_t> trigger_weight_VBF2017 ;
+   TTreeReaderValue<Double_t> trigger_weight_VBF20174D ;
    TTreeReaderValue<Double_t> trigger_weight_SingleEle352017 ;
    TTreeReaderValue<Double_t> VetoElectron_eventSelW ;
    TTreeReaderValue<Double_t> CRVetoElectron_eventSelW ;
@@ -475,9 +475,11 @@ void Events::Init(TTree *tree)
   if (tree->GetBranch("hem_weight") !=0 ) hem_weight = {  fReader,"hem_weight"};
   if (tree->GetBranch("trigger_weight_METMHT2018") !=0 ) trigger_weight_METMHT2018 = { fReader,"trigger_weight_METMHT2018"};
   if (tree->GetBranch("trigger_weight_VBF2018") !=0 ) trigger_weight_VBF2018 = { fReader,"trigger_weight_VBF2018"};
+  if (tree->GetBranch("trigger_weight_VBF20184D") !=0 ) trigger_weight_VBF20184D = { fReader,"trigger_weight_VBF20184D"};
   //  if (tree->GetBranch("trigger_weight_SingleEle322018") !=0 ) trigger_weight_SingleEle322018 = { fReader,"trigger_weight_SingleEle322018"};
   if (tree->GetBranch("trigger_weight_METMHT2017") !=0 ) trigger_weight_METMHT2017 = { fReader,"trigger_weight_METMHT2017"};
   if (tree->GetBranch("trigger_weight_VBF2017") !=0 ) trigger_weight_VBF2017 = { fReader,"trigger_weight_VBF2017"};
+  if (tree->GetBranch("trigger_weight_VBF20174D") !=0 ) trigger_weight_VBF20174D = { fReader,"trigger_weight_VBF20174D"};
   //  if (tree->GetBranch("trigger_weight_SingleEle352017") !=0 ) trigger_weight_SingleEle352017 = { fReader,"trigger_weight_SingleEle352017"};
   if (tree->GetBranch("VetoElectron_eventSelW") !=0 ) VetoElectron_eventSelW = { fReader,"VetoElectron_eventSelW"};
   /* if (tree->GetBranch("CRVetoElectron_eventSelW") !=0 ) CRVetoElectron_eventSelW = {    fReader,"CRVetoElectron_eventSelW"}; */
