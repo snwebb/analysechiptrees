@@ -32,8 +32,8 @@ years = ["2017","2018"]
 #years = ["2017"]
 
 #Choose which samples to include on the plots
-#samples = ["MET","VV","TOP","DY","EWKZll","GluGluHtoInv","VBFHtoInv","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
-samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
+samples = ["MET","VV","TOP","DY","EWKZll","GluGluHtoInv","VBFHtoInv","WH", "qqZH", "ggZH", "ttH", "EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
+#samples = ["MET","VV","TOP","DY","EWKZll","EWKZNUNU","ZJETS","EWKW","WJETS","QCD","QCDRELAX","DATA"]
 
 #Choose which regions to plot
 regions = ["MTR","VTR"]
@@ -131,29 +131,29 @@ for region in regions:
 
 
                 for i,SR in enumerate(SRs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_SR.Add(SR,-1)
                 BackgroundSubtractedData_SR.Add(BackgroundSubtractedData_HF,-1)
                 for i,HF in enumerate(HFs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_HF.Add(HF,-1)
                 for i,HFCR in enumerate(HFCRs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_HFCR.Add(HFCR,-1)
                 for i,CR in enumerate(CRs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_CR.Add(CR,-1)
                 BackgroundSubtractedData_CR.Add(BackgroundSubtractedData_HFCR,-1)
                 for i,A in enumerate(As):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_A.Add(A,-1)
                 for i,B in enumerate(Bs):
-                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                    if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_B.Add(B,-1)
 
@@ -332,8 +332,8 @@ for region in regions:
                     xbins = array('d', [0,  200, 400, 600, 900, 1200, 1500, 2000, 2750, 3500, 5000])
                     CR = CR.Rebin(len(xbins)-1,"CR_rebinned",xbins)
                     CRs[i] = CR
-
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
+                    
+                if ( samples[i] == "DATA" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
 
                 CR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
@@ -387,8 +387,9 @@ for region in regions:
                     SR = SR.Rebin(len(xbins)-1,"SR_rebinned",xbins)
                     SRs[i] = SR
 
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
+                if ( samples[i] == "DATA" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
+
                 SR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 SR.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 if ( samples[i] == "QCD"):
@@ -455,8 +456,9 @@ for region in regions:
                     HF = HF.Rebin(len(xbins)-1,"HF_rebinned",xbins)
                     HFs[i] = HF
 
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
+                if ( samples[i] == "DATA" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
+
                 HF.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 HF.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 if ( samples[i] == "QCD"):
@@ -522,8 +524,9 @@ for region in regions:
                     HFCR = HFCR.Rebin(len(xbins)-1,"HFCR_rebinned",xbins)
                     HFCRs[i] = HFCR
 
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS"):
+                if ( samples[i] == "DATA" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
+
                 HFCR.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 HFCR.SetLineColor(ROOT.TColor.GetColor((colors[samples[i]])))
                 if ( samples[i] == "QCD"):
@@ -572,7 +575,7 @@ for region in regions:
             c_A = ROOT.TCanvas("stackplot_" + variable)
             stack_A = ROOT.THStack("hs_A","")
             for i,A in enumerate(As):
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
+                if ( samples[i] == "DATA" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
 
                 A.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
@@ -603,7 +606,7 @@ for region in regions:
             stack_B = ROOT.THStack("hs_B","")
 
             for i,B in enumerate(Bs):
-                if ( samples[i] != "EWKZll"  and samples[i] != "EWKW" and samples[i] != "QCD" and samples[i] != "EWKZNUNU" and samples[i] != "VV" and samples[i] != "TOP" and samples[i] != "DY" and samples[i] != "ZJETS" and samples[i] != "WJETS" and samples[i] != "GluGluHtoInv" and samples[i] != "VBFHtoInv"):
+                if ( samples[i] == "DATA" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
 
                 B.SetFillColor(ROOT.TColor.GetColor((colors[samples[i]])))
@@ -692,12 +695,12 @@ for region in regions:
             BackgroundSum_A.Reset()
 
             for i,cr in enumerate(CRs):
-                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
                 BackgroundSum_CR.Add(cr)
 
             for i,hfcr in enumerate(HFCRs):
-                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
                 BackgroundSum_HFCR.Add(hfcr)
             BackgroundSum_HFCR.Write()
@@ -709,7 +712,7 @@ for region in regions:
             BackgroundSum_CR.Write()
 
             for i,a in enumerate(As):
-                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX"  or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv"):
+                if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                     continue
                 BackgroundSum_A.Add(a)
             BackgroundSum_A.Write()
