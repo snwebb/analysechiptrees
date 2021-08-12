@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <fstream>
 #include <vector>
@@ -36,11 +37,14 @@ int makeHistograms(){ //Main function
   //Location of the QCD trees
   std::string baseDir = "";
 
-  baseDir = "/vols/cms/snwebb/Common/";
+  baseDir = "/vols/cms/VBFHinv/Common/";
     //    baseDir = "/vols/cms/snwebb/Common/August";
 
   //Plotting directory
   std::string lPlotDir = "Plots/";
+
+  system(("mkdir -p "+lPlotDir).c_str());
+
 
   //Luminosity in 2017 and 2018
   double lLumi_2017 = 41529;
@@ -77,7 +81,7 @@ int makeHistograms(){ //Main function
   for (auto year: years){//loop over years
     for (unsigned iP(0); iP<proc.size(); ++iP){//loop over processes
       
-      fin = new TFile( (baseDir+"/"+year+"/"+name[iP]+".root").c_str() , "READ" );
+      fin = new TFile( (baseDir+"/SR_"+year+"/"+name[iP]+".root").c_str() , "READ" );
 
       if ( fin ){
 	fin->cd();

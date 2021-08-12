@@ -245,6 +245,9 @@ void Events::Begin(TTree * /*tree*/)
       mFout->mkdir((lreg+"/"+lcat).c_str());
       mFout->cd((lreg+"/"+lcat).c_str());
 
+      if (iC==CatType::VTR) mjjbins[3] = 700;
+      else mjjbins[3] = 600;
+
       for (auto var: list_of_variables){ //loop on variables for 1D
 	std::ostringstream label;
 	label << "h_" << lreg << "_" << lcat << "_" << var.name;
@@ -494,7 +497,6 @@ void Events::SetTreeContent(std::string year){
     lTreeContent["HLT_Ele32_WPTight_Gsf_L1DoubleEG"] = *HLT_Ele32_WPTight_Gsf_L1DoubleEG;
     lTreeContent["HLT_IsoMu27"] = *HLT_IsoMu27;
     lTreeContent["HLT_Photon200"] = *HLT_Photon200;
-    lTreeContent["nVLooseTau"] = *nVLooseTau;
     lTreeContent["DiVetoElectron_mass"] = *DiVetoElectron_mass;
     lTreeContent["Leading_muon_pt"] = *Leading_muon_pt;
     lTreeContent["Leading_muon_eta"] = *Leading_muon_eta;
@@ -549,20 +551,12 @@ void Events::SetTreeContent(std::string year){
 
     if (includeAll){
       lTreeContent["decayLeptonId"] = *decayLeptonId;
-      lTreeContent["CRLooseMuon_eventSelW"] = *CRLooseMuon_eventSelW;
-      lTreeContent["CRVetoElectron_eventSelW"] = *CRVetoElectron_eventSelW;
       lTreeContent["GenMET_pt"] = *GenMET_pt;
       lTreeContent["Pileup_nTrueInt"] = *Pileup_nTrueInt;
-      lTreeContent["VLooseSITTau_eventVetoW"] = *VLooseSITTau_eventVetoW;
-      lTreeContent["VLooseTau_eventVetoW"] = *VLooseTau_eventVetoW;
       lTreeContent["LHE_Nb"] = *LHE_Nb;
       lTreeContent["LHE_Nglu"] = *LHE_Nglu;
       lTreeContent["LHE_Nuds"] = *LHE_Nuds;
       lTreeContent["LHE_Nc"] = *LHE_Nc;
-      lTreeContent["CRTightElectron_eventSelW"] = *CRTightElectron_eventSelW;
-      lTreeContent["CRTightMuon_eventSelW"] = *CRTightMuon_eventSelW;
-      lTreeContent["VetoElectron_eventSelW"] = *VetoElectron_eventSelW;
-      lTreeContent["LooseMuon_eventSelW"] = *LooseMuon_eventSelW;
     }
 
     //Specific Treatment for 2017 and 2018  
@@ -672,12 +666,12 @@ Bool_t Events::PassSelection(){
     //    pass = pass && ( abs(lTreeContent["Leading_jet_eta"]) < HFcut || abs(lTreeContent["Subleading_jet_eta"]) < HFcut );
   }
   else if (mCat==CatType::VTR){
-    // pass = pass && lTreeContent["lMjj"] > 700;
-    // pass = pass && lTreeContent["lMjj_jet1_pt"] > 130;
-    // pass = pass && lTreeContent["lMjj_jet2_pt"] > 60;
-    pass = pass && lTreeContent["lMjj"] > 900;
-    pass = pass && lTreeContent["lMjj_jet1_pt"] > 140;
-    pass = pass && lTreeContent["lMjj_jet2_pt"] > 70;
+    pass = pass && lTreeContent["lMjj"] > 700;
+    pass = pass && lTreeContent["lMjj_jet1_pt"] > 130;
+    pass = pass && lTreeContent["lMjj_jet2_pt"] > 60;
+    //pass = pass && lTreeContent["lMjj"] > 900;
+    //pass = pass && lTreeContent["lMjj_jet1_pt"] > 140;
+    //pass = pass && lTreeContent["lMjj_jet2_pt"] > 70;
   }
 
   //Apply the trigger selection
@@ -1162,7 +1156,7 @@ Bool_t Events::Process(Long64_t entry)
   fReader.SetLocalEntry(entry);
   SetTreeContent(mYear);
 
-  if (entry%10000==0) std::cout << " -- processing entry " << entry/1000. << "k" << std::endl;
+  if (entry%100000==0) std::cout << " -- processing entry " << entry/1000. << "k" << std::endl;
   //   if ( entry > 100 ) Abort("maxevents");
 
   for (unsigned iC(CatType::MTR); iC!=CatType::LastCat; ++iC){//loop on cat
