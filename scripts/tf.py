@@ -12,20 +12,20 @@ log = int(sys.argv[3])#Plot the histograms using a log scale
 rebin = 0 #Rebin mjj - necessary if splitting data based on eta of forward jet #0 nominal, 1 Central, 2 Forward 
 
 #Make the relevant directories
-if os.path.exists("Plots/"+plotname) == False:
-    os.mkdir("Plots/"+plotname)
-if os.path.exists("Plots/"+plotname+"/A") == False:
-    os.mkdir("Plots/"+plotname+"/A")
-if os.path.exists("Plots/"+plotname+"/B") == False:
-    os.mkdir("Plots/"+plotname+"/B")
-if os.path.exists("Plots/"+plotname+"/SR") == False:
-    os.mkdir("Plots/"+plotname+"/SR")
-if os.path.exists("Plots/"+plotname+"/CR") == False:
-    os.mkdir("Plots/"+plotname+"/CR")
-if os.path.exists("Plots/"+plotname+"/HFNoise") == False:
-    os.mkdir("Plots/"+plotname+"/HFNoise")
-if os.path.exists("Plots/"+plotname+"/HFNoiseCR") == False:
-    os.mkdir("Plots/"+plotname+"/HFNoiseCR")
+if os.path.exists(directory_name+"/"+plotname) == False:
+    os.mkdir(directory_name+"/"+plotname)
+if os.path.exists(directory_name+"/"+plotname+"/A") == False:
+    os.mkdir(directory_name+"/"+plotname+"/A")
+if os.path.exists(directory_name+"/"+plotname+"/B") == False:
+    os.mkdir(directory_name+"/"+plotname+"/B")
+if os.path.exists(directory_name+"/"+plotname+"/SR") == False:
+    os.mkdir(directory_name+"/"+plotname+"/SR")
+if os.path.exists(directory_name+"/"+plotname+"/CR") == False:
+    os.mkdir(directory_name+"/"+plotname+"/CR")
+if os.path.exists(directory_name+"/"+plotname+"/HFNoise") == False:
+    os.mkdir(directory_name+"/"+plotname+"/HFNoise")
+if os.path.exists(directory_name+"/"+plotname+"/HFNoiseCR") == False:
+    os.mkdir(directory_name+"/"+plotname+"/HFNoiseCR")
 
 #Choose which years to plot
 years = ["2017","2018"]
@@ -75,7 +75,7 @@ for region in regions:
 
             #Load all input histograms to memory
             for sample in samples:
-                files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/"+directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
+                files.append( ROOT.TFile.Open(directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
                 Bs.append(files[-1].Get("QCDB/"+region+"/h_QCDB_"+region+"_" + variable))
                 As.append(files[-1].Get("QCDA/"+region+"/h_QCDA_"+region+"_" + variable))
                 SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
@@ -121,7 +121,7 @@ for region in regions:
             if (  (variable=="diCleanJet_M_binned" and region == "MTR" ) or (variable=="lMjj_binned" and region == "VTR" )  ):
                 
                 #Get Data - background subtracted for the mjj distribution                
-                file_out = ROOT.TFile("Plots/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
+                file_out = ROOT.TFile(directory_name+"/"+plotname + "/out_" + region + "_" + year+ ".root","RECREATE")
                 BackgroundSubtractedData_SR = SRs[0].Clone("BackgroundSubtractedData_SR")
                 BackgroundSubtractedData_HF = HFs[0].Clone("HFTemplate")
                 BackgroundSubtractedData_HFCR = HFCRs[0].Clone("HFTemplate_CR")
@@ -222,8 +222,8 @@ for region in regions:
                 QCDTransferFactor_SR.SetMaximum(0.5)
                 ROOT.gStyle.SetOptStat(0);
                 c_1.Draw()
-                c_1.SaveAs("Plots/"+plotname + "/QCDTransferFactor_SR_" + region + "_" + year + ".png" )
-                c_1.SaveAs("Plots/"+plotname + "/QCDTransferFactor_SR_" + region + "_" + year + ".pdf" )
+                c_1.SaveAs(directory_name+"/"+plotname + "/QCDTransferFactor_SR_" + region + "_" + year + ".png" )
+                c_1.SaveAs(directory_name+"/"+plotname + "/QCDTransferFactor_SR_" + region + "_" + year + ".pdf" )
                 c_1.Close()
 
                 c_2 = ROOT.TCanvas("QCDTransferFactor_B")
@@ -231,8 +231,8 @@ for region in regions:
                 QCDTransferFactor_B.GetYaxis().SetTitle("Transfer factor, r")
                 ROOT.gStyle.SetOptStat(0);
                 c_2.Draw()
-                c_2.SaveAs("Plots/"+plotname + "/QCDTransferFactor_B_" + region + "_" + year + ".png" )
-                c_2.SaveAs("Plots/"+plotname + "/QCDTransferFactor_B_" + region + "_" + year + ".pdf" )
+                c_2.SaveAs(directory_name+"/"+plotname + "/QCDTransferFactor_B_" + region + "_" + year + ".png" )
+                c_2.SaveAs(directory_name+"/"+plotname + "/QCDTransferFactor_B_" + region + "_" + year + ".pdf" )
                 c_2.Close()
 
                 #FINAL QCD
@@ -254,8 +254,8 @@ for region in regions:
 
                 ROOT.gStyle.SetOptStat(0);
                 c_3.Draw()
-                c_3.SaveAs("Plots/"+plotname + "/FinalQCDSR_" + region + "_" + year + ".png" )
-                c_3.SaveAs("Plots/"+plotname + "/FinalQCDSR_" + region + "_" + year + ".pdf" )
+                c_3.SaveAs(directory_name+"/"+plotname + "/FinalQCDSR_" + region + "_" + year + ".png" )
+                c_3.SaveAs(directory_name+"/"+plotname + "/FinalQCDSR_" + region + "_" + year + ".pdf" )
                 c_3.Close()
 
                 #FINAL QCD CROSS CHECK
@@ -276,8 +276,8 @@ for region in regions:
                 leg_4.Draw()
                 ROOT.gStyle.SetOptStat(0);
                 c_4.Draw()
-                c_4.SaveAs("Plots/"+plotname + "/FinalQCDB_" + region + "_" + year + ".png" )
-                c_4.SaveAs("Plots/"+plotname + "/FinalQCDB_" + region + "_" + year + ".pdf" )
+                c_4.SaveAs(directory_name+"/"+plotname + "/FinalQCDB_" + region + "_" + year + ".png" )
+                c_4.SaveAs(directory_name+"/"+plotname + "/FinalQCDB_" + region + "_" + year + ".pdf" )
                 c_4.Close()
 
                 #FINAL QCD CROSS CHECK Ratio
@@ -292,8 +292,8 @@ for region in regions:
                 ratio.GetYaxis().SetTitle("Ratio")
                 ROOT.gStyle.SetOptStat(0);
                 c_5.Draw()
-                c_5.SaveAs("Plots/"+plotname + "/FinalQCDBRatio_" + region + "_" + year + ".png" )
-                c_5.SaveAs("Plots/"+plotname + "/FinalQCDBRatio_" + region + "_" + year + ".pdf" )
+                c_5.SaveAs(directory_name+"/"+plotname + "/FinalQCDBRatio_" + region + "_" + year + ".png" )
+                c_5.SaveAs(directory_name+"/"+plotname + "/FinalQCDBRatio_" + region + "_" + year + ".pdf" )
                 c_5.Close()
 
                 #Data Driven Transfer Factor (B/A)
@@ -304,8 +304,8 @@ for region in regions:
                 ratio.GetYaxis().SetTitle("Ratio")
                 ROOT.gStyle.SetOptStat(0);
                 c_6.Draw()
-                c_6.SaveAs("Plots/"+plotname + "/DataDrivenQCDTransferFactor_" + region + "_" + year + ".png" )
-                c_6.SaveAs("Plots/"+plotname + "/DataDrivenQCDTransferFactor_" + region + "_" + year + ".pdf" )
+                c_6.SaveAs(directory_name+"/"+plotname + "/DataDrivenQCDTransferFactor_" + region + "_" + year + ".png" )
+                c_6.SaveAs(directory_name+"/"+plotname + "/DataDrivenQCDTransferFactor_" + region + "_" + year + ".pdf" )
                 c_6.Close()
 
                 #For the main analysis
@@ -358,8 +358,8 @@ for region in regions:
                 else:
                     CRs[0].SetMaximum(CRs[0].GetMaximum()*1.5)
             c.Draw()
-            c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".png")
-            c.SaveAs("Plots/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".pdf")
+            c.SaveAs(directory_name+"/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".png")
+            c.SaveAs(directory_name+"/"+plotname + "/CR/CR_" + variable + "_" + region + "_" + year + ".pdf")
             c.Close()
 
 
@@ -424,9 +424,9 @@ for region in regions:
             SR_Ratio.GetYaxis().SetRangeUser(0,2)
             c_SR.cd()
             c_SR.Draw()
-            c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".png")
-            c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".C")
-            c_SR.SaveAs("Plots/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
+            c_SR.SaveAs(directory_name+"/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".png")
+            c_SR.SaveAs(directory_name+"/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".C")
+            c_SR.SaveAs(directory_name+"/"+plotname + "/SR/SR_" + variable + "_" + region + "_" + year + ".pdf")
             c_SR.Close()
 
 
@@ -493,9 +493,9 @@ for region in regions:
             HF_Ratio.GetYaxis().SetRangeUser(0,2)
             c_HF.cd()
             c_HF.Draw()
-            c_HF.SaveAs("Plots/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".png")
-            c_HF.SaveAs("Plots/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".C")
-            c_HF.SaveAs("Plots/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".pdf")
+            c_HF.SaveAs(directory_name+"/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".png")
+            c_HF.SaveAs(directory_name+"/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".C")
+            c_HF.SaveAs(directory_name+"/"+plotname + "/HFNoise/HFNoise_" + variable + "_" + region + "_" + year + ".pdf")
             c_HF.Close()
 
 
@@ -561,9 +561,9 @@ for region in regions:
             HFCR_Ratio.GetYaxis().SetRangeUser(0,2)
             c_HFCR.cd()
             c_HFCR.Draw()
-            c_HFCR.SaveAs("Plots/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".png")
-            c_HFCR.SaveAs("Plots/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".C")
-            c_HFCR.SaveAs("Plots/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".pdf")
+            c_HFCR.SaveAs(directory_name+"/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".png")
+            c_HFCR.SaveAs(directory_name+"/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".C")
+            c_HFCR.SaveAs(directory_name+"/"+plotname + "/HFNoiseCR/HFNoiseCR_" + variable + "_" + region + "_" + year + ".pdf")
             c_HFCR.Close()
 
 
@@ -591,8 +591,8 @@ for region in regions:
             As[-1].Draw("same")
             leg_A.Draw()
             c_A.Draw()
-            c_A.SaveAs("Plots/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".png")
-            c_A.SaveAs("Plots/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".pdf")
+            c_A.SaveAs(directory_name+"/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".png")
+            c_A.SaveAs(directory_name+"/"+plotname + "/A/A_" + variable + "_" + region + "_" + year + ".pdf")
             c_A.Close()
 
 
@@ -627,8 +627,8 @@ for region in regions:
 
             leg_B.Draw()
             c_B.Draw()
-            c_B.SaveAs("Plots/"+plotname + "/B/B_" + variable + "_" + region + "_" + year + ".png")
-            c_B.SaveAs("Plots/"+plotname + "/B/B_" + variable + "_" + region + "_" + year + ".pdf")
+            c_B.SaveAs(directory_name+"/"+plotname + "/B/B_" + variable + "_" + region + "_" + year + ".png")
+            c_B.SaveAs(directory_name+"/"+plotname + "/B/B_" + variable + "_" + region + "_" + year + ".pdf")
             c_B.Close()
 
 
@@ -650,7 +650,7 @@ for region in regions:
             HFCRs = []
 
             for sample in samples:
-                files.append( ROOT.TFile.Open("~/invisible/AnalyseTrees/analysechiptrees/"+directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
+                files.append( ROOT.TFile.Open(directory_name+"/Histos_Nominal_"+sample+"_"+year+".root"))
                 SRs.append(files[-1].Get("SR/"+region+"/h_SR_"+region+"_" + variable))
                 CRs.append(files[-1].Get("QCDCR/"+region+"/h_QCDCR_"+region+"_" + variable))
                 As.append(files[-1].Get("QCDA/"+region+"/h_QCDA_"+region+"_" + variable))
@@ -658,7 +658,7 @@ for region in regions:
                 HFs.append(files[-1].Get("HFNoise/"+region+"/h_HFNoise_"+region+"_" + variable))
                 HFCRs.append(files[-1].Get("HFNoiseCR/"+region+"/h_HFNoiseCR_"+region+"_" + variable))
 
-            file_out = ROOT.TFile("Plots/"+ plotname + "/out_" + region + "_" + year+ ".root","UPDATE")
+            file_out = ROOT.TFile(directory_name+"/"+ plotname + "/out_" + region + "_" + year+ ".root","UPDATE")
             
             file_out.mkdir("MetNoLep_CleanJet_mindPhi")
             file_out.cd("MetNoLep_CleanJet_mindPhi")
@@ -720,5 +720,5 @@ for region in regions:
             file_out.Close()
 
 
-bashCommand = "cd Plots; tar -zcf " + plotname + ".tar.gz " + plotname + "; cd ../;"
+bashCommand = "cd "+directory_name+"; tar -zcf " + plotname + ".tar.gz " + plotname + "; cd ../;"
 process = subprocess.Popen(bashCommand, shell=True)
