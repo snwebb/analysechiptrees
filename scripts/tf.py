@@ -103,11 +103,11 @@ for region in regions:
                     HFCRs[i] = HFCR.Rebin(len(mjjbins)-1,"HFCR_rebinned",mjjbins)
                 elif variable == "lMjj_binned":
                     if rebin == 0:
-                        mjjbins=array('d',[0,900,1200,1500,2000,2750,5000])
+                        mjjbins=array('d',[0,700,1200,1500,2000,2750,5000])
                     elif rebin == 1:
-                        mjjbins=array('d',[0,900,1200,1500,5000])
+                        mjjbins=array('d',[0,700,1200,1500,5000])
                     elif rebin == 2:
-                        mjjbins=array('d',[0,900,1200,1500,2000,2750,5000])
+                        mjjbins=array('d',[0,700,1200,1500,2000,2750,5000])
 
                     As[i] = A.Rebin(len(mjjbins)-1,"A_rebinned",mjjbins)
                     Bs[i] = B.Rebin(len(mjjbins)-1,"B_rebinned",mjjbins)
