@@ -134,7 +134,6 @@ for region in regions:
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_SR.Add(SR,-1)
-                BackgroundSubtractedData_SR.Add(BackgroundSubtractedData_HF,-1)
                 for i,HF in enumerate(HFs):
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
@@ -147,7 +146,6 @@ for region in regions:
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_CR.Add(CR,-1)
-                BackgroundSubtractedData_CR.Add(BackgroundSubtractedData_HFCR,-1)
                 for i,A in enumerate(As):
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
@@ -156,6 +154,9 @@ for region in regions:
                     if ( samples[i] == "DATA" or samples[i] == "QCD" or samples[i] == "QCDRELAX" or samples[i] == "MET" or samples[i] == "GluGluHtoInv" or samples[i] == "VBFHtoInv" or samples[i] == "WH" or samples[i] == "qqZH" or samples[i] == "ggZH" or samples[i] == "ttH"):
                         continue
                     BackgroundSubtractedData_B.Add(B,-1)
+
+                BackgroundSubtractedData_SR.Add(BackgroundSubtractedData_HF,-1)
+                BackgroundSubtractedData_CR.Add(BackgroundSubtractedData_HFCR,-1)
 
                 #Get QCD Transfer factors
                 #For QCD relaxed, qcdchoice= -2
